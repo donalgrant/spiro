@@ -33,13 +33,15 @@ def spiro(R=10.0,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):
     return { 'x': x, 'y': y, 'p': p }
 
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
-              loops=1,offset=0,spacing=pi/4000,invert=False):  
+              loops=1,offset=0,spacing=pi/4000,invert=False,reverse=False):  
     '''roll on the outside (inside if invert=True) of an arc
     centered on x0, y0, with radius, starting at orientation of
     orient radians cw from the vertical.  Arc has length loops * 2pi
+    Direction of motion can be reversed by setting reverse=True
     '''
     iv = -1 if invert else 1
     t=np.linspace(0.0,2*pi*loops*R/a,int(loops/spacing)) # roll distance
+    if reverse: t=-1*t
     x=x0+(R+iv*a)*sin(t*a/R+orient) +iv*b*sin(t+offset)  # should orient come into the argument of the sin?
     y=y0+(R+iv*a)*cos(t*a/R+orient) + b*cos(t+offset)
     p=t+offset 
