@@ -10,16 +10,22 @@ def plot_spiro(d,color_scheme='radial',cmap="viridis",ax=None,
         ax.set(aspect=1,xticks=[], yticks=[])
     
     match color_scheme:
-        case 'radial':  c=sqrt(d['x']**2+d['y']**2)
-        case 'cycles':  c=sin(d['p'])
-        case 'polar':   c=arctan2(d['x'],d['y'])
-        case 'time':    c=range(len(d['p']))
-        case 'random':  c=np.random.rand(len(d['x']))
-        case 'x':       c=d['x']
-        case 'y':       c=d['y']
-        case 'xy':      c=d['x']*d['y']
-        case 'x+y':     c=d['x']+d['y']
-        case _:         c=[ 0 for i in range(len(d['x']))]
+        case 'radial':    c=sqrt(d['x']**2+d['y']**2)
+        case 'cycles':    c=sin(d['p'])
+        case 'polar':     c=arctan2(d['x'],d['y'])
+        case 'time':      c=range(len(d['p']))
+        case 'random':    c=np.random.rand(len(d['x']))
+        case 'x':         c=d['x']
+        case 'y':         c=d['y']
+        case 'xy':        c=d['x']*d['y']
+        case 'x+y':       c=d['x']+d['y']
+        case 'x-y':       c=d['x']-d['y']
+        case 'h-waves':   c=sin(d['x'])
+        case 'v-waves':   c=sin(d['y'])
+        case 'r-waves':   c=sin(sqrt(d['x']**2+d['y']**2))
+        case 'ripples':   c=sin((d['x']**2+d['y']**2))
+        case 's-ripples': c=sin((d['x']**2+d['y']**2)**(1/4))
+        case _:           c=[ 0 for i in range(len(d['x']))]
     
     ax.scatter(d['x'],d['y'],c=c,linestyle=linestyle,s=dot_size,cmap=cmap)
 
@@ -205,3 +211,35 @@ def spiro_square(R=60,a=12,b=7.2,loops=60,scatter=False,mono=False,fold=False,in
                 offset+=rot_angle
     
     return { 'x': x, 'y': y, 'p': p }
+
+def heart(x0=0,y0=0,width=40,depth=25,wheel=2.2,pen=1.0,loops=1,offset=0.0,invert=False,
+          cmap='inferno',color_scheme='radial',ax=None):
+
+    if not ax:
+        fig, ax=plt.subplots(figsize=(10,10))
+        ax.set(aspect=1,xticks=[], yticks=[])
+        
+    d=roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=offset)
+    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
+    
+    d=rotate(x0-width/2,y0,d['x'][-1],d['y'][-1],pi)
+    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
+    
+    d=spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=d['p'][-1])
+    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
+    
+    d=rotate(x0-width/2,y0,d['x'][-1],d['y'][-1],pi/2)
+    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
+    
+    d=spiro_arc(x0+width/4,y0,-pi/2,10,wheel,pen,loops=0.5,offset=d['p'][-1])
+    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
+    
+    d=rotate(x0+width/2,y0,d['x'][-1],d['y'][-1],pi)
+    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
+    
+    d=roll(x0+width,y0,x0,y0-depth,wheel,pen,offset=d['p'][-1])
+    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
+    
+    d=rotate(x0,y0-depth,d['x'][-1],d['y'][-1],pi/2)
+    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
+    offset=d['p'][-1]
