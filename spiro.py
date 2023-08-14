@@ -3,33 +3,62 @@ import numpy as np
 from numpy import sin,cos,arctan2,pi,sqrt,tan
 import math
 
-def plot_spiro(d,color_scheme='radial',cmap="viridis",ax=None,
-               dot_size=0.1,linestyle=''):
-    if not ax:
-        fig, ax=plt.subplots(figsize=(10,10))
-        ax.set(aspect=1,xticks=[], yticks=[])
-    
-    match color_scheme:
-        case 'radial':    c=sqrt(d['x']**2+d['y']**2)
-        case 'cycles':    c=sin(d['p'])
-        case 'polar':     c=arctan2(d['x'],d['y'])
-        case 'time':      c=range(len(d['p']))
-        case 'random':    c=np.random.rand(len(d['x']))
-        case 'x':         c=d['x']
-        case 'y':         c=d['y']
-        case 'xy':        c=d['x']*d['y']
-        case 'x+y':       c=d['x']+d['y']
-        case 'x-y':       c=d['x']-d['y']
-        case 'h-waves':   c=sin(d['x'])
-        case 'v-waves':   c=sin(d['y'])
-        case 'r-waves':   c=sin(sqrt(d['x']**2+d['y']**2))
-        case 'ripples':   c=sin((d['x']**2+d['y']**2))
-        case 's-ripples': c=sin((d['x']**2+d['y']**2)**(1/4))
-        case _:           c=[ 0 for i in range(len(d['x']))]
-    
-    ax.scatter(d['x'],d['y'],c=c,linestyle=linestyle,s=dot_size,cmap=cmap)
+class SpiroFig:
 
-    return ax
+    def reset_data(self):
+        self._x = np.array([])
+        self._y = np.array([])
+        self._p = np.array([])
+
+    def new_fig(self,**kw_args):
+        fig, self._ax=plt.subplots(figsize=(10,10))
+        self._ax.set(aspect=1,xticks=[],yticks=[])
+        return self._ax
+        
+    def __init__(self,ax=None):
+        self.reset_data()
+        self._ax=ax
+
+    def add(self, data):
+        self._x = np.append(self._x,data['x'])
+        self._y = np.append(self._y,data['y'])
+        self._p = np.append(self._p,data['p'])
+
+    def xc(self): return self._x[-1]
+    def yc(self): return self._y[-1]
+    def pc(self): return self._p[-1]
+
+    def plot_spiro(self,data,cmap='viridis',color_scheme='radial',new_fig=True):
+        self.reset_data()
+        self.add(data)
+        self.plot(cmap=cmap,color_scheme=color_scheme,new_fig=new_fig)
+    
+    def plot(self,cmap='viridis',color_scheme='radial',new_fig=True):
+        
+        if new_fig or not self._ax:  self.new_fig()
+        
+        dot_size=0.1
+        linestyle=''
+
+        match color_scheme:
+            case 'radial':    c=sqrt(self._x**2+self._y**2)
+            case 'cycles':    c=sin(self._p)
+            case 'polar':     c=arctan2(self._x,self._y)
+            case 'time':      c=range(len(self._p))
+            case 'random':    c=np.random.rand(len(self._x))
+            case 'x':         c=self._x
+            case 'y':         c=self._y
+            case 'xy':        c=self._x*self._y
+            case 'x+y':       c=self._x+self._y
+            case 'x-y':       c=self._x-self._y
+            case 'h-waves':   c=sin(self._x)
+            case 'v-waves':   c=sin(self._y)
+            case 'r-waves':   c=sin(sqrt(self._x**2+self._y**2))
+            case 'ripples':   c=sin((self._x**2+self._y**2))
+            case 's-ripples': c=sin((self._x**2+self._y**2)**(1/4))
+            case _:           c=[ 0 for i in range(len(self._x))]
+    
+        self._ax.scatter(self._x,self._y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap)
 
 def spiro(R=10.0,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):    
     t=np.linspace(0.0,loops*2*pi,int(loops/spacing))
@@ -213,33 +242,19 @@ def spiro_square(R=60,a=12,b=7.2,loops=60,scatter=False,mono=False,fold=False,in
     return { 'x': x, 'y': y, 'p': p }
 
 def heart(x0=0,y0=0,width=40,depth=25,wheel=2.2,pen=1.0,loops=1,offset=0.0,invert=False,
-          cmap='inferno',color_scheme='radial',ax=None):
+          cmap='inferno',color_scheme='radial'):
 
-    if not ax:
-        fig, ax=plt.subplots(figsize=(10,10))
-        ax.set(aspect=1,xticks=[], yticks=[])
+    f = SpiroFig()
         
-    d=roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=offset)
-    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
-    
-    d=rotate(x0-width/2,y0,d['x'][-1],d['y'][-1],pi)
-    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
-    
-    d=spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=d['p'][-1])
-    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
-    
-    d=rotate(x0-width/2,y0,d['x'][-1],d['y'][-1],pi/2)
-    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
-    
-    d=spiro_arc(x0+width/4,y0,-pi/2,10,wheel,pen,loops=0.5,offset=d['p'][-1])
-    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
-    
-    d=rotate(x0+width/2,y0,d['x'][-1],d['y'][-1],pi)
-    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
-    
-    d=roll(x0+width,y0,x0,y0-depth,wheel,pen,offset=d['p'][-1])
-    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
-    
-    d=rotate(x0,y0-depth,d['x'][-1],d['y'][-1],pi/2)
-    plot_spiro(d,ax=ax,cmap=cmap,color_scheme=color_scheme)
-    offset=d['p'][-1]
+    f.add(roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=offset))
+    f.add(rotate(x0-width/2,y0,f.xc(),f.yc(),pi))
+    f.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=f.pc()))
+    f.add(rotate(x0-width/2,y0,f.xc(),f.yc(),pi/2))
+    f.add(spiro_arc(x0+width/4,y0,-pi/2,10,wheel,pen,loops=0.5,offset=f.pc()))
+    f.add(rotate(x0+width/2,y0,f.xc(),f.yc(),pi))
+    f.add(roll(x0+width,y0,x0,y0-depth,wheel,pen,offset=f.pc()))
+    f.add(rotate(x0,y0-depth,f.xc(),f.yc(),pi/2))
+    offset=f.pc()
+
+    f.plot(cmap=cmap,color_scheme=color_scheme)
+
