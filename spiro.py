@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy import sin,cos,arctan2,pi,sqrt,tan
+from numpy import sin,cos,arctan2,pi,sqrt,tan,array
 import math
 
 class SpiroData:
@@ -133,10 +133,22 @@ def rotate(x0,y0,xr,yr,angle):
         
     return sd
 
+def rot_2D(angle_rads):
+    return array([ [cos(angle_rads), -sin(angle_rads) ],
+                   [sin(angle_rads), cos(angle_rads)  ] ])
+
+def rot_coords(angle_rads,coords):
+    cc = np.empty((coords.shape[0],2))
+    for i in range(cc.shape[0]):
+        cc[i] = np.matmul(rot_2D(angle_rads),coords[i])
+
+    return cc
+
 def spiro_line(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False):
 
-    xc=[-R/2*cos(orient),R/2*cos(orient)]
-    yc=[-R/2*sin(orient),R/2*sin(orient)]
+    cc = rot_coords(orient,array([ [-R/2,0], [R/2,0] ]))
+
+    # evenually, calculate rotation angles around each corner
     rot_angle=pi
     if (fold): rot_angle = rot_angle - 2*pi
 
@@ -146,27 +158,25 @@ def spiro_line(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False):
     
     for i in range(loops):
         
-        for c in range(len(xc)):
+        for c in range(cc.shape[0]):
         
-            cn=(c+1) % len(xc)
+            cn=(c+1) % cc.shape[0]
             
-            sd.add(roll(xc[c],yc[c],xc[cn],yc[cn],a,b,offset))  # cycloids roll
+            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset))  # cycloids roll
             offset=sd.pc()
         
-            sd.add(rotate(xc[cn],yc[cn],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
+            sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
             offset+=rot_angle
         
     return sd
 
-def spiro_eq_triangle(R=60,a=12,b=7.2,loops=60,n=1,fold=False,inside=False):
+def spiro_eq_triangle(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False,inside=False):
     
     rot_angle=2.0*pi/3.0
     if (fold): rot_angle = rot_angle - 2*pi
-    
+
     ytop = R*sin(pi/3.0)
-    
-    xc=[-R/2,0,R/2]
-    yc=[-ytop/3,2*ytop/3,-ytop/3]
+    cc = rot_coords(orient,array([ [-R/2,-ytop/3], [0,2*ytop/3], [R/2,-ytop/3] ]))
     
     bump = a/(np.tan(np.pi/6)) if inside else 0
     
@@ -176,26 +186,27 @@ def spiro_eq_triangle(R=60,a=12,b=7.2,loops=60,n=1,fold=False,inside=False):
     
     for i in range(loops):
         
-        for c in range(len(xc)):
+        for c in range(cc.shape[0]):
         
-            cn=(c+1) % len(xc)
+            cn=(c+1) % cc.shape[0]
             
-            sd.add(roll(xc[c],yc[c],xc[cn],yc[cn],a,b,offset,guard=bump,invert=inside))  # cycloids roll
+            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset,guard=bump,invert=inside)) 
             offset=sd.pc()
         
             if not inside:
-                sd.add(rotate(xc[cn],yc[cn],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
+                sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
                 offset+=rot_angle
         
         
     return sd
 
-def spiro_square(R=60,a=12,b=7.2,loops=60,scatter=False,mono=False,fold=False,inside=False):
-   
-    xc=[-R/2,R/2,R/2,-R/2]
-    yc=[R/2,R/2,-R/2,-R/2]
-    
+def spiro_square(R=60,a=12,b=7.2,orient=0,loops=60,scatter=False,mono=False,fold=False,inside=False):
+
     bump = a if inside else 0
+
+    cc = rot_coords(orient,array([ [-R/2,R/2], [R/2,R/2], [R/2,-R/2], [-R/2,-R/2] ]))
+
+    # evenually, calculate rotation angles around each corner
     
     rot_angle=pi/2.0
     if (fold): rot_angle = rot_angle - 2*pi
@@ -206,15 +217,15 @@ def spiro_square(R=60,a=12,b=7.2,loops=60,scatter=False,mono=False,fold=False,in
     
     for i in range(loops):
         
-        for c in range(len(xc)):
+        for c in range(cc.shape[0]):
         
-            cn=(c+1) % len(xc)
+            cn=(c+1) % cc.shape[0]
             
-            sd.add(roll(xc[c],yc[c],xc[cn],yc[cn],a,b,offset,guard=bump,invert=inside))  # cycloids roll
+            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset,guard=bump,invert=inside)) 
             offset=sd.pc()
         
             if not inside:
-                sd.add(rotate(xc[cn],yc[cn],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
+                sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
                 offset+=rot_angle
     
     return sd
