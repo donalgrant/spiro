@@ -133,10 +133,10 @@ def rotate(x0,y0,xr,yr,angle):
         
     return sd
 
-def spiro_line(R=60,a=12,b=7.2,loops=60,n=1,fold=False):
+def spiro_line(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False):
 
-    xc=[-R/2,R/2]
-    yc=[0.0,0.0]
+    xc=[-R/2*cos(orient),R/2*cos(orient)]
+    yc=[-R/2*sin(orient),R/2*sin(orient)]
     rot_angle=pi
     if (fold): rot_angle = rot_angle - 2*pi
 
