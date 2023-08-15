@@ -134,8 +134,9 @@ def rotate(x0,y0,xr,yr,angle):
     return sd
 
 def rot_2D(angle_rads):
-    return array([ [cos(angle_rads), -sin(angle_rads) ],
-                   [sin(angle_rads), cos(angle_rads)  ] ])
+    '''Matrix will rotate a coordinate by angle_rads cw'''
+    return array([ [ cos(angle_rads), sin(angle_rads) ],
+                   [-sin(angle_rads), cos(angle_rads)  ] ])
 
 def rot_coords(angle_rads,coords):
     cc = np.empty((coords.shape[0],2))
