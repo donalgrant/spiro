@@ -3,12 +3,26 @@ import numpy as np
 from numpy import sin,cos,arctan2,pi,sqrt,tan
 import math
 
-class SpiroFig:
+class SpiroData:
+    
+    def __init__(self):
+        self.reset()
+        
+    def reset(self):
+        self.x = np.array([])
+        self.y = np.array([])
+        self.p = np.array([])
 
-    def reset_data(self):
-        self._x = np.array([])
-        self._y = np.array([])
-        self._p = np.array([])
+    def add(self, sd):
+        self.x = np.append(self.x,sd.x)
+        self.y = np.append(self.y,sd.y)
+        self.p = np.append(self.p,sd.p)
+
+    def xc(self):  return self.x[-1] 
+    def yc(self):  return self.y[-1] 
+    def pc(self):  return self.p[-1]
+    
+class SpiroFig:
 
     def new_fig(self,**kw_args):
         fig, self._ax=plt.subplots(figsize=(10,10))
@@ -16,24 +30,9 @@ class SpiroFig:
         return self._ax
         
     def __init__(self,ax=None):
-        self.reset_data()
         self._ax=ax
-
-    def add(self, data):
-        self._x = np.append(self._x,data['x'])
-        self._y = np.append(self._y,data['y'])
-        self._p = np.append(self._p,data['p'])
-
-    def xc(self): return self._x[-1]
-    def yc(self): return self._y[-1]
-    def pc(self): return self._p[-1]
-
-    def plot_spiro(self,data,cmap='viridis',color_scheme='radial',new_fig=True):
-        self.reset_data()
-        self.add(data)
-        self.plot(cmap=cmap,color_scheme=color_scheme,new_fig=new_fig)
-    
-    def plot(self,cmap='viridis',color_scheme='radial',new_fig=True):
+        
+    def plot(self,sd,cmap='viridis',color_scheme='radial',new_fig=True):
         
         if new_fig or not self._ax:  self.new_fig()
         
@@ -41,31 +40,34 @@ class SpiroFig:
         linestyle=''
 
         match color_scheme:
-            case 'radial':    c=sqrt(self._x**2+self._y**2)
-            case 'cycles':    c=sin(self._p)
-            case 'polar':     c=arctan2(self._x,self._y)
-            case 'time':      c=range(len(self._p))
-            case 'random':    c=np.random.rand(len(self._x))
-            case 'x':         c=self._x
-            case 'y':         c=self._y
-            case 'xy':        c=self._x*self._y
-            case 'x+y':       c=self._x+self._y
-            case 'x-y':       c=self._x-self._y
-            case 'h-waves':   c=sin(self._x)
-            case 'v-waves':   c=sin(self._y)
-            case 'r-waves':   c=sin(sqrt(self._x**2+self._y**2))
-            case 'ripples':   c=sin((self._x**2+self._y**2))
-            case 's-ripples': c=sin((self._x**2+self._y**2)**(1/4))
-            case _:           c=[ 0 for i in range(len(self._x))]
+            case 'radial':    c=sqrt(sd.x**2+sd.y**2)
+            case 'cycles':    c=sin(sd.p)
+            case 'polar':     c=arctan2(sd.x,sd.y)
+            case 'time':      c=range(len(sd.p))
+            case 'random':    c=np.random.rand(len(sd.x))
+            case 'x':         c=sd.x
+            case 'y':         c=sd.y
+            case 'xy':        c=sd.x*sd.y
+            case 'x+y':       c=sd.x+sd.y
+            case 'x-y':       c=sd.x-sd.y
+            case 'h-waves':   c=sin(sd.x)
+            case 'v-waves':   c=sin(sd.y)
+            case 'r-waves':   c=sin(sqrt(sd.x**2+sd.y**2))
+            case 'ripples':   c=sin((sd.x**2+sd.y**2))
+            case 's-ripples': c=sin((sd.x**2+sd.y**2)**(1/4))
+            case _:           c=[ 0 for i in range(len(sd.x))]
     
-        self._ax.scatter(self._x,self._y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap)
+        self._ax.scatter(sd.x,sd.y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap)
 
-def spiro(R=10.0,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):    
+    def save_fig(self,filename='spiro.png'):  plt.savefig(filename,bbox_inches='tight')
+
+def spiro(R=10.0,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):
+    sd = SpiroData()
     t=np.linspace(0.0,loops*2*pi,int(loops/spacing))
-    x=(R-a)*sin(t)-b*sin(t*R/a+offset)
-    y=(R-a)*cos(t)+b*cos(t*R/a+offset)
-    p=t*R/a+offset    
-    return { 'x': x, 'y': y, 'p': p }
+    sd.x=(R-a)*sin(t)-b*sin(t*R/a+offset)
+    sd.y=(R-a)*cos(t)+b*cos(t*R/a+offset)
+    sd.p=t*R/a+offset    
+    return sd
 
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
               loops=1,offset=0,spacing=pi/4000,invert=False,reverse=False):  
@@ -75,25 +77,20 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
     Direction of motion can be reversed by setting reverse=True
     '''
     iv = -1 if invert else 1
+    sd = SpiroData()
     t=np.linspace(0.0,2*pi*loops*R/a,int(loops/spacing)) # roll distance
     if reverse: t=-1*t
-    x=x0+(R+iv*a)*sin(t*a/R+orient) +iv*b*sin(t+offset)  # should orient come into the argument of the sin?
-    y=y0+(R+iv*a)*cos(t*a/R+orient) + b*cos(t+offset)
-    p=t+offset 
+    sd.x=x0+(R+iv*a)*sin(t*a/R+orient) +iv*b*sin(t+offset)
+    # should orient come into the argument of the sin?
+    sd.y=y0+(R+iv*a)*cos(t*a/R+orient) + b*cos(t+offset)
+    sd.p=t+offset 
     
-    return { 'x': x, 'y': y, 'p': p }
+    return sd
 
 def spiro_steps(R=10,a=4,b=3.5,loops=1,n=10,offset=pi/10,spacing=pi/2000):
-    x=np.array([])
-    y=np.array([])
-    p=np.array([])
-    for i in range(n):
-        d=spiro(R,a,b,loops,offset=offset*i,spacing=spacing)
-        x=np.append(x,d['x'])
-        y=np.append(y,d['y'])
-        p=np.append(p,d['p'])
-        
-    return { 'x': x, 'y': y, 'p': p }
+    sd = SpiroData()
+    for i in range(n): sd.add(spiro(R,a,b,loops,offset=offset*i,spacing=spacing)) 
+    return sd
 
 def roll(x1,y1,x2,y2,a,b,offset=0,guard=0,invert=False):
     '''roll in straight line from (x1,y1) to (x2,y2)
@@ -110,11 +107,13 @@ def roll(x1,y1,x2,y2,a,b,offset=0,guard=0,invert=False):
 
     xs=x1-iv*a*sin(A)+guard*cos(A)
     ys=y1+iv*a*cos(A)+guard*sin(A)
-        
-    x=xs+a*t*cos(A) +iv*b*sin(t+offset)
-    y=ys+a*t*sin(A) +   b*cos(t+offset)  # consistent with spiro
-        
-    return { 'x': x, 'y': y, 'p': t+offset }
+
+    sd = SpiroData()
+    sd.x = xs+a*t*cos(A) +iv*b*sin(t+offset)
+    sd.y = ys+a*t*sin(A) +   b*cos(t+offset)  # consistent with spiro
+    sd.p = t+offset
+    
+    return sd
 
 def rotate(x0,y0,xr,yr,angle):
     '''rotate the coordinate (xr,yr) about the
@@ -125,22 +124,23 @@ def rotate(x0,y0,xr,yr,angle):
     phi=arctan2(xr-x0,yr-y0)
     
     if (angle<0): t*=-1
+
+    sd = SpiroData()
     
-    x=x0+r*sin(t+phi)
-    y=y0+r*cos(t+phi)
+    sd.x = x0+r*sin(t+phi)
+    sd.y = y0+r*cos(t+phi)
+    sd.p = t+phi
         
-    return { 'x': x, 'y': y, 'p': t+phi  }
+    return sd
 
 def spiro_line(R=60,a=12,b=7.2,loops=60,n=1,fold=False):
-        
-    x=np.array([])
-    y=np.array([])
-    p=np.array([])
-    
+
     xc=[-R/2,R/2]
     yc=[0.0,0.0]
     rot_angle=pi
     if (fold): rot_angle = rot_angle - 2*pi
+
+    sd = SpiroData()
     
     offset=0
     
@@ -150,25 +150,15 @@ def spiro_line(R=60,a=12,b=7.2,loops=60,n=1,fold=False):
         
             cn=(c+1) % len(xc)
             
-            d=roll(xc[c],yc[c],xc[cn],yc[cn],a,b,offset)  # cycloids roll
-            x=np.append(x,d['x'])
-            y=np.append(y,d['y'])
-            p=np.append(y,d['p'])
-            offset=p[-1]
+            sd.add(roll(xc[c],yc[c],xc[cn],yc[cn],a,b,offset))  # cycloids roll
+            offset=sd.pc()
         
-            d=rotate(xc[cn],yc[cn],x[-1],y[-1],rot_angle) # roll over upper right
-            x=np.append(x,d['x'])
-            y=np.append(y,d['y'])
-            p=np.append(y,d['p'])
+            sd.add(rotate(xc[cn],yc[cn],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
             offset+=rot_angle
         
-    return { 'x': x, 'y': y, 'p': p }
+    return sd
 
 def spiro_eq_triangle(R=60,a=12,b=7.2,loops=60,n=1,fold=False,inside=False):
-        
-    x=np.array([])
-    y=np.array([])
-    p=np.array([])
     
     rot_angle=2.0*pi/3.0
     if (fold): rot_angle = rot_angle - 2*pi
@@ -181,6 +171,8 @@ def spiro_eq_triangle(R=60,a=12,b=7.2,loops=60,n=1,fold=False,inside=False):
     bump = a/(np.tan(np.pi/6)) if inside else 0
     
     offset=0
+
+    sd = SpiroData()
     
     for i in range(loops):
         
@@ -188,28 +180,18 @@ def spiro_eq_triangle(R=60,a=12,b=7.2,loops=60,n=1,fold=False,inside=False):
         
             cn=(c+1) % len(xc)
             
-            d=roll(xc[c],yc[c],xc[cn],yc[cn],a,b,offset,guard=bump,invert=inside)  # cycloids roll
-            x=np.append(x,d['x'])
-            y=np.append(y,d['y'])
-            p=np.append(p,d['p'])
-            offset=p[-1]
+            sd.add(roll(xc[c],yc[c],xc[cn],yc[cn],a,b,offset,guard=bump,invert=inside))  # cycloids roll
+            offset=sd.pc()
         
             if not inside:
-                d=rotate(xc[cn],yc[cn],x[-1],y[-1],rot_angle) # roll over upper right
-                x=np.append(x,d['x'])
-                y=np.append(y,d['y'])
-                p=np.append(p,d['p'])
+                sd.add(rotate(xc[cn],yc[cn],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
                 offset+=rot_angle
         
         
-    return { 'x': x, 'y': y, 'p': p }
+    return sd
 
 def spiro_square(R=60,a=12,b=7.2,loops=60,scatter=False,mono=False,fold=False,inside=False):
-        
-    x=np.array([])
-    y=np.array([])
-    p=np.array([])
-    
+   
     xc=[-R/2,R/2,R/2,-R/2]
     yc=[R/2,R/2,-R/2,-R/2]
     
@@ -219,6 +201,8 @@ def spiro_square(R=60,a=12,b=7.2,loops=60,scatter=False,mono=False,fold=False,in
     if (fold): rot_angle = rot_angle - 2*pi
     
     offset=0
+
+    sd = SpiroData()
     
     for i in range(loops):
         
@@ -226,35 +210,28 @@ def spiro_square(R=60,a=12,b=7.2,loops=60,scatter=False,mono=False,fold=False,in
         
             cn=(c+1) % len(xc)
             
-            d=roll(xc[c],yc[c],xc[cn],yc[cn],a,b,offset,guard=bump,invert=inside)  # cycloids roll
-            x=np.append(x,d['x'])
-            y=np.append(y,d['y'])
-            p=np.append(p,d['p'])
-            offset=p[-1]
+            sd.add(roll(xc[c],yc[c],xc[cn],yc[cn],a,b,offset,guard=bump,invert=inside))  # cycloids roll
+            offset=sd.pc()
         
             if not inside:
-                d=rotate(xc[cn],yc[cn],x[-1],y[-1],rot_angle) # roll over upper right
-                x=np.append(x,d['x'])
-                y=np.append(y,d['y'])
-                p=np.append(p,d['p'])
+                sd.add(rotate(xc[cn],yc[cn],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
                 offset+=rot_angle
     
-    return { 'x': x, 'y': y, 'p': p }
+    return sd
 
-def heart(x0=0,y0=0,width=40,depth=25,wheel=2.2,pen=1.0,loops=1,offset=0.0,invert=False,
-          cmap='inferno',color_scheme='radial'):
+def heart(x0=0,y0=0,width=40,depth=25,wheel=2.2,pen=1.0,loops=1,offset=0.0,invert=False):
 
-    f = SpiroFig()
-        
-    f.add(roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=offset))
-    f.add(rotate(x0-width/2,y0,f.xc(),f.yc(),pi))
-    f.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=f.pc()))
-    f.add(rotate(x0-width/2,y0,f.xc(),f.yc(),pi/2))
-    f.add(spiro_arc(x0+width/4,y0,-pi/2,10,wheel,pen,loops=0.5,offset=f.pc()))
-    f.add(rotate(x0+width/2,y0,f.xc(),f.yc(),pi))
-    f.add(roll(x0+width,y0,x0,y0-depth,wheel,pen,offset=f.pc()))
-    f.add(rotate(x0,y0-depth,f.xc(),f.yc(),pi/2))
-    offset=f.pc()
+    sd = SpiroData()
+    
+    sd.add(roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=offset))
+    sd.add(rotate(x0-width/2,y0,sd.xc(),sd.yc(),pi))
+    sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=sd.pc()))
+    sd.add(rotate(x0-width/2,y0,sd.xc(),sd.yc(),pi/2))
+    sd.add(spiro_arc(x0+width/4,y0,-pi/2,10,wheel,pen,loops=0.5,offset=sd.pc()))
+    sd.add(rotate(x0+width/2,y0,sd.xc(),sd.yc(),pi))
+    sd.add(roll(x0+width,y0,x0,y0-depth,wheel,pen,offset=sd.pc()))
+    sd.add(rotate(x0,y0-depth,sd.xc(),sd.yc(),pi/2))
+    offset=sd.pc()
 
-    f.plot(cmap=cmap,color_scheme=color_scheme)
+    return sd
 
