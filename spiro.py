@@ -72,6 +72,24 @@ class SpiroFig:
 def spiro(R=10,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):
     return spiro_arc(0,0,0,R,a,b,loops,offset,spacing,invert=True,reverse=False)
 
+# def spiro_arc_orig(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
+#               loops=1,offset=0,spacing=pi/4000,invert=False,reverse=False):  
+#     '''roll on the outside (inside if invert=True) of an arc
+#     centered on x0, y0, with radius, starting at orientation of
+#     orient radians cw from the vertical.  Arc has length loops * 2pi
+#     Direction of motion can be reversed by setting reverse=True
+#     '''
+#     iv = -1 if invert else 1
+#     p0 = pi if invert else 0
+#     sd = SpiroData()
+#     t=np.linspace(0.0,2*pi*loops*R/a,int(loops/spacing)) # roll distance
+#     if reverse: t=-1*t
+#     sd.x=x0+(R+iv*a)*sin(t*a/R+orient) + iv*  b*sin(t+offset)
+#     sd.y=y0+(R+iv*a)*cos(t*a/R+orient) +      b*cos(t+offset)
+#     sd.p=t+offset 
+#     
+#     return sd
+
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
               loops=1,offset=0,spacing=pi/4000,invert=False,reverse=False):  
     '''roll on the outside (inside if invert=True) of an arc
@@ -83,9 +101,11 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
     p0 = pi if invert else 0
     sd = SpiroData()
     t=np.linspace(0.0,2*pi*loops*R/a,int(loops/spacing)) # roll distance
-    if reverse: t=-1*t
-    sd.x=x0+(R+iv*a)*sin(t*a/R+orient) + iv*  b*sin(t+offset)
-    sd.y=y0+(R+iv*a)*cos(t*a/R+orient) +      b*cos(t+offset)
+
+    if invert: t *= -1
+#    if reverse: t=-1*t
+    sd.x=x0+(R+iv*a)*sin(iv*t*a/R+orient) + b*sin(t+offset)
+    sd.y=y0+(R+iv*a)*cos(iv*t*a/R+orient) + b*cos(t+offset)
     sd.p=t+offset 
     
     return sd
@@ -94,6 +114,29 @@ def spiro_steps(R=10,a=4,b=3.5,loops=1,n=10,offset=pi/10,spacing=pi/2000):
     sd = SpiroData()
     for i in range(n): sd.add(spiro(R,a,b,loops,offset=offset*i,spacing=spacing)) 
     return sd
+
+# def roll_orig(x1,y1,x2,y2,a,b,offset=0,guard=0,invert=False):
+#     '''roll in straight line from (x1,y1) to (x2,y2)
+#     using wheel of diameter a and pen position b.
+#     offset is the start angle off the vertical for the pen, in radians.
+#     invert keyword controls sense of wheel location:  default
+#     is above and/or to the right.  invert=True is the opposite.
+#     '''
+#     R=sqrt((x2-x1)**2+(y2-y1)**2) - 2*guard # roll distance
+#     A=arctan2(y2-y1,x2-x1)                  # roll angle
+#     t=np.linspace(0,R/a,1000)               # angle through which the wheel rolls
+# 
+#     iv = -1 if invert else 1
+# 
+#     xs=x1-iv*a*sin(A)+guard*cos(A)
+#     ys=y1+iv*a*cos(A)+guard*sin(A)
+# 
+#     sd = SpiroData()
+#     sd.x = xs+a*t*cos(A) +iv*b*sin(t+offset)
+#     sd.y = ys+a*t*sin(A) +   b*cos(t+offset)  # consistent with spiro
+#     sd.p = t+offset
+#     
+#     return sd
 
 def roll(x1,y1,x2,y2,a,b,offset=0,guard=0,invert=False):
     '''roll in straight line from (x1,y1) to (x2,y2)
@@ -111,9 +154,11 @@ def roll(x1,y1,x2,y2,a,b,offset=0,guard=0,invert=False):
     xs=x1-iv*a*sin(A)+guard*cos(A)
     ys=y1+iv*a*cos(A)+guard*sin(A)
 
+    if invert: t *= -1
+
     sd = SpiroData()
-    sd.x = xs+a*t*cos(A) +iv*b*sin(t+offset)
-    sd.y = ys+a*t*sin(A) +   b*cos(t+offset)  # consistent with spiro
+    sd.x = xs+iv*a*t*cos(A) + b*sin(t+offset)
+    sd.y = ys+iv*a*t*sin(A) + b*cos(t+offset) 
     sd.p = t+offset
     
     return sd
@@ -132,7 +177,7 @@ def rotate(x0,y0,xr,yr,angle):
     
     sd.x = x0+r*sin(t+phi)
     sd.y = y0+r*cos(t+phi)
-    sd.p = t+phi
+    sd.p = t+phi  # this "offset" angle no longer connects to rolling
         
     return sd
 
