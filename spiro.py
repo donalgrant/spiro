@@ -61,13 +61,16 @@ class SpiroFig:
 
     def save_fig(self,filename='spiro.png'):  plt.savefig(filename,bbox_inches='tight')
 
-def spiro(R=10.0,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):
-    sd = SpiroData()
-    t=np.linspace(0.0,loops*2*pi,int(loops/spacing))
-    sd.x=(R-a)*sin(t)-b*sin(t*R/a+offset)
-    sd.y=(R-a)*cos(t)+b*cos(t*R/a+offset)
-    sd.p=t*R/a+offset    
-    return sd
+# def spiro(R=10.0,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):
+#     sd = SpiroData()
+#     t=np.linspace(0.0,loops*2*pi,int(loops/spacing))
+#     sd.x=(R-a)*sin(t)-b*sin(t*R/a+offset)
+#     sd.y=(R-a)*cos(t)+b*cos(t*R/a+offset)
+#     sd.p=t*R/a+offset    
+#     return sd
+
+def spiro(R=10,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):
+    return spiro_arc(0,0,0,R,a,b,loops,offset,spacing,invert=True,reverse=False)
 
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
               loops=1,offset=0,spacing=pi/4000,invert=False,reverse=False):  
@@ -77,12 +80,12 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
     Direction of motion can be reversed by setting reverse=True
     '''
     iv = -1 if invert else 1
+    p0 = pi if invert else 0
     sd = SpiroData()
     t=np.linspace(0.0,2*pi*loops*R/a,int(loops/spacing)) # roll distance
     if reverse: t=-1*t
-    sd.x=x0+(R+iv*a)*sin(t*a/R+orient) +iv*b*sin(t+offset)
-    # should orient come into the argument of the sin?
-    sd.y=y0+(R+iv*a)*cos(t*a/R+orient) + b*cos(t+offset)
+    sd.x=x0+(R+iv*a)*sin(t*a/R+orient) + iv*  b*sin(t+offset)
+    sd.y=y0+(R+iv*a)*cos(t*a/R+orient) +      b*cos(t+offset)
     sd.p=t+offset 
     
     return sd
