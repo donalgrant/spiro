@@ -104,15 +104,22 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
     # work out guard effects:  change in arc-length
     start_guard_angle = start_guard/(R+iv*a)
     end_guard_angle   = end_guard/(R+iv*a)
+
+    print(f'start_g={start_guard_angle*180/pi}, end_g={end_guard_angle*180/pi}')
+    print(f'decrease phi from {2*pi*R/a*loops*180/pi} by {(start_guard_angle+end_guard_angle)*R/a*180/pi}')
     
-    t=np.linspace(0.0,(2*pi*R/a)*loops-(start_guard+end_guard)*R/a,int(loops/spacing))
+    t=np.linspace(0.0,(2*pi*R/a)*loops-(start_guard_angle+end_guard_angle)*R/a,int(loops/spacing))
 
     # work out start_guard and end_guard effects in invert and reverse situations
-    
+
     if invert: t *= -1
     if reverse: t=-1*t
-    sd.x=x0+(R+iv*a)*sin(iv*t*a/R+orient+start_guard_angle) + b*sin(t+offset)
-    sd.y=y0+(R+iv*a)*cos(iv*t*a/R+orient+start_guard_angle) + b*cos(t+offset)
+
+    guard_offset_angle=start_guard_angle
+    guard_offset_angle=end_guard_angle if False else start_guard_angle  # work this out later
+    
+    sd.x=x0+(R+iv*a)*sin(iv*t*a/R+orient+guard_offset_angle) + b*sin(t+offset)
+    sd.y=y0+(R+iv*a)*cos(iv*t*a/R+orient+guard_offset_angle) + b*cos(t+offset)
     sd.p=t+offset 
     
     return sd
