@@ -91,21 +91,28 @@ def spiro(R=10,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):
 #     return sd
 
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
-              loops=1,offset=0,spacing=pi/4000,invert=False,reverse=False):  
+              loops=1,offset=0,spacing=pi/4000,
+              start_guard=0,end_guard=0,invert=False,reverse=False):  
     '''roll on the outside (inside if invert=True) of an arc
     centered on x0, y0, with radius, starting at orientation of
     orient radians cw from the vertical.  Arc has length loops * 2pi
     Direction of motion can be reversed by setting reverse=True
     '''
     iv = -1 if invert else 1
-    p0 = pi if invert else 0
     sd = SpiroData()
-    t=np.linspace(0.0,2*pi*loops*R/a,int(loops/spacing)) # roll distance
 
+    # work out guard effects:  change in arc-length
+    start_guard_angle = start_guard/(R+iv*a)
+    end_guard_angle   = end_guard/(R+iv*a)
+    
+    t=np.linspace(0.0,(2*pi*R/a)*loops-(start_guard+end_guard)*R/a,int(loops/spacing))
+
+    # work out start_guard and end_guard effects in invert and reverse situations
+    
     if invert: t *= -1
-#    if reverse: t=-1*t
-    sd.x=x0+(R+iv*a)*sin(iv*t*a/R+orient) + b*sin(t+offset)
-    sd.y=y0+(R+iv*a)*cos(iv*t*a/R+orient) + b*cos(t+offset)
+    if reverse: t=-1*t
+    sd.x=x0+(R+iv*a)*sin(iv*t*a/R+orient+start_guard_angle) + b*sin(t+offset)
+    sd.y=y0+(R+iv*a)*cos(iv*t*a/R+orient+start_guard_angle) + b*cos(t+offset)
     sd.p=t+offset 
     
     return sd
@@ -138,21 +145,23 @@ def spiro_steps(R=10,a=4,b=3.5,loops=1,n=10,offset=pi/10,spacing=pi/2000):
 #     
 #     return sd
 
-def roll(x1,y1,x2,y2,a,b,offset=0,guard=0,invert=False):
+def roll(x1,y1,x2,y2,a,b,offset=0,start_guard=0,end_guard=0,invert=False):
     '''roll in straight line from (x1,y1) to (x2,y2)
     using wheel of diameter a and pen position b.
     offset is the start angle off the vertical for the pen, in radians.
     invert keyword controls sense of wheel location:  default
     is above and/or to the right.  invert=True is the opposite.
     '''
-    R=sqrt((x2-x1)**2+(y2-y1)**2) - 2*guard # roll distance
-    A=arctan2(y2-y1,x2-x1)                  # roll angle
-    t=np.linspace(0,R/a,1000)               # angle through which the wheel rolls
+    R=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
+    A=arctan2(y2-y1,x2-x1)                                   # roll angle
+    t=np.linspace(0,R/a,1000)           # angle through which the wheel rolls
 
     iv = -1 if invert else 1
 
-    xs=x1-iv*a*sin(A)+guard*cos(A)
-    ys=y1+iv*a*cos(A)+guard*sin(A)
+    # do we have to swap to end_guard on inversion?
+    
+    xs=x1-iv*a*sin(A)+start_guard*cos(A)
+    ys=y1+iv*a*cos(A)+start_guard*sin(A)
 
     if invert: t *= -1
 
@@ -181,10 +190,13 @@ def rotate(x0,y0,xr,yr,angle):
         
     return sd
 
-def rot_2D(angle_rads):
+def corner_guard(wheel_size=0,corner_angle=pi/2,):
+    return wheel_size/tan(corner_angle/2)
+
+def rot_2D(angle):
     '''Matrix will rotate a coordinate by angle_rads cw'''
-    return array([ [ cos(angle_rads), sin(angle_rads) ],
-                   [-sin(angle_rads), cos(angle_rads)  ] ])
+    return array([ [ cos(angle), sin(angle) ],
+                   [-sin(angle), cos(angle)  ] ])
 
 def rot_coords(angle_rads,coords):
     cc = np.empty((coords.shape[0],2))
@@ -193,7 +205,7 @@ def rot_coords(angle_rads,coords):
 
     return cc
 
-def spiro_line(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False):
+def spiro_line(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False, invert=False):
 
     cc = rot_coords(orient,array([ [-R/2,0], [R/2,0] ]))
 
@@ -211,7 +223,7 @@ def spiro_line(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False):
         
             cn=(c+1) % cc.shape[0]
             
-            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset))  # cycloids roll
+            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset,invert=invert))  # cycloids roll
             offset=sd.pc()
         
             sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
@@ -227,7 +239,7 @@ def spiro_eq_triangle(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False,inside=Fa
     ytop = R*sin(pi/3.0)
     cc = rot_coords(orient,array([ [-R/2,-ytop/3], [0,2*ytop/3], [R/2,-ytop/3] ]))
     
-    bump = a/(np.tan(np.pi/6)) if inside else 0
+    bump = corner_guard(a,pi/3) if inside else 0
     
     offset=0
 
@@ -239,7 +251,8 @@ def spiro_eq_triangle(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False,inside=Fa
         
             cn=(c+1) % cc.shape[0]
             
-            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset,guard=bump,invert=inside)) 
+            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset,
+                        start_guard=bump,end_guard=bump,invert=inside)) 
             offset=sd.pc()
         
             if not inside:
@@ -251,7 +264,7 @@ def spiro_eq_triangle(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False,inside=Fa
 
 def spiro_square(R=60,a=12,b=7.2,orient=0,loops=60,scatter=False,mono=False,fold=False,inside=False):
 
-    bump = a if inside else 0
+    bump = corner_guard(a,pi/2) if inside else 0
 
     cc = rot_coords(orient,array([ [-R/2,R/2], [R/2,R/2], [R/2,-R/2], [-R/2,-R/2] ]))
 
@@ -270,7 +283,8 @@ def spiro_square(R=60,a=12,b=7.2,orient=0,loops=60,scatter=False,mono=False,fold
         
             cn=(c+1) % cc.shape[0]
             
-            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset,guard=bump,invert=inside)) 
+            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset,
+                        start_guard=bump,end_guard=bump,invert=inside)) 
             offset=sd.pc()
         
             if not inside:
@@ -279,19 +293,50 @@ def spiro_square(R=60,a=12,b=7.2,orient=0,loops=60,scatter=False,mono=False,fold
     
     return sd
 
-def heart(x0=0,y0=0,width=40,depth=25,wheel=2.2,pen=1.0,loops=1,offset=0.0,invert=False):
+def heart(x0=0,y0=0,width=40,depth=20,wheel=2.2,pen=1.0,loops=1,offset=0.0,
+          inside=False,guarded=True):
 
     sd = SpiroData()
+
+    g=1 if guarded else 0
+    o=offset
     
-    sd.add(roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=offset))
-    sd.add(rotate(x0-width/2,y0,sd.xc(),sd.yc(),pi))
-    sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=sd.pc()))
-    sd.add(rotate(x0-width/2,y0,sd.xc(),sd.yc(),pi/2))
-    sd.add(spiro_arc(x0+width/4,y0,-pi/2,10,wheel,pen,loops=0.5,offset=sd.pc()))
-    sd.add(rotate(x0+width/2,y0,sd.xc(),sd.yc(),pi))
-    sd.add(roll(x0+width,y0,x0,y0-depth,wheel,pen,offset=sd.pc()))
-    sd.add(rotate(x0,y0-depth,sd.xc(),sd.yc(),pi/2))
-    offset=sd.pc()
+    for k in range(loops):
+
+        if inside:
+            
+            sd.add(roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=o,
+                        start_guard=g*corner_guard(wheel,pi/2),
+                        end_guard=g*corner_guard(wheel,pi-pi/4),
+                        invert=True))
+            sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=sd.pc(),
+                             start_guard=g*corner_guard(wheel,pi-pi/4),
+                             invert=True))
+            o = sd.pc()
+            sd.add(rotate(x0,y0,sd.xc(),sd.yc(),-pi))
+            sd.add(spiro_arc(x0+width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=sd.pc(),
+                             end_guard=g*corner_guard(wheel,pi-pi/4),
+                             invert=True))
+            sd.add(roll(x0+width/2,y0,x0,y0-depth,wheel,pen,offset=sd.pc(),
+                        start_guard=g*corner_guard(wheel,pi-pi/4),
+                        end_guard=g*corner_guard(wheel,pi/2),
+                        invert=True))
+            o=sd.pc()
+
+        else:
+            
+            sd.add(roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=o+pi/2))
+            o = sd.pc()
+            sd.add(rotate(x0-width/2,y0,sd.xc(),sd.yc(),pi/4))
+            sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=o+pi/4,
+                             end_guard=g*corner_guard(wheel,pi/2)))
+            sd.add(spiro_arc(x0+width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=sd.pc(),
+                             start_guard=g*corner_guard(wheel,pi/2)))
+            o = sd.pc()
+            sd.add(rotate(x0+width/2,y0,sd.xc(),sd.yc(),pi/4))
+            sd.add(roll(x0+width/2,y0,x0,y0-depth,wheel,pen,offset=o+pi/4))
+            o = sd.pc()
+            sd.add(rotate(x0,y0-depth,sd.xc(),sd.yc(),pi/2))
 
     return sd
 
