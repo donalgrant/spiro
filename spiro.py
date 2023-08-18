@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy import sin,cos,arctan2,pi,sqrt,tan,array
+from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array
 import math
 
 class SpiroData:
@@ -186,7 +186,7 @@ def rot_coords(angle_rads,coords):
 
     return cc
 
-def spiro_line(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False, invert=False):
+def spiro_line_orig(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False, invert=False):
 
     cc = rot_coords(orient,array([ [-R/2,0], [R/2,0] ]))
 
@@ -212,17 +212,54 @@ def spiro_line(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False, invert=False):
         
     return sd
 
-def spiro_eq_triangle(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False,inside=False):
-    
-    rot_angle=2.0*pi/3.0
-    if (fold): rot_angle = rot_angle - 2*pi
+def spiro_line(R=60,a=12,b=7.2,orient=0,offset=0,loops=60,n=1,fold=False, invert=False):
+    coords=array([ [-R/2,0], [R/2,0] ])
+    return spiro_polygon(coords,a,b,orient,
+                         offset=offset,loops=loops,fold=fold,inside=False)  # invert doesn't work
 
+def spiro_eq_triangle(R=60,a=12,b=7.2,orient=0,offset=0,loops=60,n=1,fold=False,inside=False):
     ytop = R*sin(pi/3.0)
-    cc = rot_coords(orient,array([ [-R/2,-ytop/3], [0,2*ytop/3], [R/2,-ytop/3] ]))
-    
-    bump = corner_guard(a,pi/3) if inside else 0
-    
-    offset=0
+    coords = array([ [-R/2,-ytop/3], [0,2*ytop/3], [R/2,-ytop/3] ])
+    return spiro_polygon(coords,a,b,orient,
+                         offset=offset,loops=loops,fold=fold,inside=inside)
+
+def spiro_square(R=60,a=12,b=7.2,orient=0,offset=0,loops=60,fold=False,inside=False):
+    coords = array([ [-R/2,R/2], [R/2,R/2], [R/2,-R/2], [-R/2,-R/2] ])
+    return spiro_polygon(coords,a,b,orient,
+                         offset=offset,loops=loops,fold=fold,inside=inside)
+
+def spiro_ngon(n,R=60,a=12,b=7.2,orient=0,offset=0,loops=1,fold=False,inside=False):
+    coords = np.empty((n,2))
+    for i in range(n):
+        theta = -2*pi*i/n
+        coords[i,0]=R*cos(theta)
+        coords[i,1]=R*sin(theta)
+    return spiro_polygon(coords,a,b,orient,loops,fold=fold,inside=inside)
+
+def spiro_polygon(coords,wheel,pen,orient=0,loops=1,offset=0,fold=False,inside=False):
+
+    cc = rot_coords(orient,coords)
+
+    ba = np.empty(cc.shape[0])
+    bump = [ 0 for i in range(len(ba)) ]
+
+    # find the angle between adjacent pairs of coords
+    for c0 in range(cc.shape[0]):
+        c1 = (c0+1) % cc.shape[0]
+        c2 = (c0+2) % cc.shape[0]
+        dx1 = cc[c1,0]-cc[c0,0]
+        dx2 = cc[c2,0]-cc[c1,0]
+        dy1 = cc[c1,1]-cc[c0,1]
+        dy2 = cc[c2,1]-cc[c1,1]
+
+        arccos_arg = (dx1*dx2+dy1*dy2) / ( sqrt(dx1*dx1+dy1*dy1) * sqrt(dx2*dx2+dy2*dy2) )
+        if   (arccos_arg >  1): ba[c0]=0
+        elif (arccos_arg < -1): ba[c0]=pi
+        else:                   ba[c0]=arccos(arccos_arg)
+        
+        bump[c0] = corner_guard(wheel,pi-ba[c0]) if inside else 0
+        
+        if (fold): ba[c0] -= 2*pi
 
     sd = SpiroData()
     
@@ -230,47 +267,16 @@ def spiro_eq_triangle(R=60,a=12,b=7.2,orient=0,loops=60,n=1,fold=False,inside=Fa
         
         for c in range(cc.shape[0]):
         
+            cp=(c+cc.shape[0]-1) % cc.shape[0]
             cn=(c+1) % cc.shape[0]
-            
-            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset,
-                        start_guard=bump,end_guard=bump,invert=inside)) 
+
+            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],wheel,pen,offset,
+                        start_guard=bump[cp],end_guard=bump[c],invert=inside)) 
             offset=sd.pc()
-        
+
             if not inside:
-                sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
-                offset+=rot_angle
-        
-        
-    return sd
-
-def spiro_square(R=60,a=12,b=7.2,orient=0,loops=60,scatter=False,mono=False,fold=False,inside=False):
-
-    bump = corner_guard(a,pi/2) if inside else 0
-
-    cc = rot_coords(orient,array([ [-R/2,R/2], [R/2,R/2], [R/2,-R/2], [-R/2,-R/2] ]))
-
-    # evenually, calculate rotation angles around each corner
-    
-    rot_angle=pi/2.0
-    if (fold): rot_angle = rot_angle - 2*pi
-    
-    offset=0
-
-    sd = SpiroData()
-    
-    for i in range(loops):
-        
-        for c in range(cc.shape[0]):
-        
-            cn=(c+1) % cc.shape[0]
-            
-            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],a,b,offset,
-                        start_guard=bump,end_guard=bump,invert=inside)) 
-            offset=sd.pc()
-        
-            if not inside:
-                sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
-                offset+=rot_angle
+                sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),ba[c])) # roll over upper right
+                offset+=ba[c]
     
     return sd
 
