@@ -234,7 +234,8 @@ def spiro_ngon(n,R=60,a=12,b=7.2,orient=0,offset=0,loops=1,fold=False,inside=Fal
         theta = -2*pi*i/n
         coords[i,0]=R*cos(theta)
         coords[i,1]=R*sin(theta)
-    return spiro_polygon(coords,a,b,orient,loops,fold=fold,inside=inside)
+    return spiro_polygon(coords,a,b,orient,
+                         offset=offset,loops=loops,fold=fold,inside=inside)
 
 def spiro_polygon(coords,wheel,pen,orient=0,loops=1,offset=0,fold=False,inside=False):
 
