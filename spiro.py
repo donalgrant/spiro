@@ -61,12 +61,13 @@ class SpiroFig:
 
     def save_fig(self,filename='spiro.png'):  plt.savefig(filename,bbox_inches='tight')
 
-def spiro(R=10,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):
-    return spiro_arc(0,0,0,R,a,b,loops,offset,spacing,invert=True,reverse=False)
+def spiro(R=10,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000,slide=1.0):
+    return spiro_arc(0,0,0,R,a,b,loops,
+                     slide=slide,offset=offset,spacing=spacing,invert=True,reverse=False)
 
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
               loops=1,offset=0,spacing=pi/4000,
-              start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
+              slide=1.0,start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
               invert=False,reverse=False):  
     '''roll on the outside (inside if invert=True) of an arc
     centered on x0, y0, with radius, starting at orientation of
@@ -90,8 +91,8 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
     guard_offset_angle=start_guard_angle
 #    guard_offset_angle=end_guard_angle if False else start_guard_angle  # work this out later
     
-    sd.x=x0+(R+iv*a)*sin(iv*t*a/R+orient+guard_offset_angle) + b*sin(t+offset)
-    sd.y=y0+(R+iv*a)*cos(iv*t*a/R+orient+guard_offset_angle) + b*cos(t+offset)
+    sd.x=x0+(R+iv*a)*sin(slide*iv*t*a/R+orient+guard_offset_angle) + b*sin(t+offset)
+    sd.y=y0+(R+iv*a)*cos(slide*iv*t*a/R+orient+guard_offset_angle) + b*cos(t+offset)
     sd.p=t+offset 
     
     return sd
