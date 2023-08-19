@@ -251,7 +251,6 @@ def corner_angles(coords,inside=False):
         if   (arccos_arg >  1): ba[c0]=0
         elif (arccos_arg < -1): ba[c0]=pi
         else:                   ba[c0]=arccos(arccos_arg)
-        if (ba[c0]<0): print(arccos_arg,ba[c0]*180/pi)
         # get orientation of first and second vectors
         if (np.cross(v1,v2).dot(unit_z)<=0): ba[c0]*=-1       # v2 veers away from v1:  -angle for rotation
         else:                                ba[c0]=pi-ba[c0] # v2 veers towards v1: corner angle
@@ -303,7 +302,7 @@ def poly_heart(width=40,depth=20,height=5,wheel=2.2,pen=1.0,orient=0,offset=0,lo
                          offset=offset,loops=loops,fold=fold,inside=inside)
 
 def heart(x0=0,y0=0,width=40,depth=20,wheel=2.2,pen=1.0,loops=1,offset=0.0,
-          inside=False,guarded=True):
+          inside=False,fold=False,guarded=True):
 
     sd = SpiroData()
 
@@ -313,18 +312,22 @@ def heart(x0=0,y0=0,width=40,depth=20,wheel=2.2,pen=1.0,loops=1,offset=0.0,
     for k in range(loops):
 
         if inside:
+
+            ba=corner_angles(np.array([ [x0,y0-depth], [x0-width/2,y0], [x0-width/2,y0+1] ]),inside=True)
+            cg=corner_guard(wheel,ba[0])
             
             sd.add(roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=o,
-                        start_guard=g*corner_guard(wheel,pi/2),
-                        end_guard=g*corner_guard(wheel,pi-pi/4),
+                        start_guard=g*corner_guard(wheel,pi/2),end_guard=g*cg,
                         invert=True))
             sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=sd.pc(),
-                             start_guard=g*corner_guard(wheel,pi-pi/4),
+                             start_guard=g*cg,
                              invert=True))
+            
             o = sd.pc()
-            sd.add(rotate(x0,y0,sd.xc(),sd.yc(),-pi))
-            sd.add(spiro_arc(x0+width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=sd.pc(),
-                             end_guard=g*corner_guard(wheel,pi-pi/4),
+            rot_angle = pi if fold else -pi
+            sd.add(rotate(x0,y0,sd.xc(),sd.yc(),rot_angle))
+            sd.add(spiro_arc(x0+width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=o+rot_angle,
+                             end_guard=g*cg,
                              invert=True))
             sd.add(roll(x0+width/2,y0,x0,y0-depth,wheel,pen,offset=sd.pc(),
                         start_guard=g*corner_guard(wheel,pi-pi/4),
@@ -334,18 +337,25 @@ def heart(x0=0,y0=0,width=40,depth=20,wheel=2.2,pen=1.0,loops=1,offset=0.0,
 
         else:
             
-            sd.add(roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=o+pi/2))
+            sd.add(roll(x0,y0-depth,x0-width/2,y0,wheel,pen,offset=o))
             o = sd.pc()
-            sd.add(rotate(x0-width/2,y0,sd.xc(),sd.yc(),pi/4))
-            sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=o+pi/4,
-                             end_guard=g*corner_guard(wheel,pi/2)))
+            rot_angle = pi/4 - 2*pi if fold else pi/4
+            sd.add(rotate(x0-width/2,y0,sd.xc(),sd.yc(),rot_angle))
+            # calculate the corner_guard for tangent circles here
+            cg=2*wheel # approx for the moment
+
+            sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=o+rot_angle,
+                             end_guard=g*cg))
             sd.add(spiro_arc(x0+width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=sd.pc(),
-                             start_guard=g*corner_guard(wheel,pi/2)))
+                             start_guard=g*cg))
             o = sd.pc()
-            sd.add(rotate(x0+width/2,y0,sd.xc(),sd.yc(),pi/4))
-            sd.add(roll(x0+width/2,y0,x0,y0-depth,wheel,pen,offset=o+pi/4))
+            rot_angle = pi/4 - 2*pi if fold else pi/4
+            sd.add(rotate(x0+width/2,y0,sd.xc(),sd.yc(),rot_angle))
+            sd.add(roll(x0+width/2,y0,x0,y0-depth,wheel,pen,offset=o+rot_angle))
             o = sd.pc()
-            sd.add(rotate(x0,y0-depth,sd.xc(),sd.yc(),pi/2))
+            rot_angle = pi/2 - 2*pi if fold else pi/2
+            sd.add(rotate(x0,y0-depth,sd.xc(),sd.yc(),rot_angle))
+            o += rot_angle
 
     return sd
 
