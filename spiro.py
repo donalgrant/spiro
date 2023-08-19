@@ -237,31 +237,41 @@ def spiro_ngon(n,R=60,a=12,b=7.2,orient=0,offset=0,loops=1,fold=False,inside=Fal
     return spiro_polygon(coords,a,b,orient,
                          offset=offset,loops=loops,fold=fold,inside=inside)
 
-def spiro_polygon(coords,wheel,pen,orient=0,loops=1,offset=0,fold=False,inside=False):
-
-    cc = rot_coords(orient,coords)
-
-    ba = np.empty(cc.shape[0])
-    bump = [ 0 for i in range(len(ba)) ]
-
-    # find the angle between adjacent pairs of coords
-    for c0 in range(cc.shape[0]):
-        c1 = (c0+1) % cc.shape[0]
-        c2 = (c0+2) % cc.shape[0]
-        dx1 = cc[c1,0]-cc[c0,0]
-        dx2 = cc[c2,0]-cc[c1,0]
-        dy1 = cc[c1,1]-cc[c0,1]
-        dy2 = cc[c2,1]-cc[c1,1]
-
-        arccos_arg = (dx1*dx2+dy1*dy2) / ( sqrt(dx1*dx1+dy1*dy1) * sqrt(dx2*dx2+dy2*dy2) )
+def corner_angles(coords,inside=False):
+    '''find the angle between adjacent pairs of coords'''
+    ba = np.empty(coords.shape[0])
+    unit_z = -1 if inside else 1
+    for c0 in range(coords.shape[0]):
+        c1 = (c0+1) % coords.shape[0]
+        c2 = (c0+2) % coords.shape[0]
+        v1 = coords[c1]-coords[c0]
+        v2 = coords[c2]-coords[c1]
+        arccos_arg = v1.dot(v2) / sqrt(v1.dot(v1)*v2.dot(v2))
+        # protect against out of range arccos arguments (due to precision error)
         if   (arccos_arg >  1): ba[c0]=0
         elif (arccos_arg < -1): ba[c0]=pi
         else:                   ba[c0]=arccos(arccos_arg)
-        
-        bump[c0] = corner_guard(wheel,pi-ba[c0]) if inside else 0
-        
-        if (fold): ba[c0] -= 2*pi
+        if (ba[c0]<0): print(arccos_arg,ba[c0]*180/pi)
+        # get orientation of first and second vectors
+        if (np.cross(v1,v2).dot(unit_z)<=0): ba[c0]*=-1       # v2 veers away from v1:  -angle for rotation
+        else:                                ba[c0]=pi-ba[c0] # v2 veers towards v1: corner angle
 
+    return ba
+            
+def spiro_polygon(coords,wheel,pen,orient=0,loops=1,offset=0,fold=False,inside=False):
+
+    cc = rot_coords(orient,coords)
+    ba = corner_angles(cc,inside)
+    
+    bump = [ 0 for i in range(len(ba)) ]
+
+    for c in range(ba.shape[0]):
+        if ba[c]>0:
+            bump[c] = corner_guard(wheel,ba[c])
+            ba[c]=0  # to indicate no rotation
+        else:
+            ba[c]*=-1 # rotation angles
+            
     sd = SpiroData()
     
     for i in range(loops):
@@ -275,11 +285,18 @@ def spiro_polygon(coords,wheel,pen,orient=0,loops=1,offset=0,fold=False,inside=F
                         start_guard=bump[cp],end_guard=bump[c],invert=inside)) 
             offset=sd.pc()
 
-            if not inside:
-                sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),ba[c])) # roll over upper right
-                offset+=ba[c]
+            if ba[c]>0:
+                rot_angle=ba[c]-2*pi if fold else ba[c]
+                sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
+                offset+=rot_angle
     
     return sd
+
+def poly_heart(width=40,depth=20,height=5,wheel=2.2,pen=1.0,orient=0,offset=0,loops=1,fold=False,inside=False,guarded=True):
+    coords = array([ [0,-depth], [-width/2,-height/2], [-width/2+width/12,0], [-width/6,height],
+                     [0,0], [width/6,height], [width/2-width/12,0], [width/2,-height/2] ])
+    return spiro_polygon(coords,wheel,pen,orient,
+                         offset=offset,loops=loops,fold=fold,inside=inside)
 
 def heart(x0=0,y0=0,width=40,depth=20,wheel=2.2,pen=1.0,loops=1,offset=0.0,
           inside=False,guarded=True):
