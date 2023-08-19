@@ -66,7 +66,8 @@ def spiro(R=10,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000):
 
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
               loops=1,offset=0,spacing=pi/4000,
-              start_guard=0,end_guard=0,invert=False,reverse=False):  
+              start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
+              invert=False,reverse=False):  
     '''roll on the outside (inside if invert=True) of an arc
     centered on x0, y0, with radius, starting at orientation of
     orient radians cw from the vertical.  Arc has length loops * 2pi
@@ -76,12 +77,9 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
     sd = SpiroData()
 
     # work out guard effects:  change in arc-length
-    start_guard_angle = start_guard/(R+iv*a)
-    end_guard_angle   = end_guard/(R+iv*a)
+    if start_guard_angle==0:  start_guard_angle = start_guard/(R+iv*a)
+    if end_guard_angle==0:    end_guard_angle   = end_guard/(R+iv*a)
 
-#    print(f'start_g={start_guard_angle*180/pi}, end_g={end_guard_angle*180/pi}')
-#    print(f'decrease phi from {2*pi*R/a*loops*180/pi} by {(start_guard_angle+end_guard_angle)*R/a*180/pi}')
-    
     t=np.linspace(0.0,(2*pi*R/a)*loops-(start_guard_angle+end_guard_angle)*R/a,int(loops/spacing))
 
     # work out start_guard and end_guard effects in invert and reverse situations
@@ -90,7 +88,7 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
     if reverse: t=-1*t
 
     guard_offset_angle=start_guard_angle
-    guard_offset_angle=end_guard_angle if False else start_guard_angle  # work this out later
+#    guard_offset_angle=end_guard_angle if False else start_guard_angle  # work this out later
     
     sd.x=x0+(R+iv*a)*sin(iv*t*a/R+orient+guard_offset_angle) + b*sin(t+offset)
     sd.y=y0+(R+iv*a)*cos(iv*t*a/R+orient+guard_offset_angle) + b*cos(t+offset)
@@ -170,6 +168,9 @@ def rotate(x0,y0,xr,yr,angle):
     sd.p = t+phi  # this "offset" angle no longer connects to rolling
         
     return sd
+
+def cos_angle(a,b,c):
+    return arccos( (a**2+b**2-c**2) / (2*a*b) )
 
 def corner_guard(wheel_size=0,corner_angle=pi/2,):
     return wheel_size/tan(corner_angle/2)
@@ -341,13 +342,16 @@ def heart(x0=0,y0=0,width=40,depth=20,wheel=2.2,pen=1.0,loops=1,offset=0.0,
             o = sd.pc()
             rot_angle = pi/4 - 2*pi if fold else pi/4
             sd.add(rotate(x0-width/2,y0,sd.xc(),sd.yc(),rot_angle))
-            # calculate the corner_guard for tangent circles here
-            cg=2*wheel # approx for the moment
+
+            ca=cos_angle(width/4+wheel,width/4+width/4,width/4+wheel)
 
             sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=o+rot_angle,
-                             end_guard=g*cg))
+                             end_guard_angle=g*ca))
+
+            ca=cos_angle(width/4+width/4,width/4+wheel,width/4+wheel)
+
             sd.add(spiro_arc(x0+width/4,y0,-pi/2,width/4,wheel,pen,loops=0.5,offset=sd.pc(),
-                             start_guard=g*cg))
+                             start_guard_angle=g*ca))
             o = sd.pc()
             rot_angle = pi/4 - 2*pi if fold else pi/4
             sd.add(rotate(x0+width/2,y0,sd.xc(),sd.yc(),rot_angle))
