@@ -286,13 +286,17 @@ def spiro_polygon(coords,wheel,pen,orient=0,loops=1,offset=0,fold=False,inside=F
             offset=sd.pc()
 
             if ba[c]>0:
-                rot_angle=ba[c]-2*pi if fold else ba[c]
+                if inside: rot_angle= -ba[c]
+                else:      rot_angle=  ba[c]
+                if fold:
+                    rot_angle=ba[c]+2*pi if inside else ba[c]-2*pi
                 sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
                 offset+=rot_angle
     
     return sd
 
-def poly_heart(width=40,depth=20,height=5,wheel=2.2,pen=1.0,orient=0,offset=0,loops=1,fold=False,inside=False,guarded=True):
+def poly_heart(width=40,depth=20,height=5,wheel=2.2,pen=1.0,orient=0,offset=0,loops=1,
+               fold=False,inside=False,guarded=True):
     coords = array([ [0,-depth], [-width/2,-height/2], [-width/2+width/12,0], [-width/6,height],
                      [0,0], [width/6,height], [width/2-width/12,0], [width/2,-height/2] ])
     return spiro_polygon(coords,wheel,pen,orient,
