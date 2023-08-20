@@ -25,8 +25,9 @@ class SpiroData:
 class SpiroFig:
 
     def new_fig(self,**kw_args):
-        fig, self._ax=plt.subplots(figsize=(10,10))
+        fig, self._ax=plt.subplots(frameon=False,figsize=(10,10))
         self._ax.set(aspect=1,xticks=[],yticks=[])
+        self._ax.set_axis_off()
         return self._ax
         
     def __init__(self,ax=None):
@@ -61,9 +62,10 @@ class SpiroFig:
 
     def save_fig(self,filename='spiro.png'):  plt.savefig(filename,bbox_inches='tight')
 
-def spiro(R=10,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000,slide=1.0):
-    return spiro_arc(0,0,0,R,a,b,loops,
-                     slide=slide,offset=offset,spacing=spacing,invert=True,reverse=False)
+def spiro(R=10,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000,slide=1.0,orient=0):
+    return spiro_arc(x0=0,y0=0,orient=orient,R=R,a=a,b=b,loops=loops,
+                     slide=slide,offset=offset,
+                     spacing=spacing,invert=True,reverse=False)
 
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
               loops=1,offset=0,spacing=pi/4000,
@@ -230,6 +232,18 @@ def spiro_square(R=60,a=12,b=7.2,orient=0,offset=0,loops=60,fold=False,inside=Fa
     return spiro_polygon(coords,a,b,orient,
                          offset=offset,loops=loops,fold=fold,inside=inside)
 
+def spiro_cross(width=30,height=30,fwidth=1/3,fheight=0.3,base=0.3,
+                wheel=0.01,pen=0,orient=0,offset=0,loops=1,
+                fold=False,inside=False):
+    coords = array([ [-width/2,height*fheight/2], [-fwidth*width/2,height*fheight/2],
+                     [-fwidth*width/2,height/2],  [fwidth*width/2,height/2],
+                     [fwidth*width/2,height*fheight/2], [width/2,height*fheight/2],
+                     [width/2,-fheight*height/2], [fwidth*width/2,-fheight*height/2],
+                     [fwidth*width/2,-height/2], [-fwidth*width/2,-height/2],
+                     [-fwidth*width/2,-fheight*height/2], [-width/2,-fheight*height/2] ])
+    return spiro_polygon(coords,wheel,pen,orient=orient,
+                         offset=offset,loops=loops,fold=fold,inside=inside)
+    
 def spiro_ngon(n,R=60,a=12,b=7.2,orient=0,offset=0,loops=1,fold=False,inside=False):
     coords = np.empty((n,2))
     for i in range(n):
@@ -238,7 +252,20 @@ def spiro_ngon(n,R=60,a=12,b=7.2,orient=0,offset=0,loops=1,fold=False,inside=Fal
         coords[i,1]=R*sin(theta)
     return spiro_polygon(coords,a,b,orient,
                          offset=offset,loops=loops,fold=fold,inside=inside)
-
+    
+def spiro_nstar(n,r1=30,r2=0.5,wheel=0.01,pen=0,
+                orient=0,offset=0,loops=1,fold=False,inside=False):
+    coords = np.empty((2*n,2))
+    for i in range(0,n):
+        theta1 = -2*pi*i/n
+        theta2 = -(2*i+1)*pi/n
+        coords[2*i,0]=r1*cos(theta1)
+        coords[2*i,1]=r1*sin(theta1)
+        coords[2*i+1,0]=r2*r1*cos(theta2)
+        coords[2*i+1,1]=r2*r1*sin(theta2)
+        
+    return spiro_polygon(coords,wheel,pen,orient,
+                         offset=offset,loops=loops,fold=fold,inside=inside)
 def corner_angles(coords,inside=False):
     '''find the angle between adjacent pairs of coords'''
     ba = np.empty(coords.shape[0])
