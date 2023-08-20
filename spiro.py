@@ -39,6 +39,7 @@ class SpiroFig:
         
         dot_size=0.1
         linestyle=''
+        alpha=1.0
 
         match color_scheme:
             case 'radial':    c=sqrt(sd.x**2+sd.y**2)
@@ -58,7 +59,7 @@ class SpiroFig:
             case 's-ripples': c=sin((sd.x**2+sd.y**2)**(1/4))
             case _:           c=[ 0 for i in range(len(sd.x))]
     
-        self._ax.scatter(sd.x,sd.y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap)
+        self._ax.scatter(sd.x,sd.y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
 
     def save_fig(self,filename='spiro.png'):  plt.savefig(filename,bbox_inches='tight')
 
