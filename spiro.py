@@ -12,15 +12,18 @@ class SpiroData:
         self.x = np.array([])
         self.y = np.array([])
         self.p = np.array([])
+        self.t = np.array([])   # parameterize the drawing data (not sure if this is needed yet)
 
     def add(self, sd):
         self.x = np.append(self.x,sd.x)
         self.y = np.append(self.y,sd.y)
         self.p = np.append(self.p,sd.p)
+        self.t = np.append(self.t,sd.t)
 
     def xc(self):  return self.x[-1] 
     def yc(self):  return self.y[-1] 
     def pc(self):  return self.p[-1]
+    def tc(self):  return self.t[-1]
     
 class SpiroFig:
 
@@ -63,14 +66,17 @@ class SpiroFig:
 
     def save_fig(self,filename='spiro.png'):  plt.savefig(filename,bbox_inches='tight')
 
-def spiro(R=10,a=4.0,b=3.5,loops=5,offset=0,spacing=pi/4000,slide=1.0,orient=0):
+def spiro(R=10,a=4.0,b=3.5,loops=5,
+          slide = lambda t: 1,
+          offset=0,spacing=pi/4000,orient=0):
     return spiro_arc(x0=0,y0=0,orient=orient,R=R,a=a,b=b,loops=loops,
                      slide=slide,offset=offset,
                      spacing=spacing,invert=True,reverse=False)
 
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
               loops=1,offset=0,spacing=pi/4000,
-              slide=1.0,start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
+              slide = lambda t: 1,
+              start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
               invert=False,reverse=False):  
     '''roll on the outside (inside if invert=True) of an arc
     centered on x0, y0, with radius, starting at orientation of
@@ -86,23 +92,42 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,a=4.0,b=3.5,
 
     t=np.linspace(0.0,(2*pi*R/a)*loops-(start_guard_angle+end_guard_angle)*R/a,int(loops/spacing))
 
+    p = t
+    
+    guard_offset_angle=start_guard_angle
+    
+#    guard_offset_angle=end_guard_angle if False else start_guard_angle  # work this out later
+
+    theta_factor = iv * a/R * slide(t)
+    phi_factor   = 1
+    
     # work out start_guard and end_guard effects in invert and reverse situations
 
-    if invert: t *= -1
-    if reverse: t=-1*t
-
-    guard_offset_angle=start_guard_angle
-#    guard_offset_angle=end_guard_angle if False else start_guard_angle  # work this out later
+    if invert:
+        phi_factor   *= -1
+        theta_factor *= -1
+    if reverse:
+        phi_factor   *= -1
+        theta_factor *= -1
     
-    sd.x=x0+(R+iv*a)*sin(slide*iv*t*a/R+orient+guard_offset_angle) + b*sin(t+offset)
-    sd.y=y0+(R+iv*a)*cos(slide*iv*t*a/R+orient+guard_offset_angle) + b*cos(t+offset)
-    sd.p=t+offset 
+    guard_offset_angle=start_guard_angle
+    
+#    guard_offset_angle=end_guard_angle if False else start_guard_angle  # work this out later
+
+    p     = phi_factor   * t + offset
+    theta = theta_factor * t + orient + guard_offset_angle
+    r     = R + iv * a
+    
+    sd.t=t
+    sd.x=x0+r*sin(theta) + b*sin(p)
+    sd.y=y0+r*cos(theta) + b*cos(p)
+    sd.p=p
     
     return sd
 
 def spiro_steps(R=10,a=4,b=3.5,loops=1,n=10,offset=pi/10,spacing=pi/2000):
     sd = SpiroData()
-    for i in range(n): sd.add(spiro(R,a,b,loops,offset=offset*i,spacing=spacing)) 
+    for i in range(n): sd.add(spiro(R=R,a=a,b=b,loops=loops,offset=offset*i,spacing=spacing)) 
     return sd
 
 # def roll_orig(x1,y1,x2,y2,a,b,offset=0,guard=0,invert=False):
@@ -138,20 +163,29 @@ def roll(x1,y1,x2,y2,a,b,offset=0,start_guard=0,end_guard=0,invert=False):
     R=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
     A=arctan2(y2-y1,x2-x1)                                   # roll angle
     t=np.linspace(0,R/a,1000)           # angle through which the wheel rolls
-
+    
     iv = -1 if invert else 1
 
+    phi_factor = 1
+    time_factor = iv * a
+
+    if invert:
+        phi_factor  *= -1
+        time_factor *= -1
+        
     # do we have to swap to end_guard on inversion?
+
+    xs = x1 - iv * a * sin(A) + start_guard * cos(A)
+    ys = y1 + iv * a * cos(A) + start_guard * sin(A)
+
+    p = phi_factor * t + offset
     
-    xs=x1-iv*a*sin(A)+start_guard*cos(A)
-    ys=y1+iv*a*cos(A)+start_guard*sin(A)
-
-    if invert: t *= -1
-
     sd = SpiroData()
-    sd.x = xs+iv*a*t*cos(A) + b*sin(t+offset)
-    sd.y = ys+iv*a*t*sin(A) + b*cos(t+offset) 
-    sd.p = t+offset
+    
+    sd.x = xs + time_factor * t * cos(A) + b * sin(p)
+    sd.y = ys + time_factor * t * sin(A) + b * cos(p) 
+    sd.p = p
+    sd.t = t
     
     return sd
 
@@ -162,14 +196,20 @@ def rotate(x0,y0,xr,yr,angle):
     t=np.linspace(0.0,np.abs(angle),int(500*np.abs(angle)/pi))
     r=sqrt((xr-x0)**2+(yr-y0)**2)
     phi=arctan2(xr-x0,yr-y0)
-    
-    if (angle<0): t*=-1
 
+    p = t
+    
+    if (angle<0):
+        p *= -1
+
+    p += phi
+    
     sd = SpiroData()
     
-    sd.x = x0+r*sin(t+phi)
-    sd.y = y0+r*cos(t+phi)
-    sd.p = t+phi  # this "offset" angle no longer connects to rolling
+    sd.x = x0+r*sin(p)
+    sd.y = y0+r*cos(p)
+    sd.p = p
+    sd.t = t
         
     return sd
 
@@ -233,15 +273,20 @@ def spiro_square(R=60,a=12,b=7.2,orient=0,offset=0,loops=60,fold=False,inside=Fa
     return spiro_polygon(coords,a,b,orient,
                          offset=offset,loops=loops,fold=fold,inside=inside)
 
-def spiro_cross(width=30,height=30,fwidth=1/3,fheight=0.3,base=0.3,
+def spiro_cross(width=30,height=30,fwidth=1/3,fheight=1/3,base=1/3,
                 wheel=0.01,pen=0,orient=0,offset=0,loops=1,
                 fold=False,inside=False):
-    coords = array([ [-width/2,height*fheight/2], [-fwidth*width/2,height*fheight/2],
-                     [-fwidth*width/2,height/2],  [fwidth*width/2,height/2],
-                     [fwidth*width/2,height*fheight/2], [width/2,height*fheight/2],
-                     [width/2,-fheight*height/2], [fwidth*width/2,-fheight*height/2],
-                     [fwidth*width/2,-height/2], [-fwidth*width/2,-height/2],
-                     [-fwidth*width/2,-fheight*height/2], [-width/2,-fheight*height/2] ])
+    (x0,x1,x2,x3) = (-width/2, -fwidth*width/2, fwidth*width/2, width/2)
+    (y0,y1,y2,y3) = (height*(-base-fheight/2), -height*fheight/2, height*fheight/2, height*(1-fheight/2-base))
+    coords = array([ [x0,y2], [x1,y2], [x1,y3], [x2,y3], [x2,y2], [x3,y2],
+                     [x3,y1], [x2,y1], [x2,y0], [x1,y0], [x1,y1], [x0,y1] ])
+    
+#    coords = array([ [-width/2,height*fheight/2], [-fwidth*width/2,height*fheight/2],
+#                     [-fwidth*width/2,height/2],  [fwidth*width/2,height/2],
+#                     [fwidth*width/2,height*fheight/2], [width/2,height*fheight/2],
+#                     [width/2,-fheight*height/2], [fwidth*width/2,-fheight*height/2],
+#                     [fwidth*width/2,-height/2], [-fwidth*width/2,-height/2],
+#                     [-fwidth*width/2,-fheight*height/2], [-width/2,-fheight*height/2] ])
     return spiro_polygon(coords,wheel,pen,orient=orient,
                          offset=offset,loops=loops,fold=fold,inside=inside)
     
