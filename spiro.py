@@ -36,7 +36,7 @@ class SpiroFig:
     def __init__(self,ax=None):
         self._ax=ax
         
-    def plot(self,sd,cmap='viridis',color_scheme='radial',new_fig=True):
+    def plot(self,sd,cmap='viridis',color_scheme='radial',new_fig=True,smooth=False):
         
         if new_fig or not self._ax:  self.new_fig()
         
@@ -61,8 +61,11 @@ class SpiroFig:
             case 'ripples':   c=sin((sd.x**2+sd.y**2))
             case 's-ripples': c=sin((sd.x**2+sd.y**2)**(1/4))
             case _:           c=[ 0 for i in range(len(sd.x))]
-    
-        self._ax.scatter(sd.x,sd.y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
+
+        if (smooth):
+            self._ax.plot(sd.x,sd.y)
+        else:
+            self._ax.scatter(sd.x,sd.y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
 
     def save_fig(self,filename='spiro.png'):  plt.savefig(filename,bbox_inches='tight')
 
@@ -72,6 +75,27 @@ class Wheel:   # might consider making "spacing" part of the Wheel's data
         self.r = radius # radius of the wheel
         self.m = pen    # marker position
         self.o = offset # cw angle from the vertical
+
+def circum(major,minor=None):
+    if not minor: minor=major
+    if major<=minor: return 2*pi*major
+    # approximation for Circumference for an ellipse from Wikipedia
+    h = (major-minor)**2/(major+minor)**2
+    return pi*(major+minor)*(1 + 3*h/(10+sqrt(4-3*h)))
+    
+class Ellipse:   # might consider making "spacing" part of the Wheel's data
+
+    def __init__(self,major=3, eccen=0.5, pen=2, offset=0):
+        self.a = major  # semi-major axis
+        self.b = self.a * sqrt(1.0 - eccen**2)  # semi-minor axis
+        self.m = pen    # marker position
+        self.o = offset # cw angle from the horizontal (diff from Wheel)
+        self.c = circum(self.a,self.b)
+
+    def r(self,phi=None):
+        if not phi: phi = self.o
+        return self.a*self.b / sqrt((self.a*sin(phi))**2+(self.b*cos(phi))**2)
+
 
 def spiro(R=10,wheel=Wheel(4,3.5,0.0),loops=5,
           slide = lambda t: 1,
@@ -142,6 +166,48 @@ def spiro_steps(R=10,wheel=Wheel(4,3.5,0),loops=1,n=10,offset=pi/10,spacing=pi/2
         wheel.o = offset*i
         sd.add(spiro(R=R,wheel=wheel,loops=loops,spacing=spacing)) 
     return sd
+
+def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
+                   loops=1,spacing=pi/4000,inside=True):  
+    '''roll on the outside (inside if invert=True) of an arc
+    centered on x0, y0, with radius, starting at orientation of
+    orient radians cw from the vertical.  Arc has length loops * 2pi
+    Direction of motion can be reversed by setting reverse=True
+    '''
+
+    sd = SpiroData()
+
+    a = wheel.a
+    b = wheel.b
+    m = wheel.m
+    offset = wheel.o
+
+    wc = wheel.c
+    RC = circum(R)
+    
+    t=np.linspace(0.0,2*pi*RC/wc*loops,int(loops/spacing))
+
+    iv = -1 if inside else 1
+    
+    p = t
+    
+    phi_factor   = 1
+    
+    # work out start_guard and end_guard effects in invert and reverse situations
+
+    p   = phi_factor   * t + offset
+    rp  = np.array([ wheel.r(phi) for phi in p ])
+    
+    theta = iv * rp / R * t + orient
+    r     = R + iv * rp
+    
+    sd.t=t
+    sd.x=x0+r*sin(theta) + (m/a)*rp*sin(p)
+    sd.y=y0+r*cos(theta) + (m/a)*rp*cos(p)
+    sd.p=p
+    
+    return sd
+
 
 # def roll_orig(x1,y1,x2,y2,a,b,offset=0,guard=0,invert=False):
 #     '''roll in straight line from (x1,y1) to (x2,y2)
