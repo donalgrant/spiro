@@ -28,7 +28,8 @@ class SpiroData:
 class SpiroFig:
 
     def new_fig(self,**kw_args):
-        fig, self._ax=plt.subplots(frameon=False,figsize=(10,10))
+        self._fig = plt.figure(figsize=(10,10))
+        self._ax=self._fig.add_subplot(frameon=False)
         self._ax.set(aspect=1,xticks=[],yticks=[])
         self._ax.set_axis_off()
         return self._ax
@@ -36,19 +37,18 @@ class SpiroFig:
     def __init__(self,ax=None):
         self._ax=ax
         
-    def plot(self,sd,cmap='viridis',color_scheme='radial',new_fig=True,smooth=False):
+    def plot(self,sd,cmap='viridis',color_scheme='radial',
+             dot_size=0.1,linestyle='',alpha=1.0,
+             new_fig=True,smooth=False):
         
         if new_fig or not self._ax:  self.new_fig()
         
-        dot_size=0.1
-        linestyle=''
-        alpha=1.0
-
         match color_scheme:
             case 'radial':    c=sqrt(sd.x**2+sd.y**2)
             case 'cycles':    c=sin(sd.p)
             case 'polar':     c=arctan2(sd.x,sd.y)
-            case 'time':      c=range(len(sd.p))
+            case 'time':      c=sd.t
+            case 'length':    c=range(len(sd.p))
             case 'random':    c=np.random.rand(len(sd.x))
             case 'x':         c=sd.x
             case 'y':         c=sd.y
@@ -60,14 +60,20 @@ class SpiroFig:
             case 'r-waves':   c=sin(sqrt(sd.x**2+sd.y**2))
             case 'ripples':   c=sin((sd.x**2+sd.y**2))
             case 's-ripples': c=sin((sd.x**2+sd.y**2)**(1/4))
-            case _:           c=[ 0 for i in range(len(sd.x))]
+            case _:
+                c=color_scheme
+                cmap=None
 
         if (smooth):
             self._ax.plot(sd.x,sd.y)
         else:
             self._ax.scatter(sd.x,sd.y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
 
-    def save_fig(self,filename='spiro.png'):  plt.savefig(filename,bbox_inches='tight')
+    def caption(self,text):
+        self._fig.text(0.0, 0.05, text, ha='left')
+        self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right')
+        
+    def save_fig(self,filename='spiro.png'):  self._fig.savefig(filename,bbox_inches='tight')
 
 class Wheel:   # might consider making "spacing" part of the Wheel's data
 
