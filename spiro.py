@@ -39,7 +39,7 @@ class SpiroFig:
         
     def plot(self,sd,cmap='viridis',color_scheme='radial',
              dot_size=0.1,linestyle='',alpha=1.0,
-             new_fig=True,smooth=False):
+             new_fig=True,smooth=False, caption=True):
         
         if new_fig or not self._ax:  self.new_fig()
         
@@ -69,9 +69,12 @@ class SpiroFig:
         else:
             self._ax.scatter(sd.x,sd.y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
 
+        if caption:
+            self._fig.text(0.0, 0.05, f'{color_scheme} Color Scheme, {cmap} color map', ha='left')
+            self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right')
+
     def caption(self,text):
-        self._fig.text(0.0, 0.05, text, ha='left')
-        self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right')
+        self._fig.text(0.4, 0.05, text, ha='left')
         
     def save_fig(self,filename='spiro.png'):  self._fig.savefig(filename,bbox_inches='tight')
 
@@ -239,9 +242,7 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
 #     return sd
 
 def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
-    '''roll in straight line from (x1,y1) to (x2,y2)
-    using wheel of diameter a and pen position b.
-    offset is the start angle off the vertical for the pen, in radians.
+    '''roll in straight line from (x1,y1) to (x2,y2) using circular wheel
     invert keyword controls sense of wheel location:  default
     is above and/or to the right.  invert=True is the opposite.
     '''
@@ -253,6 +254,46 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
     R=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
     A=arctan2(y2-y1,x2-x1)                                   # roll angle
     t=np.linspace(0,R/a,1000)           # angle through which the wheel rolls
+    
+    iv = -1 if invert else 1
+
+    phi_factor = 1
+    time_factor = iv * a
+
+    if invert:
+        phi_factor  *= -1
+        time_factor *= -1
+        
+    # do we have to swap to end_guard on inversion?
+
+    xs = x1 - iv * a * sin(A) + start_guard * cos(A)
+    ys = y1 + iv * a * cos(A) + start_guard * sin(A)
+
+    p = phi_factor * t + offset
+    
+    sd = SpiroData()
+    
+    sd.x = xs + time_factor * t * cos(A) + b * sin(p)
+    sd.y = ys + time_factor * t * sin(A) + b * cos(p) 
+    sd.p = p
+    sd.t = t
+    
+    return sd
+
+
+def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False):
+    '''roll in straight line from (x1,y1) to (x2,y2) using ellipse.
+    invert keyword controls sense of wheel location:  default
+    is above and/or to the right.  invert=True is the opposite.
+    '''
+    
+    C = ellipse.c
+    b = wheel.m
+    offset = wheel.o
+    
+    R=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
+    A=arctan2(y2-y1,x2-x1)                                   # roll angle
+    t=np.linspace(0,2*pi*R/C,1000)                           # angle through which the wheel rolls
     
     iv = -1 if invert else 1
 
