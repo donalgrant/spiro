@@ -71,8 +71,8 @@ def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False):
     '''
     
     C = ellipse.c
-    b = wheel.m
-    offset = wheel.o
+    b = ellipse.m
+    offset = ellipse.o
     
     R=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
     A=arctan2(y2-y1,x2-x1)                                   # roll angle

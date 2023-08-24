@@ -112,9 +112,9 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
     b = wheel.m
     offset = wheel.o
     
-    R=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
+    D=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
     A=arctan2(y2-y1,x2-x1)                                   # roll angle
-    t=np.linspace(0,R/a,1000)           # angle through which the wheel rolls
+    t=np.linspace(0,2*pi*(D/(2*pi*a)),1000)                  # angle through which the wheel rolls
     
     iv = -1 if invert else 1
 
