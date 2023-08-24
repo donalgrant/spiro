@@ -1,82 +1,6 @@
-import matplotlib.pyplot as plt
+from SpiroData import *
 import numpy as np
 from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array
-import math
-
-class SpiroData:
-    
-    def __init__(self):
-        self.reset()
-        
-    def reset(self):
-        self.x = np.array([])
-        self.y = np.array([])
-        self.p = np.array([])
-        self.t = np.array([])   # parameterize the drawing data (not sure if this is needed yet)
-
-    def add(self, sd):
-        self.x = np.append(self.x,sd.x)
-        self.y = np.append(self.y,sd.y)
-        self.p = np.append(self.p,sd.p)
-        self.t = np.append(self.t,sd.t)
-
-    def xc(self):  return self.x[-1] 
-    def yc(self):  return self.y[-1] 
-    def pc(self):  return self.p[-1]
-    def tc(self):  return self.t[-1]
-    
-class SpiroFig:
-
-    def new_fig(self,**kw_args):
-        self._fig = plt.figure(figsize=(10,10))
-        self._ax=self._fig.add_subplot(frameon=False)
-        self._ax.set(aspect=1,xticks=[],yticks=[])
-        self._ax.set_axis_off()
-        return self._ax
-        
-    def __init__(self,ax=None):
-        self._ax=ax
-        
-    def plot(self,sd,cmap='viridis',color_scheme='radial',
-             dot_size=0.1,linestyle='',alpha=1.0,
-             new_fig=True,smooth=False, caption=True):
-        
-        if new_fig or not self._ax:  self.new_fig()
-        
-        match color_scheme:
-            case 'radial':    c=sqrt(sd.x**2+sd.y**2)
-            case 'cycles':    c=sin(sd.p)
-            case 'polar':     c=arctan2(sd.x,sd.y)
-            case 'time':      c=sd.t
-            case 'length':    c=range(len(sd.p))
-            case 'random':    c=np.random.rand(len(sd.x))
-            case 'x':         c=sd.x
-            case 'y':         c=sd.y
-            case 'xy':        c=sd.x*sd.y
-            case 'x+y':       c=sd.x+sd.y
-            case 'x-y':       c=sd.x-sd.y
-            case 'h-waves':   c=sin(sd.x)
-            case 'v-waves':   c=sin(sd.y)
-            case 'r-waves':   c=sin(sqrt(sd.x**2+sd.y**2))
-            case 'ripples':   c=sin((sd.x**2+sd.y**2))
-            case 's-ripples': c=sin((sd.x**2+sd.y**2)**(1/4))
-            case _:
-                c=color_scheme
-                cmap=None
-
-        if (smooth):
-            self._ax.plot(sd.x,sd.y)
-        else:
-            self._ax.scatter(sd.x,sd.y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
-
-        if caption:
-            self._fig.text(0.0, 0.05, f'{color_scheme} Color Scheme, {cmap} color map', ha='left')
-            self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right')
-
-    def caption(self,text):
-        self._fig.text(0.4, 0.05, text, ha='left')
-        
-    def save_fig(self,filename='spiro.png'):  self._fig.savefig(filename,bbox_inches='tight')
 
 class Wheel:   # might consider making "spacing" part of the Wheel's data
 
@@ -84,27 +8,6 @@ class Wheel:   # might consider making "spacing" part of the Wheel's data
         self.r = radius # radius of the wheel
         self.m = pen    # marker position
         self.o = offset # cw angle from the vertical
-
-def circum(major,minor=None):
-    if not minor: minor=major
-    if major<=minor: return 2*pi*major
-    # approximation for Circumference for an ellipse from Wikipedia
-    h = (major-minor)**2/(major+minor)**2
-    return pi*(major+minor)*(1 + 3*h/(10+sqrt(4-3*h)))
-    
-class Ellipse:   # might consider making "spacing" part of the Wheel's data
-
-    def __init__(self,major=3, eccen=0.5, pen=2, offset=0):
-        self.a = major  # semi-major axis
-        self.b = self.a * sqrt(1.0 - eccen**2)  # semi-minor axis
-        self.m = pen    # marker position
-        self.o = offset # cw angle from the horizontal (diff from Wheel)
-        self.c = circum(self.a,self.b)
-
-    def r(self,phi=None):
-        if not phi: phi = self.o
-        return self.a*self.b / sqrt((self.a*sin(phi))**2+(self.b*cos(phi))**2)
-
 
 def spiro(R=10,wheel=Wheel(4,3.5,0.0),loops=5,
           slide = lambda t: 1,
@@ -176,48 +79,6 @@ def spiro_steps(R=10,wheel=Wheel(4,3.5,0),loops=1,n=10,offset=pi/10,spacing=pi/2
         sd.add(spiro(R=R,wheel=wheel,loops=loops,spacing=spacing)) 
     return sd
 
-def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
-                   loops=1,spacing=pi/4000,inside=True):  
-    '''roll on the outside (inside if invert=True) of an arc
-    centered on x0, y0, with radius, starting at orientation of
-    orient radians cw from the vertical.  Arc has length loops * 2pi
-    Direction of motion can be reversed by setting reverse=True
-    '''
-
-    sd = SpiroData()
-
-    a = wheel.a
-    b = wheel.b
-    m = wheel.m
-    offset = wheel.o
-
-    wc = wheel.c
-    RC = circum(R)
-    
-    t=np.linspace(0.0,2*pi*RC/wc*loops,int(loops/spacing))
-
-    iv = -1 if inside else 1
-    
-    p = t
-    
-    phi_factor   = 1
-    
-    # work out start_guard and end_guard effects in invert and reverse situations
-
-    p   = phi_factor   * t + offset
-    rp  = np.array([ wheel.r(phi) for phi in p ])
-    
-    theta = iv * rp / R * t + orient
-    r     = R + iv * rp
-    
-    sd.t=t
-    sd.x=x0+r*sin(theta) + (m/a)*rp*sin(p)
-    sd.y=y0+r*cos(theta) + (m/a)*rp*cos(p)
-    sd.p=p
-    
-    return sd
-
-
 # def roll_orig(x1,y1,x2,y2,a,b,offset=0,guard=0,invert=False):
 #     '''roll in straight line from (x1,y1) to (x2,y2)
 #     using wheel of diameter a and pen position b.
@@ -254,46 +115,6 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
     R=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
     A=arctan2(y2-y1,x2-x1)                                   # roll angle
     t=np.linspace(0,R/a,1000)           # angle through which the wheel rolls
-    
-    iv = -1 if invert else 1
-
-    phi_factor = 1
-    time_factor = iv * a
-
-    if invert:
-        phi_factor  *= -1
-        time_factor *= -1
-        
-    # do we have to swap to end_guard on inversion?
-
-    xs = x1 - iv * a * sin(A) + start_guard * cos(A)
-    ys = y1 + iv * a * cos(A) + start_guard * sin(A)
-
-    p = phi_factor * t + offset
-    
-    sd = SpiroData()
-    
-    sd.x = xs + time_factor * t * cos(A) + b * sin(p)
-    sd.y = ys + time_factor * t * sin(A) + b * cos(p) 
-    sd.p = p
-    sd.t = t
-    
-    return sd
-
-
-def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False):
-    '''roll in straight line from (x1,y1) to (x2,y2) using ellipse.
-    invert keyword controls sense of wheel location:  default
-    is above and/or to the right.  invert=True is the opposite.
-    '''
-    
-    C = ellipse.c
-    b = wheel.m
-    offset = wheel.o
-    
-    R=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
-    A=arctan2(y2-y1,x2-x1)                                   # roll angle
-    t=np.linspace(0,2*pi*R/C,1000)                           # angle through which the wheel rolls
     
     iv = -1 if invert else 1
 
