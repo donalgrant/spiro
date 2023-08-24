@@ -70,8 +70,9 @@ class SpiroFig:
             self._ax.scatter(sd.x,sd.y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
 
         if caption:
-            self._fig.text(0.0, 0.05, f'{color_scheme} Color Scheme, {cmap} color map', ha='left')
-            self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right')
+            if hasattr(self,'_fig'):
+                self._fig.text(0.0, 0.05, f'{color_scheme} Color Scheme, {cmap} color map', ha='left')
+                self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right')
 
     def caption(self,text):
         self._fig.text(0.4, 0.05, text, ha='left')
@@ -251,9 +252,9 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
     b = wheel.m
     offset = wheel.o
     
-    R=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
+    D=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
     A=arctan2(y2-y1,x2-x1)                                   # roll angle
-    t=np.linspace(0,R/a,1000)           # angle through which the wheel rolls
+    t=np.linspace(0,2*pi*(D/(2*pi*a)),1000)                  # angle through which the wheel rolls
     
     iv = -1 if invert else 1
 
@@ -288,8 +289,9 @@ def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False):
     '''
     
     C = ellipse.c
-    b = wheel.m
-    offset = wheel.o
+    a = ellipse.a
+    m = ellipse.m
+    offset = ellipse.o
     
     R=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
     A=arctan2(y2-y1,x2-x1)                                   # roll angle
@@ -298,23 +300,29 @@ def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False):
     iv = -1 if invert else 1
 
     phi_factor = 1
-    time_factor = iv * a
+    time_factor = iv * C/(2*pi)
 
     if invert:
         phi_factor  *= -1
         time_factor *= -1
         
     # do we have to swap to end_guard on inversion?
+    
+    xs = x1 - iv * ellipse.r(pi/2+ellipse.o) * sin(A) + start_guard * cos(A)
+    ys = y1 + iv * ellipse.r(pi/2+ellipse.o) * cos(A) + start_guard * sin(A)
+                   
+#    xs = x1 - iv * a * sin(A) + start_guard * cos(A)
+#    ys = y1 + iv * a * cos(A) + start_guard * sin(A)
 
-    xs = x1 - iv * a * sin(A) + start_guard * cos(A)
-    ys = y1 + iv * a * cos(A) + start_guard * sin(A)
-
-    p = phi_factor * t + offset
+    p   = phi_factor * t + offset
+    rp  = np.array([ ellipse.r(phi) for phi in p ])
     
     sd = SpiroData()
+
+    # need to fix this -- time_factor*t --> ellapsed_circum(t)
     
-    sd.x = xs + time_factor * t * cos(A) + b * sin(p)
-    sd.y = ys + time_factor * t * sin(A) + b * cos(p) 
+    sd.x = xs + time_factor * t * cos(A) + (m/a) * rp * sin(p)
+    sd.y = ys + time_factor * t * sin(A) + (m/a) * rp * cos(p) 
     sd.p = p
     sd.t = t
     
