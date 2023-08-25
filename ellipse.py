@@ -124,6 +124,11 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
 #        coords[i]=np.array([ [ rp[i]*sin(p[i]), rp[i]*cos(p[i]) ]  ])
 
 #    ec = rot_coords(-1.0*theta[i],coords)
+
+    T = np.array([  (phi%(pi/2)) - ellip_T(a,b,phi%(pi/2)) for phi in p ])
+
+    rx = np.array([ sin(tt) for tt in T ])
+    ry = np.array([ cos(tt) for tt in T ])
     
     r     = iv * rp
 
@@ -137,8 +142,11 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
 
     # not right, but just looking for a place-holder...
 
-    sd.x = x0 + (R+r) * sin(theta) + rp * (m/a) * sin(p)
-    sd.y = y0 + (R+r) * cos(theta) + rp * (m/a) * cos(p)
+    sd.x = x0 + (R+rx*r) * sin(theta) + rp * (m/a) * sin(p)
+    sd.y = y0 + (R+rx*r) * cos(theta) + rp * (m/a) * cos(p)  # rx is intentional
+
+#    sd.x = x0 + (R+r) * sin(theta) + rp * (m/a) * sin(p)
+#    sd.y = y0 + (R+r) * cos(theta) + rp * (m/a) * cos(p)
     
     sd.p=p
     
