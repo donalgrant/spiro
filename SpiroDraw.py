@@ -54,6 +54,7 @@ class SpiroFig:
     def caption(self,text):
         self._fig.text(0.4, 0.05, text, ha='left')
         
-    def save_fig(self,filename='spiro.png'):  self._fig.savefig(filename,bbox_inches='tight')
+    def save_fig(self,filename='spiro.png'):
+        self._fig.savefig(filename,bbox_inches='tight',transparent=True)
 
 
