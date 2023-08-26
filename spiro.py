@@ -1,13 +1,8 @@
 from SpiroData import *
 import numpy as np
 from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array
-
-class Wheel:   # might consider making "spacing" part of the Wheel's data
-
-    def __init__(self,radius=3.0, pen=2.0, offset=0):
-        self.r = radius # radius of the wheel
-        self.m = pen    # marker position
-        self.o = offset # cw angle from the vertical
+from Wheel import *
+from Ellipse import *
 
 def spiro(R=10,wheel=Wheel(4,3.5,0.0),loops=5,
           slide = lambda t: 1,
@@ -15,6 +10,40 @@ def spiro(R=10,wheel=Wheel(4,3.5,0.0),loops=5,
     return spiro_arc(x0=0,y0=0,orient=orient,R=R,wheel=wheel,loops=loops,
                      slide=slide,
                      spacing=spacing,invert=True,reverse=False)
+
+def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
+              loops=1,pts_per_loop=4000,
+              slide = lambda t: 1,
+              start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
+              invert=False,reverse=False):  
+    '''roll on the outside (inside if invert=True) of an elliptical arc
+    centered on x0, y0.  Direction of motion can be reversed by setting reverse=True
+    '''
+    
+    iv = -1 if invert else 1
+    
+    sd = SpiroData()
+
+    a = wheel.r
+    m = wheel.m
+    offset = wheel.o
+    
+    t=np.linspace(0,loops,int(loops*pts_per_loop))
+    
+    if reverse: t *= -1
+    
+    p = t * ellipse.c / wheel.c * 2 * pi + wheel.o
+
+    theta = np.array([ iv * ellipse.phi_at_arc(wheel.arc(phi)) for phi in p ])
+    
+    r = np.array([ ellipse.r(th) + iv * a for th in theta ])
+    
+    sd.t=t
+    sd.x=x0+r*sin(theta+ellipse.o) + m*sin(p)
+    sd.y=y0+r*cos(theta+ellipse.o) + m*cos(p)
+    sd.p=p
+    
+    return sd
 
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
               loops=1,spacing=pi/4000,

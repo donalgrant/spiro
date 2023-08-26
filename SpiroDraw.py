@@ -17,7 +17,7 @@ class SpiroFig:
         
     def plot(self,sd,cmap='viridis',color_scheme='radial',
              dot_size=0.1,linestyle='',alpha=1.0,
-             new_fig=True,smooth=False, caption=True):
+             new_fig=True,smooth=False, caption=False):
         
         if new_fig or not self._ax:  self.new_fig()
         
