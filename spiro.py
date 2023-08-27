@@ -6,10 +6,10 @@ from Ellipse import *
 
 def spiro(R=10,wheel=Wheel(4,3.5,0.0),loops=5,
           slide = lambda t: 1,
-          spacing=pi/4000,orient=0):
+          spacing=pi/4000,orient=0,inside=True):
     return spiro_arc(x0=0,y0=0,orient=orient,R=R,wheel=wheel,loops=loops,
                      slide=slide,
-                     spacing=spacing,invert=True,reverse=False)
+                     spacing=spacing,invert=True if inside else False,reverse=False)
 
 def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
               loops=1,pts_per_loop=4000,
@@ -34,13 +34,19 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     
     p = t * ellipse.c / wheel.c * 2 * pi + wheel.o
 
-    theta = np.array([ iv * ellipse.phi_at_arc(wheel.arc(phi)) for phi in p ])
-    
-    r = np.array([ ellipse.r(th) + iv * a for th in theta ])
+    theta = np.array([ iv * ellipse.phi_at_arc(wheel.arc(phi)) + ellipse.o for phi in p ])
+
+    normal = np.array([ ellipse.normal_at_phi(th) for th in theta ])
+
+    xnc = np.array([ x0 + ellipse.r(th)*sin(th) for th in theta ])
+    ync = np.array([ y0 + ellipse.r(th)*cos(th) for th in theta ])
+
+    x0_wheel = xnc + iv * wheel.r * sin(normal)
+    y0_wheel = ync + iv * wheel.r * cos(normal)
     
     sd.t=t
-    sd.x=x0+r*sin(theta+ellipse.o) + m*sin(p)
-    sd.y=y0+r*cos(theta+ellipse.o) + m*cos(p)
+    sd.x=x0_wheel + m*sin(p)
+    sd.y=y0_wheel + m*cos(p)
     sd.p=p
     
     return sd

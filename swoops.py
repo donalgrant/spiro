@@ -6,12 +6,17 @@ from spiro import *
 from spiro_ellipse import *
 
 def swoops(n=40,ring=10,radius=2.5,wheel_e=0.0,ring_e=0.0,
-           seed=11,xscale=40,yscale=40,swoop_min=0.01,swoop_mean=0.26,swoop_spread=0.15):
+           seed=11,xscale=40,yscale=40,exponential=False,
+           swoop_min=0.01,swoop_mean=0.26,swoop_spread=0.15):
     np.random.seed(seed)
     a = radius
     bv = [0.9*a + 0.03*a*i for i in range(10)]
-    x0=np.random.standard_normal(n)*xscale-xscale/2
-    y0=np.random.standard_normal(n)*yscale-yscale/2
+    if exponential:
+        x0=np.random.exponential(xscale,n)
+        y0=np.random.exponential(yscale,n)
+    else:
+        x0=np.random.standard_normal(n)*xscale-xscale/2
+        y0=np.random.standard_normal(n)*yscale-yscale/2
     sd=SpiroData()
     for o in range(x0.shape[0]):
         o0  = np.random.uniform(2*pi)

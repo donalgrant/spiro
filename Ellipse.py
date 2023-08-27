@@ -46,12 +46,13 @@ def _ellipse_arc(p0,pf,a,b):
 
 class Ellipse:   # might consider making "spacing" part of the Wheel's data
 
-    def __init__(self,major=3, eccen=0.5, pen=2, offset=0):
+    def __init__(self,major=3, eccen=0.5, pen=2, offset=0, origin=np.array([0,0])):
         self.a = major  # semi-major axis
         self.b = semi_minor(self.a,eccen)
         self.m = pen    # marker position
         self.o = offset # cw angle from the horizontal (diff from Wheel)
         self.c = circum(self.a,self.b)
+        self.O = origin
 
         # arc length array -- to be interpolated
 #        self.arc = np.array([ ellipse_arc(0,phi) for phi in np.linspace(0,2*pi,1000) ])
@@ -69,4 +70,13 @@ class Ellipse:   # might consider making "spacing" part of the Wheel's data
         bracket = [ nc*2*pi+p0 , (nc+1)*2*pi+p0 ]
         sol = optimize.root_scalar(f,bracket=bracket,method='brentq')
         return sol.root
+
+    def normal_at_phi(self,phi):   # returns the slope at coordinate phi
+        angle = phi  # or ellip_T(self.a,self.b,phi) ?
+        ab2 = self.a**2-self.b**2
+        denom = self.a**2 - ab2*cos(angle)**2
+        numer = ab2*sin(angle)*cos(angle)
+        if abs(denom) < 1.0e-8:
+            return phi+pi if numer<0 else phi    # not sure about the sign here
+        return phi + arctan2(numer,denom)
         
