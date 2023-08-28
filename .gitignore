@@ -1,4 +1,5 @@
 *.ipynb_checkpoints
+Untitled*
 *.png
 *~
 __pycache__
