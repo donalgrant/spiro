@@ -1,4 +1,6 @@
 import numpy as np
+from numpy import array, append, column_stack
+from SpiroGeometry import *
 
 class SpiroData:
     
@@ -6,32 +8,36 @@ class SpiroData:
         self.reset()
         
     def reset(self):
-        self.x = np.array([])
-        self.y = np.array([])
-        self.p = np.array([])
-        self.t = np.array([])   # parameterize the drawing data (not sure if this is needed yet)
+        self.x = array([])
+        self.y = array([])
+        self.p = array([])
+        self.t = array([])   # parameterize the drawing data (not sure if this is needed yet)
 
     def add(self, sd):
-        self.x = np.append(self.x,sd.x)
-        self.y = np.append(self.y,sd.y)
-        self.p = np.append(self.p,sd.p)
-        self.t = np.append(self.t,sd.t)
+        self.x = append(self.x,sd.x)
+        self.y = append(self.y,sd.y)
+        self.p = append(self.p,sd.p)
+        self.t = append(self.t,sd.t)
 
     def set(self,x=0,y=0,p=0,t=0):
-        self.x = np.array([x])
-        self.y = np.array([y])
-        self.p = np.array([p])
-        self.t = np.array([t])
+        self.x = array([x])
+        self.y = array([y])
+        self.p = array([p])
+        self.t = array([t])
 
     def set_array(self,x,y,p,t):
-        for i in range(x.shape[0]):
-            np.append(self.x,x)
-            np.append(self.y,y)
-            np.append(self.p,y)
-            np.append(self.t,t)
+        self.x = x
+        self.y = y
+        self.p = p
+        self.t = t
     
     def xc(self):  return self.x[-1] 
     def yc(self):  return self.y[-1] 
     def pc(self):  return self.p[-1]
     def tc(self):  return self.t[-1]
     
+    def rotate(self,angle):
+        coords = rot_coords(angle,column_stack((self.x,self.y)))
+        self.x = coords[:,0]
+        self.y = coords[:,1]
+        

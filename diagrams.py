@@ -74,7 +74,7 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),whee
         
     return sd
 
-def ring_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),phi0=0,inside=True):
+def ring_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),phi0=0,inside=True,orient=0):
 
     # Draw the ring
     
@@ -89,7 +89,7 @@ def ring_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),phi0=0,inside
 
     iv = -1 if inside else 1
 
-    phi = wheel.o
+    phi = wheel.o - orient
 
     theta = iv * ring.phi_at_arc(wheel.arc(phi-phi0)) + theta_offset
 
@@ -122,4 +122,6 @@ def ring_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),phi0=0,inside
 
     sd.add(line(np.array([ [x0_wheel,y0_wheel],[x0_pen,y0_pen] ])))
 
+    sd.rotate(orient)
+    
     return sd
