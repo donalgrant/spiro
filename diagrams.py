@@ -5,6 +5,7 @@ from Wheel import *
 from Ellipse import *
 from Ring import *
 from spiro import *
+from spiro_ellipse import *
 
 def line(coords,npts=20):
 
@@ -70,7 +71,7 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),whee
 
     # draw a line from center to pen location
 
-    sd.add(line(np.array([ [x0_wheel,y0_wheel],[x0_pen,y0_pen] ])))
+    sd.add(line(array([ [x0_wheel,y0_wheel],[x0_pen,y0_pen] ])))
         
     return sd
 
@@ -100,7 +101,7 @@ def ring_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),phi0=0,inside
     xnc = x0 + ring.r(theta)*sin(theta)
     ync = y0 + ring.r(theta)*cos(theta)
 
-    sd.add(line_at_angle(np.array([xnc,ync]),normal,length=wheel.r/2))
+    sd.add(line_at_angle(array([xnc,ync]),normal,length=wheel.r/2))
 
     x0_wheel = xnc + iv * wheel.r * sin(normal)
     y0_wheel = ync + iv * wheel.r * cos(normal)
@@ -120,8 +121,79 @@ def ring_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),phi0=0,inside
 
     # draw a line from center to pen location
 
-    sd.add(line(np.array([ [x0_wheel,y0_wheel],[x0_pen,y0_pen] ])))
+    sd.add(line(array([ [x0_wheel,y0_wheel],[x0_pen,y0_pen] ])))
 
     sd.rotate(orient)
     
+    return sd
+
+def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),phi0=0,inside=True,orient=0,pen_offset=0):
+    '''roll on the outside (inside if invert=True) of an arc
+    centered on x0, y0, with radius, starting at orientation of
+    orient radians cw from the vertical.  Arc has length loops * 2pi
+    pen_offset should become part of the wheel's attributes
+    '''
+
+    sp = 0.001
+    
+    iv = -1 if inside else 1
+    
+    # Draw the ring
+    
+    sd = SpiroData()
+    sd.add(spiro(ring.r,wheel=Wheel(0.01,0.0,0.0),loops=1,spacing=sp))
+
+    # find the elliptical wheel along the ring
+
+    rp = wheel.r(wheel.o)
+    arc = wheel.arc(phi0,wheel.o)
+    theta = iv * arc / ring.r + ring.o
+
+     # coordinate of contact
+    
+    cx = ring.O[0] + ring.r * sin(theta)
+    cy = ring.O[1] + ring.r * cos(theta)
+
+    # mark that point of contact, temporarily...
+
+    sd.add(line_at_angle(array([cx,cy]),theta,wheel.a/4))
+
+    # unrotated ellipse center coord
+
+    ucx = cx + iv * rp * sin(-wheel.o)
+    ucy = cy + iv * rp * cos(-wheel.o)
+
+    # Draw the unrotated ellipse wheel 
+
+#    sd.add(wheel_in_ellipse(x0=ucx,y0=ucy,
+#                            wheel=Wheel(0.01,0.0),ellipse=Ellipse(wheel.a,wheel.e),
+#                            orient=0,loops=1))
+
+    # unrotated ellipse pen coord
+
+    upx = ucx + wheel.m * sin(pen_offset)
+    upy = ucy + wheel.m * cos(pen_offset)
+
+    # draw a line from the center of the unrotated ellipse wheel to the pen
+
+ #   sd.add(line(array([ [ucx,ucy],[upx,upy] ])))
+
+    # normal to ellipse at wheel.o -- must be lined up with ring radial (theta)
+    
+    normal = wheel.normal_at_phi(wheel.o)
+
+    # rotate ellipse center and pen positions to align normal with ring radial
+
+    ec = rot_about(array([cx,cy]),normal+theta,array([ [ucx,ucy],[upx,upy] ]))
+
+    # Draw the ellipse wheel
+
+    sd.add(wheel_in_ellipse(x0=ec[0,0],y0=ec[0,1],
+                            wheel=Wheel(0.01,0.0),ellipse=Ellipse(wheel.a,wheel.e),
+                            orient=normal+theta,loops=1))
+
+    # draw a line from the center of the ellipse wheel to the pen
+
+    sd.add(line(ec))
+
     return sd

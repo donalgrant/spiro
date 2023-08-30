@@ -5,11 +5,13 @@ from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array
 
 class SpiroFig:
 
-    def new_fig(self,**kw_args):
+    def new_fig(self,no_frame=True,**kw_args):
         self._fig = plt.figure(figsize=(10,10))
         self._ax=self._fig.add_subplot(frameon=False)
-        self._ax.set(aspect=1,xticks=[],yticks=[])
-        self._ax.set_axis_off()
+        self._ax.set(aspect=1)
+        if no_frame:
+            self._ax.set(xticks=[],yticks=[])
+            self._ax.set_axis_off()
         return self._ax
         
     def __init__(self,ax=None):
@@ -17,9 +19,10 @@ class SpiroFig:
         
     def plot(self,sd,cmap='viridis',color_scheme='radial',
              dot_size=0.1,linestyle='',alpha=1.0,
+             subsample=None,no_frame=True,
              new_fig=True,smooth=False, caption=False):
         
-        if new_fig or not self._ax:  self.new_fig()
+        if new_fig or not self._ax:  self.new_fig(no_frame=no_frame)
         
         match color_scheme:
             case 'radial':    c=sqrt(sd.x**2+sd.y**2)
@@ -41,11 +44,23 @@ class SpiroFig:
             case _:
                 c=color_scheme
                 cmap=None
-
-        if (smooth):
-            self._ax.plot(sd.x,sd.y)
+        
+        if subsample:
+            x = sd.x[::subsample]
+            y = sd.y[::subsample]
+            t = sd.t[::subsample]
+            p = sd.p[::subsample]
+            c = c[::subsample]
         else:
-            self._ax.scatter(sd.x,sd.y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
+            x = sd.x
+            y = sd.y
+            t = sd.t
+            p = sd.p
+            
+        if (smooth):
+            self._ax.plot(x,y)
+        else:
+            self._ax.scatter(x,y,c=c,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
 
         if caption:
             self._fig.text(0.0, 0.05, f'{color_scheme} Color Scheme, {cmap} color map', ha='left')

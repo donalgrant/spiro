@@ -48,6 +48,7 @@ class Ellipse:   # might consider making "spacing" part of the Wheel's data
 
     def __init__(self,major=3, eccen=0.5, pen=2, offset=0, origin=np.array([0,0])):
         self.a = major  # semi-major axis
+        self.e = eccen  # eccentricity
         self.b = semi_minor(self.a,eccen)
         self.m = pen    # marker position
         self.o = offset # cw angle from the horizontal (diff from Wheel)

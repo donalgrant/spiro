@@ -3,6 +3,7 @@ import numpy as np
 from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array
 from Wheel import *
 from Ellipse import *
+from SpiroGeometry import *
 
 def spiro(R=10,wheel=Wheel(4,3.5,0.0),loops=5,
           slide = lambda t: 1,
@@ -37,8 +38,8 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
 
     normal = np.array([ ellipse.normal_at_phi(th) for th in theta ])
 
-    xnc = np.array([ x0 + ellipse.r(th)*sin(th) for th in theta ])
-    ync = np.array([ y0 + ellipse.r(th)*cos(th) for th in theta ])
+    xnc = np.array([ ellipse.r(th)*sin(th) for th in theta ])
+    ync = np.array([ ellipse.r(th)*cos(th) for th in theta ])
 
     x0_wheel = xnc + iv * wheel.r * sin(normal)
     y0_wheel = ync + iv * wheel.r * cos(normal)
@@ -49,6 +50,9 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     sd.p=p
 
     sd.rotate(orient)
+
+    sd.x += x0
+    sd.y += y0
     
     return sd
 
@@ -206,18 +210,6 @@ def cos_angle(a,b,c):
 
 def corner_guard(wheel_size=0,corner_angle=pi/2,):
     return wheel_size/tan(corner_angle/2)
-
-def rot_2D(angle):
-    '''Matrix will rotate a coordinate by angle_rads cw'''
-    return array([ [ cos(angle), sin(angle) ],
-                   [-sin(angle), cos(angle)  ] ])
-
-def rot_coords(angle_rads,coords):
-    cc = np.empty((coords.shape[0],2))
-    for i in range(cc.shape[0]):
-        cc[i] = np.matmul(rot_2D(angle_rads),coords[i])
-
-    return cc
 
 def spiro_line_orig(R=60,wheel=Wheel(12,7.2),orient=0,loops=60,n=1,fold=False, invert=False):
 

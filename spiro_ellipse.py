@@ -1,21 +1,69 @@
 from SpiroData import *
 import numpy as np
-from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array,arctan
+from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array,arctan,empty
 from Ellipse import *
+from SpiroGeometry import *
 
-# duplicate function -- put them in a spiro_math module eventually
+def elliptical_arc_new(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
+                       loops=1,spacing=pi/4000,inside=True,pen_offset=0):  
+    '''roll on the outside (inside if invert=True) of an arc
+    centered on x0, y0, with radius, starting at orientation of
+    orient radians cw from the vertical.  Arc has length loops * 2pi
+    Direction of motion can be reversed by setting reverse=True
+    Eventually put pen_offset in Ellipse attribute
+    '''
 
-def rot_2D(angle):
-    '''Matrix will rotate a coordinate by angle_rads cw'''
-    return array([ [ cos(angle), sin(angle) ],
-                   [-sin(angle), cos(angle)  ] ])
+    sd = SpiroData()
 
-def rot_coords(angle_rads,coords):
-    cc = np.empty((coords.shape[0],2))
-    for i in range(cc.shape[0]):
-        cc[i] = np.matmul(rot_2D(angle_rads),coords[i])
+    RC = circum(R)
 
-    return cc
+    t=np.linspace(0.0,wheel.phi_at_arc(RC*loops),int(loops/spacing))
+
+    iv = -1 if inside else 1
+    
+    # work out start_guard and end_guard effects in invert and reverse situations
+
+    p   = t + wheel.o
+    rp  = np.array([ wheel.r(phi) for phi in p ])
+
+    arc = np.array([ wheel.arc(p[0],phi) for phi in p ])
+    theta = iv * arc / R + orient
+
+    # coordinate of contact
+    
+    cx = R * sin(theta)
+    cy = R * cos(theta)
+
+    # normal at point of contact
+
+    normal = array([ wheel.normal_at_phi(phi) for phi in p ])
+    
+    # unrotated ellipse center coord
+
+    ucx = cx + iv * rp * sin(-p)
+    ucy = cy + iv * rp * cos(-p)
+
+    # unrotated ellipse pen coord
+
+    upx = ucx + wheel.m * sin(pen_offset)
+    upy = ucy + wheel.m * cos(pen_offset)
+
+    # rotate ellipse center and pen positions to align normal with ring radial
+
+    pp = empty((theta.shape[0],2))
+    
+    for i in range(theta.shape[0]):
+        pp[i] = rot_about(array([cx[i],cy[i]]),normal[i]+theta[i],array([ [upx[i],upy[i]] ]))
+        
+    # coordinate of pen
+
+    sd.t = t
+    sd.p = p
+
+    sd.x = pp[:,0] + x0
+    sd.y = pp[:,1] + y0
+
+    return sd
 
 def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
                    loops=1,spacing=pi/4000,inside=True):  

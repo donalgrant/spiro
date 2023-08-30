@@ -11,3 +11,10 @@ def rot_coords(angle_rads,coords):
         cc[i] = matmul(rot_2D(angle_rads),coords[i])
 
     return cc
+
+def rot_about(origin,angle,coords):
+    cc = empty((coords.shape[0],2))
+    for i in range(cc.shape[0]):
+        cc[i] = matmul(rot_2D(angle),coords[i]-origin)+origin
+    return cc
+

@@ -19,7 +19,7 @@ class SpiroData:
         self.p = append(self.p,sd.p)
         self.t = append(self.t,sd.t)
 
-    def set(self,x=0,y=0,p=0,t=0):
+    def set(self,x=0,y=0,p=0,t=0,m=1):
         self.x = array([x])
         self.y = array([y])
         self.p = array([p])
