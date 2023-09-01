@@ -41,3 +41,13 @@ class SpiroData:
         self.x = coords[:,0]
         self.y = coords[:,1]
         
+    def subsample(self,n):
+        '''return a subsampled version of the current data'''
+        sd = SpiroData()
+        sd.x=self.x[::n]
+        sd.y=self.y[::n]
+        sd.p=self.p[::n]
+        sd.t=self.t[::n]
+        return sd
+
+    def n(self):  return self.x.shape[0]
