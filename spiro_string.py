@@ -65,12 +65,15 @@ def string_dispersing_links(sd,offset=1000,step0=50,step=1,line_pts=500):
         
     return st
 
-def strings_from_coord(sd,coord=array([0,0]),offset=100,line_pts=500,nLines=0):
+def strings_from_coord(sd,coord=array([0,0]),offset=100,line_pts=500,nLines=0,i2_start=-1):
     st = SpiroData()
     if nLines==0: nLines = int(sd.n()/offset)
     x0=coord[0]
     y0=coord[1]
-    initial_i2 = np.random.random_integers(0,sd.n()-nLines*offset)
+    if i2_start<0:
+        initial_i2 = np.random.random_integers(0,sd.n()-nLines*offset)
+    else:
+        initial_i2 = i2_start
     if initial_i2 < 0:  initial_i2=0
     for i in range(0,nLines):
         i2=i*offset+initial_i2
@@ -85,11 +88,12 @@ def strings_from_coord(sd,coord=array([0,0]),offset=100,line_pts=500,nLines=0):
         
     return st
 
-def strings_from_pts(sd,n=3,offset=100,line_pts=500,nLines=30):
+def strings_from_pts(sd,n=3,offset=100,line_pts=500,nLines=30,fixed=0):
     st = SpiroData()
     for i in range(n):
         j = np.random.random_integers(0,sd.n())
-        st.add(strings_from_coord(sd,array([ sd.x[j], sd.y[j] ]),offset,line_pts,nLines))
+        i2_start=-1 if fixed==0 else j+fixed
+        st.add(strings_from_coord(sd,array([ sd.x[j], sd.y[j] ]),offset,line_pts,nLines,i2_start=i2_start))
         
     return st
 
