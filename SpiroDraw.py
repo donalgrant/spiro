@@ -3,6 +3,8 @@ import SpiroData
 import numpy as np
 from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array,linspace
 
+from pathlib import Path
+        
 def cmap_list():
     return ['viridis','magma','inferno','plasma','cividis',
             'spring','summer','winter','autumn','Wistia','cool',
@@ -28,12 +30,16 @@ class SpiroFig:
             self._ax.set_axis_off()
         return self._ax
         
-    def __init__(self,ax=None):
+    def __init__(self,ax=None,savepath='out/'):
+        self._path=savepath
+        Path(savepath).mkdir(parents=True, exist_ok=True)
+        self._figname='Figure-'
         self._ax=ax
+        self._fig_number=0
         
     def plot(self,sd,cmap='viridis',color_scheme='radial',
              dot_size=0.1,linestyle='',alpha=1.0,
-             subsample=None,no_frame=True,
+             subsample=None,no_frame=True, save=False,
              new_fig=True,smooth=False, caption=False):
         
         if new_fig or not self._ax:  self.new_fig(no_frame=no_frame)
@@ -87,10 +93,16 @@ class SpiroFig:
             self._fig.text(0.0, 0.05, f'{color_scheme} Color Scheme, {cmap} color map', ha='left')
             self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right')
 
+        if save:
+            self.save_fig()
+
     def caption(self,text):
         self._fig.text(0.4, 0.05, text, ha='left')
         
-    def save_fig(self,filename='spiro.png'):
+    def save_fig(self,filename=None):
+        if filename is None:
+            filename=self._path+self._figname+f'{self._fig_number}.png'
         self._fig.savefig(filename,bbox_inches='tight',transparent=True)
+        self._fig_number+=1
 
     def close(self):  plt.close(self._fig)
