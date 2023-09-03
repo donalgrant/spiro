@@ -34,7 +34,8 @@ def line_at_angle(center=np.array([0,0]),vert_angle=0.0,length=10.0,npts=20):
         
     return line(coords,npts)
 
-def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),wheel=Wheel(4,3.5,0.0),phi0=0,inside=True):
+def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),
+                       wheel=Wheel(4,3.5,0.0),phi0=0,inside=True):
 
     # Draw the ring
     
@@ -56,11 +57,13 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),whee
     x0_wheel = x0 + wheel_center_r * sin(theta)
     y0_wheel = y0 + wheel_center_r * cos(theta)
     
-    sd.add(spiro_arc(x0=x0_wheel,y0=y0_wheel,orient=phi,R=wheel.r,wheel=Wheel(0.01,0.0),loops=1))
+    sd.add(spiro_arc(x0=x0_wheel,y0=y0_wheel,orient=phi,R=wheel.r,
+                     wheel=Wheel(0.01,0.0),loops=1))
 
     # Mark the center location
 
-    sd.add(spiro_arc(x0=x0_wheel,y0=y0_wheel,orient=0,R=wheel.r/20,wheel=Wheel(0.01,0.0),loops=1))
+    sd.add(spiro_arc(x0=x0_wheel,y0=y0_wheel,orient=0,R=wheel.r/20,
+                     wheel=Wheel(0.01,0.0),loops=1))
 
     # Mark the pen location
 
@@ -75,7 +78,8 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),whee
         
     return sd
 
-def ring_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),phi0=0,inside=True,orient=0):
+def ring_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
+                         phi0=0,inside=True,orient=0):
 
     # Draw the ring
     
@@ -106,18 +110,21 @@ def ring_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),phi0=0,inside
     x0_wheel = xnc + iv * wheel.r * sin(normal)
     y0_wheel = ync + iv * wheel.r * cos(normal)
     
-    sd.add(spiro_arc(x0=x0_wheel,y0=y0_wheel,orient=phi,R=wheel.r,wheel=Wheel(0.01,0.0),loops=1))
+    sd.add(spiro_arc(x0=x0_wheel,y0=y0_wheel,orient=phi,R=wheel.r,
+                     wheel=Wheel(0.01,0.0),loops=1))
 
     # Mark the center location
 
-    sd.add(spiro_arc(x0=x0_wheel,y0=y0_wheel,orient=0,R=wheel.r/20,wheel=Wheel(0.01,0.0),loops=1))
+    sd.add(spiro_arc(x0=x0_wheel,y0=y0_wheel,orient=0,R=wheel.r/20,
+                     wheel=Wheel(0.01,0.0),loops=1))
 
     # Mark the pen location
 
     x0_pen = x0_wheel + wheel.m * sin(phi)
     y0_pen = y0_wheel + wheel.m * cos(phi)
 
-    sd.add(spiro_arc(x0=x0_pen,y0=y0_pen,orient=0,R=0.01,wheel=Wheel(0.01,0.0),loops=1))
+    sd.add(spiro_arc(x0=x0_pen,y0=y0_pen,orient=0,R=0.01,
+                     wheel=Wheel(0.01,0.0),loops=1))
 
     # draw a line from center to pen location
 
@@ -127,7 +134,8 @@ def ring_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),phi0=0,inside
     
     return sd
 
-def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),phi0=0,inside=True,orient=0,pen_offset=0):
+def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),
+                           phi0=0,inside=True,orient=0,pen_offset=0):
     '''roll on the outside (inside if invert=True) of an arc
     centered on x0, y0, with radius, starting at orientation of
     orient radians cw from the vertical.  Arc has length loops * 2pi
@@ -163,20 +171,10 @@ def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),phi0=0,insid
     ucx = cx + iv * rp * sin(-wheel.o)
     ucy = cy + iv * rp * cos(-wheel.o)
 
-    # Draw the unrotated ellipse wheel 
-
-#    sd.add(wheel_in_ellipse(x0=ucx,y0=ucy,
-#                            wheel=Wheel(0.01,0.0),ellipse=Ellipse(wheel.a,wheel.e),
-#                            orient=0,loops=1))
-
     # unrotated ellipse pen coord
 
     upx = ucx + wheel.m * sin(pen_offset)
     upy = ucy + wheel.m * cos(pen_offset)
-
-    # draw a line from the center of the unrotated ellipse wheel to the pen
-
- #   sd.add(line(array([ [ucx,ucy],[upx,upy] ])))
 
     # normal to ellipse at wheel.o -- must be lined up with ring radial (theta)
     

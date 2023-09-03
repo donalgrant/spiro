@@ -19,6 +19,16 @@ def cmap_list():
             'YlOrRd','OrRd','PuRd','RdPu','BuPu','GnBu','PuBu','YlGnBu','PuBuGn','BuGn','YlGn'
             ]
 
+# would like a better way to capture the color_scheme name with the encoding in a single
+# place, rather than both here and in the match statement.
+
+def cs_list():
+    return ['radial','cycles','polar','time','length','random',
+            'x','xrand','y','yrand','rrand','xy','x+y',
+            'x-y','h-waves','t-waves','l-waves','v-waves',
+            'r-waves','ripples','s-ripples'
+            ]
+
 class SpiroFig:
 
     def new_fig(self,no_frame=True,**kw_args):
@@ -30,12 +40,13 @@ class SpiroFig:
             self._ax.set_axis_off()
         return self._ax
         
-    def __init__(self,ax=None,savepath='out/'):
+    def __init__(self,ax=None,savepath='./'):
         self._path=savepath
         Path(savepath).mkdir(parents=True, exist_ok=True)
         self._figname='Figure-'
         self._ax=ax
-        self._fig_number=0
+        self.fig_number=0
+        self.text_color='white'
         
     def plot(self,sd,cmap='viridis',color_scheme='radial',
              dot_size=0.1,linestyle='',alpha=1.0,
@@ -90,19 +101,21 @@ class SpiroFig:
             self._ax.scatter(x,y,c=clr,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
 
         if caption:
-            self._fig.text(0.0, 0.05, f'{color_scheme} Color Scheme, {cmap} color map', ha='left')
-            self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right')
+            self._fig.text(0.0, 0.05, f'{color_scheme} Color Scheme, {cmap} color map', ha='left',
+                           color=self.text_color)
+            self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right',color=self.text_color)
 
         if save:
             self.save_fig()
 
     def caption(self,text):
-        self._fig.text(0.4, 0.05, text, ha='left')
+        self._fig.text(0.4, 0.05, text, ha='left',color=self.text_color)
         
     def save_fig(self,filename=None):
         if filename is None:
-            filename=self._path+self._figname+f'{self._fig_number}.png'
+            filename=self._path+self._figname+f'{self.fig_number}.png'
         self._fig.savefig(filename,bbox_inches='tight',transparent=True)
-        self._fig_number+=1
+        self.fig_number+=1
+        self.close()
 
     def close(self):  plt.close(self._fig)

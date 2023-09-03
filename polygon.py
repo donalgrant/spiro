@@ -4,6 +4,7 @@ from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array
 from Wheel import *
 from Ellipse import *
 from SpiroGeometry import *
+from spiro import *
 
 # def roll_orig(x1,y1,x2,y2,a,b,offset=0,guard=0,invert=False):
 #     '''roll in straight line from (x1,y1) to (x2,y2)
@@ -239,19 +240,22 @@ def heart(x0=0,y0=0,width=40,depth=20,wheel=Wheel(2.2,1.0),loops=1,
 
         if inside:
 
-            ba=corner_angles(np.array([ [x0,y0-depth], [x0-width/2,y0], [x0-width/2,y0+1] ]),inside=True)
+            ba=corner_angles(np.array([ [x0,y0-depth], [x0-width/2,y0],
+                                        [x0-width/2,y0+1] ]),inside=True)
             cg=corner_guard(wheel.r,ba[0])
             
             sd.add(roll(x0,y0-depth,x0-width/2,y0,wheel,
                         start_guard=g*corner_guard(wheel.r,pi/2),end_guard=g*cg,invert=True))
             wheel.o=sd.pc()
-            sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,loops=0.5,start_guard=g*cg,invert=True))
+            sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,
+                             loops=0.5,start_guard=g*cg,invert=True))
             
             wheel.o = sd.pc()
             rot_angle = pi if fold else -pi
             sd.add(rotate(x0,y0,sd.xc(),sd.yc(),rot_angle))
             wheel.o += rot_angle
-            sd.add(spiro_arc(x0+width/4,y0,-pi/2,width/4,wheel,loops=0.5,end_guard=g*cg,invert=True))
+            sd.add(spiro_arc(x0+width/4,y0,-pi/2,width/4,wheel,
+                             loops=0.5,end_guard=g*cg,invert=True))
             wheel.o = sd.pc()
             sd.add(roll(x0+width/2,y0,x0,y0-depth,wheel,
                         start_guard=g*corner_guard(wheel.r,pi-pi/4),
