@@ -111,10 +111,10 @@ class SpiroFig:
     def caption(self,text):
         self._fig.text(0.4, 0.05, text, ha='left',color=self.text_color)
         
-    def save_fig(self,filename=None):
+    def save_fig(self,filename=None,dpi=None):
         if filename is None:
             filename=self._path+self._figname+f'{self.fig_number}.png'
-        self._fig.savefig(filename,bbox_inches='tight',transparent=True)
+        self._fig.savefig(filename,bbox_inches='tight',transparent=True,dpi=dpi)
         self.fig_number+=1
         self.close()
 

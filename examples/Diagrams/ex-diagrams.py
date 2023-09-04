@@ -5,6 +5,7 @@ from SpiroData import *
 from SpiroDraw import *
 from spiro import *
 from spiro_string import *
+from polygon import *
 from diagrams import *
 
 S = SpiroData()
@@ -97,3 +98,64 @@ for phi in np.linspace(phi1,phi2,n):
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
 F.save_fig()
+
+### arc-continuity
+
+S.reset()
+r=10
+a=1.3
+p=2.3
+F.plot(spiro_arc(orient=0,R=r,wheel=Wheel(0.01,0),
+                 loops=1,invert=False,reverse=False),
+       cmap='hsv',color_scheme='time',new_fig=True)
+o=0
+for i in range(1):
+    S.add(spiro_arc(orient=0,R=r,wheel=Wheel(a,p,o+pi),loops=0.25,invert=True,reverse=True))
+    o=S.pc()
+    S.add(rotate(-r,0,S.xc(),S.yc(),pi))
+    S.add(spiro_arc(orient=-pi/2,R=r,wheel=Wheel(a,p,o+pi),loops=0.25,invert=False,reverse=False))
+    o=S.pc()
+    S.add(rotate(0,r,S.xc(),S.yc(),pi))
+    
+F.plot(S,new_fig=False,cmap='autumn',color_scheme='time')
+F.save_fig()
+
+###
+
+S.reset()
+r=9
+F.plot(spiro_arc(orient=-pi/2,R=r,wheel=Wheel(0.01,0.0),
+                 loops=1,invert=False,reverse=False),
+       cmap='hsv',color_scheme='time',new_fig=True)
+
+rot=pi/10
+(a,b)=(1.5,1.3)
+for i in range(1):
+    S.add(spiro_arc(orient=-pi/2+rot,R=r,wheel=Wheel(a,b),loops=0.5,invert=False,reverse=False))
+    S.add(spiro_arc(orient=-pi/2+rot,R=r,wheel=Wheel(a,b),loops=0.5,invert=False,reverse=True))
+    S.add(spiro_arc(orient=-pi/2+rot,R=r,wheel=Wheel(a,b),loops=0.5,invert=True,reverse=False))
+    S.add(spiro_arc(orient=-pi/2+rot,R=r,wheel=Wheel(a,b),loops=0.5,invert=True,reverse=True))
+    
+F.plot(S,new_fig=False,cmap='autumn',color_scheme='time')
+F.save_fig()
+
+###
+
+(x1,y1,x2,y2)=(0,0,30,0)
+(a,b)=(2,2)
+S.reset()
+S.add(roll(x1,y1,x2,y2,Wheel(0.01,0.0),invert=False))
+S.add(roll(x1,y1,x2,y2,Wheel(a,b),invert=False))
+o=S.pc()
+S.add(rotate(x2,y2,S.xc(),S.yc(),pi))
+S.add(roll(x2,y2,x1,y1,Wheel(a,b,o+pi),invert=False))
+S.add(rotate(x1,y1,S.xc(),S.yc(),pi))
+S.add(roll(x1,y1,x2,y2,Wheel(a,b),invert=True))
+o = S.pc()
+S.add(rotate(x2,y2,S.xc(),S.yc(),-pi))
+S.add(roll(x2,y2,x1,y1,Wheel(a,b,o-pi),invert=True))
+S.add(rotate(x1,y1,S.xc(),S.yc(),-pi))
+F.plot(S)
+
+F.save_fig()
+

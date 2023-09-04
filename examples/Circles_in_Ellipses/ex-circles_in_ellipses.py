@@ -104,7 +104,8 @@ for j in range(20):
                            ellipse=Ellipse(20,e,0,offset),
                            pts_per_loop=ppl,
                            loops=3,invert=True,orient=orient))
-F.plot(S,color_scheme='cycles',cmap='Greens',save=True)
+F.plot(S,color_scheme='cycles',cmap='Greens')
+F.save_fig(dpi=100)
 
 ###
 
