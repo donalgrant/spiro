@@ -238,3 +238,26 @@ F.plot(S,cmap=c,color_scheme=cs,save=True)
 
 ###
 
+S.reset()
+for i in range(1):
+    S.add(spiro_nstar(4,r2=0.6,wheel=Wheel(5,4),orient=0,
+                  loops=14,inside=False,fold=True))
+    S.add(spiro_nstar(4,r2=0.6,wheel=Wheel(6,5),orient=0,
+                  loops=30,inside=True,fold=False))
+F.plot(S,color_scheme='time',cmap='jet',save=True)
+
+###
+
+S.reset()
+
+S.add(spiro_nstar(4,r2=0.6,wheel=Wheel(5,4),orient=0,
+                  loops=14,inside=False,fold=True))
+S.add(spiro_nstar(4,r2=0.6,wheel=Wheel(6,5),orient=0,
+                  loops=30,inside=True,fold=False))
+S.add(spiro_nstar(4,r2=0.6,wheel=Wheel(18,8),orient=0,
+                  loops=30,inside=False,fold=False))
+
+F.plot(S,color_scheme='l-waves',cmap='RdPu',save=True)
+
+###
+

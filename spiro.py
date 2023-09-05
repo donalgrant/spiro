@@ -56,49 +56,6 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     
     return sd
 
-def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
-              loops=1,pts_per_loop=4000,
-              slide = lambda t: 1,
-              start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
-              orient=0,invert=False,reverse=False):  
-    '''roll on the outside (inside if invert=True) of an elliptical arc
-    centered on x0, y0.  Direction of motion can be reversed by setting reverse=True
-    '''
-    
-    iv = -1 if invert else 1
-    
-    sd = SpiroData()
-
-    a = wheel.r
-    m = wheel.m
-    
-    t=np.linspace(0,loops,int(loops*pts_per_loop))
-    
-    if reverse: t *= -1
-    
-    p = t * ellipse.c / wheel.c * 2 * pi + wheel.o - orient
-
-    theta = np.array([ iv * ellipse.phi_at_arc(wheel.arc(phi)) + ellipse.o for phi in p ])
-
-    normal = np.array([ ellipse.normal_at_phi(th) for th in theta ])
-
-    xnc = np.array([ ellipse.r(th)*sin(th) for th in theta ])
-    ync = np.array([ ellipse.r(th)*cos(th) for th in theta ])
-
-    x0_wheel = xnc + iv * wheel.r * sin(normal)
-    y0_wheel = ync + iv * wheel.r * cos(normal)
-    
-    sd.t=t
-    sd.x=x0_wheel + m*sin(p)
-    sd.y=y0_wheel + m*cos(p)
-    sd.p=p
-
-    sd.rotate(orient)
-
-    sd.x += x0
-    sd.y += y0
-    
-    return sd
 
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
                     loops=1,spacing=pi/4000,

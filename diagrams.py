@@ -195,3 +195,66 @@ def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),
     sd.add(line(ec))
 
     return sd
+
+def ee_diagram(ring,wheel,phi0=0,inside=True):
+    '''roll an ellipse on the outside (inside if invert=True) of an elliptical arc
+    the wheel starts at phi0 -- its rotation from the position lined with the major
+    axis of the ring.
+    '''
+
+    iv = -1 if inside else 1
+    
+    # Draw the ring
+    
+    sd = SpiroData()
+    
+    sd.add(wheel_in_ellipse(wheel=Wheel(0.01,0.0),ellipse=ring,loops=1))
+
+    # find the elliptical wheel along the ring
+
+    rp = wheel.r(wheel.o)
+    arc = wheel.arc(phi0,wheel.o)
+    ring_phi = ring.phi_at_arc(iv * arc, ring.po)  # ring.po is initial angle of wheel
+    ring_r = ring.r(ring_phi)
+
+    # normal to ellipse at wheel.o -- must be lined up with ring normal at ring_phi
+    
+    wheel_n = wheel.normal_at_phi(wheel.o)
+    ring_n = ring.normal_at_phi(ring_phi)
+
+     # coordinate of contact
+    
+    cx = ring.O[0] + ring_r * sin(ring_phi)  # move offsets to the end?
+    cy = ring.O[1] + ring_r * cos(ring_phi)
+
+    # mark that point of contact
+
+    sd.add(line_at_angle(array([cx,cy]),ring_n,wheel.a/4))
+
+    # unrotated ellipse center coord
+
+    ucx = cx + iv * rp * sin(-wheel.o)
+    ucy = cy + iv * rp * cos(-wheel.o)
+
+    # unrotated ellipse pen coord
+
+    upx = ucx + wheel.m * sin(wheel.po)
+    upy = ucy + wheel.m * cos(wheel.po)
+
+    # rotate ellipse center and pen positions to align normal with ring radial
+
+    ec = rot_about(array([cx,cy]),wheel_n+ring_n,array([ [ucx,ucy],[upx,upy] ]))
+
+    # Draw the ellipse wheel
+
+    sd.add(wheel_in_ellipse(x0=ec[0,0],y0=ec[0,1],
+                            wheel=Wheel(0.01,0.0),ellipse=Ellipse(wheel.a,wheel.e),
+                            orient=wheel_n+ring_n,loops=1))
+
+    # draw a line from the center of the ellipse wheel to the pen
+
+    sd.add(line(ec))
+
+    sd.rotate(ring.o)
+    
+    return sd

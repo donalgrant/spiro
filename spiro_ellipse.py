@@ -1,32 +1,104 @@
 from SpiroData import *
 import numpy as np
-from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array,arctan,empty
+from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array,arctan,empty,linspace
 from Ellipse import *
 from SpiroGeometry import *
 
-def elliptical_arc_new(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
-                       loops=1,spacing=pi/4000,inside=True,pen_offset=0):  
+def elliptical_in_ellipse(ring=Ellipse(20,0.5,0,0),
+                          wheel=Ellipse(3,0.5,2,0),
+                          loops=1,
+                          slide = lambda t: 1,
+                          start_guard=0,end_guard=0,
+                          start_guard_angle=0,end_guard_angle=0,
+                          pts_per_loop=4000,inside=True,reverse=False):  
+    '''roll on the inside (outside if inside=False) of an *elliptical* arc
+    centered on x0, y0, with radius, starting at orientation of
+    orient radians cw from the vertical given by ring.o; initial position of
+    wheel given by ring.po.  Arc has length loops * ellipse_circum
+    
+    '''
+
+    sd = SpiroData()
+
+    RC = ring.c
+
+    t=linspace(0,loops,int(loops*pts_per_loop))
+    if reverse:  t *= -1
+    
+    iv = -1 if inside else 1
+    
+    # work out start_guard and end_guard effects in invert and reverse situations
+
+    p   = t * ring.c / wheel.c * 2 * pi + wheel.o 
+    rp  = array([ wheel.r(phi) for phi in p ])
+
+    arc = array([ wheel.arc(p[0],phi) for phi in p ])
+    ring_phi = array([ ring.phi_at_arc(iv * arc_i, ring.po) for arc_i in arc])
+    ring_r   = array([ ring.r(phi) for phi in ring_phi ])
+    ring_n   = array([ ring.normal_at_phi(phi) for phi in ring_phi ])
+
+    # coordinate of contact
+    
+    cx = ring_r * sin(ring_phi)   # does this work in python?
+    cy = ring_r * cos(ring_phi)
+
+    # normal at point of contact
+
+    wheel_n = array([ wheel.normal_at_phi(phi) for phi in p ])
+    
+    # unrotated ellipse center coord
+
+    ucx = cx + iv * rp * sin(-p)
+    ucy = cy + iv * rp * cos(-p)
+
+    # unrotated ellipse pen coord
+
+    upx = ucx + wheel.m * sin(wheel.po)
+    upy = ucy + wheel.m * cos(wheel.po)
+
+    # rotate ellipse center and pen positions to align wheel normal with ring normal
+
+    pp = empty((ring_n.shape[0],2))
+    
+    for i in range(ring_n.shape[0]):
+        pp[i] = rot_about(array([cx[i],cy[i]]),wheel_n[i]+ring_n[i],
+                          array([ [upx[i],upy[i]] ]))
+        
+    # coordinate of pen
+
+    sd.t = t
+    sd.p = p
+
+    sd.x = pp[:,0] + ring.O[0]
+    sd.y = pp[:,1] + ring.O[1]
+
+    print('rotating by ',ring.o*180/pi)
+    sd.rotate(ring.o)
+    
+    return sd
+
+def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
+                   loops=1,spacing=pi/4000,inside=True,pen_offset=0):  
     '''roll on the outside (inside if invert=True) of an arc
     centered on x0, y0, with radius, starting at orientation of
     orient radians cw from the vertical.  Arc has length loops * 2pi
-    Direction of motion can be reversed by setting reverse=True
-    Eventually put pen_offset in Ellipse attribute
+    Todo:  Direction of motion can be reversed by setting reverse=True
     '''
 
     sd = SpiroData()
 
     RC = circum(R)
 
-    t=np.linspace(0.0,wheel.phi_at_arc(RC*loops),int(loops/spacing))
+    t=linspace(0.0,wheel.phi_at_arc(RC*loops),int(loops/spacing))
 
     iv = -1 if inside else 1
     
     # work out start_guard and end_guard effects in invert and reverse situations
 
     p   = t + wheel.o
-    rp  = np.array([ wheel.r(phi) for phi in p ])
+    rp  = array([ wheel.r(phi) for phi in p ])
 
-    arc = np.array([ wheel.arc(p[0],phi) for phi in p ])
+    arc = array([ wheel.arc(p[0],phi) for phi in p ])
     theta = iv * arc / R + orient
 
     # coordinate of contact
@@ -65,83 +137,6 @@ def elliptical_arc_new(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
 
     return sd
 
-def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
-                   loops=1,spacing=pi/4000,inside=True):  
-    '''roll on the outside (inside if invert=True) of an arc
-    centered on x0, y0, with radius, starting at orientation of
-    orient radians cw from the vertical.  Arc has length loops * 2pi
-    Direction of motion can be reversed by setting reverse=True
-    '''
-
-    sd = SpiroData()
-
-    a = wheel.a
-    b = wheel.b
-    m = wheel.m
-    offset = wheel.o
-
-    wc = wheel.c
-    RC = circum(R)
-
-    # to calculate exact value of phi for one complete loop
-    # would neet to solve ellipse.arc(0,phi) for value of phi which
-    # makes arc = 2*pi*RC
-    
-    t=np.linspace(0.0,wheel.phi_at_arc(RC*loops),int(loops/spacing))
-
-    iv = -1 if inside else 1
-    
-    p = t
-    
-    phi_factor   = 1
-    
-    # work out start_guard and end_guard effects in invert and reverse situations
-
-    p   = phi_factor   * t + offset
-    rp  = np.array([ wheel.r(phi) for phi in p ])
-
-    arc = np.array([ wheel.arc(0,phi) for phi in p ])
-    theta = iv * arc / R + orient
-
-    # -theta is the tangent slope at the point of contact
-    # rotate the ellipse-based coords by this angle to get
-    # figure based coordinates
-
-#    coords = np.empty((t.shape[0],2))  # ellipse ref frame coordinates of the contact point
-#    for i in range(t.shape[0]):
-#        coords[i]=np.array([ [ rp[i]*sin(p[i]), rp[i]*cos(p[i]) ]  ])
-
-#    ec = rot_coords(-1.0*theta[i],coords)
-
-    T = np.array([  (phi%(pi/2)) - ellip_T(a,b,phi%(pi/2)) for phi in p ])
-
-    rx = np.array([ sin(2*tt) for tt in theta - p ])
-    ry = np.array([ cos(2*tt) for tt in theta - p ])
-    
-    r     = iv * rp + (b-a)*rx 
-
-    alpha = (b-a)*rx / (R+r)
-    
-    # ignore pen position for the moment...
-    
-    sd.t=t
-#    sd.x=x0+R*sin(theta) + iv * ec[i][0]
-#    sd.y=y0+R*cos(theta) + iv * ec[i][1]
-#    sd.x=x0+R*sin(theta) + iv * rp * (1 - (m/a)) * sin(p)
-#    sd.y=y0+R*cos(theta) + iv * rp * (1 - (m/a)) * cos(p)
-
-    # not right, but just looking for a place-holder...
-
-#    sd.x = x0 + (R+rx*r) * sin(theta) + rp * (m/a) * sin(p)
-#    sd.y = y0 + (R+rx*r) * cos(theta) + rp * (m/a) * cos(p)  # rx is intentional
-
-    sd.x = x0 + (R+r) * sin(theta-alpha) + rp * (m/a) * sin(p)
-    sd.y = y0 + (R+r) * cos(theta-alpha) + rp * (m/a) * cos(p)
-    
-    sd.p=p
-    
-    return sd
-
 def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False):
     '''roll in straight line from (x1,y1) to (x2,y2) using ellipse.
     invert keyword controls sense of wheel location:  default
@@ -157,7 +152,7 @@ def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False):
     A=arctan2(y2-y1,x2-x1)                                   # roll angle
 
     pf = ellipse.phi_at_arc(R,ellipse.o)
-    t=np.linspace(0,pf,1000)                 # angle through which the wheel rolls
+    t=linspace(0,pf,1000)                 # angle through which the wheel rolls
     
     iv = -1 if invert else 1
 

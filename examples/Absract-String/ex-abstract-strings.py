@@ -19,10 +19,10 @@ F.plot(S,cmap='turbo',color_scheme='xrand',alpha=1,save=True)
 ###
 
 F.plot(string_dispersing_pairs(S,step=500,step2=500,offset=3000),
-       cmap='turbo',color_scheme='l-waves',save=True)
+       cmap='turbo',color_scheme='length',save=True)
 
 F.plot(string_dispersing_links(S,step0=10,step=40,offset=200),
-       cmap='turbo',color_scheme='l-waves',save=True)
+       cmap='turbo',color_scheme='cycles',save=True)
        
 F.plot(strings_from_coord(S,offset=200),
        cmap='turbo',color_scheme='l-waves',save=True)

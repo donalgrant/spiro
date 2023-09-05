@@ -19,7 +19,7 @@ n=6
 orient=0
 ring=Ring(radius=20,orient=orient)
 wheel=Ellipse(5,0.7,4)
-F.plot(elliptical_arc_new(R=ring.r,wheel=wheel,loops=1,inside=True,pen_offset=pi/4),
+F.plot(elliptical_arc(R=ring.r,wheel=wheel,loops=1,inside=True,pen_offset=pi/4),
        no_frame=False)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
@@ -31,8 +31,9 @@ F.save_fig()
 
 ###
 
+ring=Ring(radius=20,orient=0)
 wheel=Ellipse(8,0.7,7,phi1)
-F.plot(elliptical_arc_new(R=ring.r,wheel=wheel,loops=1,inside=False,
+F.plot(elliptical_arc(R=ring.r,wheel=wheel,loops=1,inside=False,
                           orient=orient,pen_offset=pi/4))
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
