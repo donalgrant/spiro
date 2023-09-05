@@ -72,7 +72,6 @@ def elliptical_in_ellipse(ring=Ellipse(20,0.5,0,0),
     sd.x = pp[:,0] + ring.O[0]
     sd.y = pp[:,1] + ring.O[1]
 
-    print('rotating by ',ring.o*180/pi)
     sd.rotate(ring.o)
     
     return sd

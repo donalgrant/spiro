@@ -10,6 +10,13 @@ def circum(major,minor=None):
     h = (major-minor)**2/(major+minor)**2
     return pi*(major+minor)*(1 + 3*h/(10+sqrt(4-3*h)))
 
+def major_from_circum(c,eccen=0.0):
+    if (eccen==0):  return c / (2*pi)
+    def f(x):  return circum(x,semi_minor(x,eccen))-c
+    bracket=array([ c/(2.1*pi),c/3.9 ])  # circle vs. line for brackets, with space
+    sol = optimize.root_scalar(f,bracket=bracket,method='brentq')
+    return sol.root
+    
 from math import fmod
 def pfmod(a,b):
     '''a mod b, but requiring the result to be between 0 and <b if a<0'''
