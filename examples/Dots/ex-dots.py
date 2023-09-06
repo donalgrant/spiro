@@ -18,7 +18,7 @@ cs = cs_list()
 
 S.reset()
 for j in range(10):
-    S.add(elliptical_arc_new(x0=-j/5,y0=j/5,orient=0,R=2.0,wheel=Ellipse(6.5,0.8,2,pi/20*j),
+    S.add(elliptical_arc(x0=-j/5,y0=j/5,orient=0,R=2.0,wheel=Ellipse(6.5,0.8,2,pi/20*j),
                              loops=3,spacing=0.01,inside=False))
 F.plot(S,cmap='Dark2',color_scheme='time',dot_size=10,alpha=1.0)
 

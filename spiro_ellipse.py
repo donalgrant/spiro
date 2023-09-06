@@ -177,3 +177,19 @@ def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False):
     sd.t = t
     
     return sd
+
+def integral_ellipticals(n,e_ring,e_wheel,ring_angle=pi/4,
+                         min_pen=0.4,max_pen=1.0,
+                         min_po=0.0,max_po=pi/2,
+                         rounds=9,circuits=8,inside=True):
+    S = SpiroData()
+    ring=Ellipse(major=20,eccen=e_ring,offset=ring_angle)
+    nwr = rounds / circuits
+    a = major_from_circum(ring.c/nwr,e_wheel)
+    for i in range(n):
+        m  = min_pen + (max_pen-min_pen)*i/(n-1)
+        po = min_po  + (max_po -min_po) *i/(n-1)
+        wheel = Ellipse(a,e_wheel,m*a,0,pen_offset=po)
+        S.add(elliptical_in_ellipse(ring,wheel,inside=inside,loops=circuits))
+
+    return S

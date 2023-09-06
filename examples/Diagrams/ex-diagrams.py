@@ -160,3 +160,82 @@ F.plot(S)
 
 F.save_fig()
 
+###  Elliptical Wheels in Elliptical Rings
+
+e=0.4
+phi1=0
+phi2=2*pi
+po=pi/4
+o=0
+wo=pi/8
+n=8
+wheel=Ellipse(8,0.7,7,phi1,pen_offset=po)
+F.plot(elliptical_arc(R=20,wheel=wheel,inside=True,loops=1))
+for phi in linspace(phi1,phi2,n):
+    wheel.o=phi
+    F.plot(new_elliptical_diagram(wheel=wheel,phi0=0,inside=True),new_fig=False,
+          alpha=1.0 if phi==phi1 else 0.1)
+
+F.save_fig()
+
+###
+
+e=0.4
+phi1=0
+phi2=2*pi
+po=pi/4
+o=0
+wo=pi/8
+n=8
+ring=Ellipse(major=20,eccen=e,offset=o,pen_offset=wo)
+wheel=Ellipse(5,0.9,4,phi1,pen_offset=po)
+F.plot(elliptical_in_ellipse(ring=ring,wheel=wheel,inside=False,loops=1))
+for phi in linspace(phi1,phi2,n):
+    wheel.o=phi
+    F.plot(ee_diagram(ring=ring,wheel=wheel,phi0=0,inside=False),new_fig=False,
+          alpha=1.0 if phi==phi1 else 0.1)
+
+F.save_fig()
+
+###
+
+e=0.7
+phi1=0
+phi2=2*pi
+po=pi/4
+o=pi/4
+wo=pi/3
+phi0=0
+n=8
+ring=Ellipse(major=20,eccen=e,offset=o,pen_offset=wo)
+wheel=Ellipse(5,0.8,4,phi1,pen_offset=po)
+F.plot(elliptical_in_ellipse(ring=ring,wheel=wheel,inside=True,loops=1.0))
+phi = linspace(phi1,phi2,n)
+for i in range(len(phi)):
+    wheel.o=phi[i]
+    F.plot(ee_diagram(ring=ring,wheel=wheel,phi0=phi0,inside=True),new_fig=False,
+          alpha=1.0 if phi[i]==phi1 else 0.1)
+
+F.save_fig()
+
+###
+
+e=0.7
+phi1=0
+phi2=2*pi
+po=0
+o=0
+wo=0
+phi0=pi/4
+n=8
+ring=Ellipse(major=20,eccen=e,offset=o,pen_offset=wo)
+wheel=Ellipse(5,0.8,4,phi0,pen_offset=po)
+F.plot(elliptical_in_ellipse(ring=ring,wheel=wheel,inside=True,loops=1.0))
+phi = linspace(phi1,phi2,n)
+for i in range(len(phi)):
+    wheel.o=phi[i]
+    F.plot(ee_diagram(ring=ring,wheel=wheel,phi0=phi0,inside=True),new_fig=False,
+          alpha=1.0 if phi[i]==phi1 else 0.1)
+
+F.save_fig()
+
