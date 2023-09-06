@@ -33,7 +33,8 @@ def elliptical_in_ellipse(ring=Ellipse(20,0.5,0,0),
     rp  = array([ wheel.r(phi) for phi in p ])
 
     arc = array([ wheel.arc(p[0],phi) for phi in p ])
-    ring_phi = array([ ring.phi_at_arc(iv * arc_i, ring.po) for arc_i in arc])
+    ring_phi = array([ ring.phi_at_arc(iv * arc_i * slide(arc_i), ring.po)
+                       for arc_i in arc])
     ring_r   = array([ ring.r(phi) for phi in ring_phi ])
     ring_n   = array([ ring.normal_at_phi(phi) for phi in ring_phi ])
 
