@@ -10,7 +10,7 @@ def spiro_string(sd,subsample=100,line_pts=500):
         sti = SpiroData()
         sti.x=cc[:,0]
         sti.y=cc[:,1]
-        sti.t=linspace(0,sti.x.shape[0])
+        sti.t=linspace(0,sti.x.shape[0],len(cc[:,0]))
         sti.p=sti.t*0+s.p[i]
         st.add(sti)
         
@@ -93,7 +93,8 @@ def strings_from_pts(sd,n=3,offset=100,line_pts=500,nLines=30,fixed=0):
     for i in range(n):
         j = np.random.random_integers(0,sd.n())
         i2_start=-1 if fixed==0 else j+fixed
-        st.add(strings_from_coord(sd,array([ sd.x[j], sd.y[j] ]),offset,line_pts,nLines,i2_start=i2_start))
+        st.add(strings_from_coord(sd,array([ sd.x[j], sd.y[j] ]),
+                                  offset,line_pts,nLines,i2_start=i2_start))
         
     return st
 

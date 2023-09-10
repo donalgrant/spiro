@@ -39,3 +39,6 @@ S.reset()
 S.add(swoops(n=10,yscale=30))
 F.plot(S,color_scheme='x-y',cmap='inferno',alpha=0.1,new_fig=False)
 F.save_fig()
+
+###
+

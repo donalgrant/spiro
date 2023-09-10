@@ -1,7 +1,14 @@
 import numpy as np
 from numpy import array, append, column_stack
 from SpiroGeometry import *
+import pickle
 
+
+def read_SD(filename):
+    with open(filename,'rb') as f:
+        U = pickle.load(f)
+    return U
+    
 class SpiroData:
     
     def __init__(self):
@@ -51,3 +58,13 @@ class SpiroData:
         return sd
 
     def n(self):  return self.x.shape[0]
+
+    def save(self,filename):
+        with open(filename,'wb') as f:
+            pickle.dump(self,f,pickle.HIGHEST_PROTOCOL)
+        f.close()
+
+    def read(filename):
+        with open(filename,'rb') as f:
+            U = pickle.load(f)
+        return U

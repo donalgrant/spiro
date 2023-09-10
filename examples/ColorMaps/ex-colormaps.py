@@ -6,31 +6,41 @@ from SpiroDraw import *
 from spiro import *
 from spiro_string import *
 
-S = SpiroData()
-F = SpiroFig()
+###
 
-cs = cs_list()
-
-ncols = 5
-nrows = len(cs) // ncols
-if nrows*ncols < len(cs):  nrows+=1
-
-fig, axes=plt.subplots(nrows,ncols,figsize=(10,10),layout='compressed')
-f=[]
-for i in range(nrows):
-    for j in range(ncols):
-        axes[i,j].set(aspect=1,xticks=[], yticks=[])
-        axes[i,j].set_axis_off()
-        f.append(SpiroFig(axes[i,j]))
-        
-cm='hsv'
-
-for i in range(len(cs)):
-    f[i]._fig=fig  # kludge
-    f[i].plot(spiro_steps(R=8.0,wheel=Wheel(4,4),loops=5,n=10),
-              new_fig=False,cmap=cm,color_scheme=cs[i],caption=False,no_frame=True)
-
-fig.savefig('color_scheme_chart.png',bbox_inches='tight',transparent=True)
+T = spiro_string(spiro_arc(loops=50),subsample=500)
+nsubs=len(cmap_list())
+ncols=6
+nrows=nsubs//ncols
+G = SpiroFig(rows=nrows,cols=ncols)
+G.text_color='white'
+if nsubs % ncols > 0:  nrows += 1
+for cs in cs_list():
+    first=True
+    for color_map in cmap_list():
+        G.plot(T,color_scheme=cs,cmap=color_map,caption=color_map,
+               new_fig=True if first else False)
+        first=False
+    G.caption(cs)
+    G.save_fig()
 
 ###
 
+cs = cs_list()
+
+nsubs=len(cs)
+ncols=5
+nrows=nsubs//ncols
+if nsubs % ncols > 0:  nrows += 1
+
+S = spiro_steps(R=8.0,wheel=Wheel(4,4),loops=5,n=10)
+F = SpiroFig(rows=nrows,cols=ncols)
+
+F.text_color='white'
+first=True
+for color_scheme in cs:
+    F.plot(S,color_scheme=color_scheme,cmap='hsv',caption=color_scheme,
+           new_fig=True if first else False)
+    first=False
+
+F.save_fig('color_scheme_chart.png')

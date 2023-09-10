@@ -10,6 +10,8 @@ from spiro_ellipse import *
 S = SpiroData()
 F = SpiroFig()
 
+F.no_save()
+
 ###
 
 c = cmap_list()
@@ -77,4 +79,21 @@ for i in range(4):
                                min_pen=0.5,max_pen=1.0,
                                rounds=3,circuits=2,inside=True))
 F.plot(S,color_scheme=cs[fig_n % len(cs)], cmap=c[fig_n % len(c)],save=True)
+fig_n+=1
+
+###
+
+F.ok_save()
+
+T=SpiroData()
+Q=SpiroData()
+S=integral_ellipticals(10,0.7,0.8,max_po=0.0,rounds=1,circuits=1)
+S.add(spiro(R=7,loops=2))
+for o in linspace(0,2*pi,11):
+    T.reset()
+    T.add(S)
+    T.rotate(o)
+    Q.add(T)
+    
+F.plot(Q,color_scheme='radial',cmap='inferno',save=True)
 fig_n+=1

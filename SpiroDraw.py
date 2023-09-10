@@ -16,7 +16,8 @@ def cmap_list():
             'nipy_spectral','gist_ncar',
             'bone','twilight','twilight_shifted','hsv',
             'Greys','Purples','Blues','Greens','Oranges','Reds','YlOrBr',
-            'YlOrRd','OrRd','PuRd','RdPu','BuPu','GnBu','PuBu','YlGnBu','PuBuGn','BuGn','YlGn'
+            'YlOrRd','OrRd','PuRd','RdPu','BuPu','GnBu','PuBu',
+            'YlGnBu','PuBuGn','BuGn','YlGn'
             ]
 
 # would like a better way to capture the color_scheme name with the encoding in a single
@@ -32,28 +33,55 @@ def cs_list():
 class SpiroFig:
 
     def new_fig(self,no_frame=True,**kw_args):
-        self._fig = plt.figure(figsize=(10,10))
-        self._ax=self._fig.add_subplot(frameon=False)
-        self._ax.set(aspect=1)
-        if no_frame:
-            self._ax.set(xticks=[],yticks=[])
-            self._ax.set_axis_off()
-        return self._ax
         
-    def __init__(self,ax=None,savepath='./'):
+        n_subs = self.rows*self.cols
+        expansion = int(sqrt(n_subs))*10
+        sub_expansion = expansion / 2 if expansion > 20 else 10
+        if self.multi:
+            self._fig = plt.figure(figsize=(expansion,expansion))
+            self._fig, self.ax = plt.subplots(self.rows,self.cols,
+                                              figsize=(sub_expansion,sub_expansion),
+                                                layout='compressed')
+            self.plot_num=0
+            for i in range(self.rows):
+                for j in range(self.cols):
+                    self.ax[i,j].set(aspect=1)
+                    if no_frame:
+                        self.ax[i,j].set(xticks=[], yticks=[])
+                        self.ax[i,j].set_axis_off()
+            return self.ax
+                                                
+        else:
+            self._fig = plt.figure(figsize=(10,10))
+            self.ax=self._fig.add_subplot(frameon=False)
+            self.ax.set(aspect=1)
+            if no_frame:
+                self.ax.set(xticks=[],yticks=[])
+                self.ax.set_axis_off()
+            return self.ax
+        
+    def __init__(self,ax=None,savepath='./',rows=1,cols=1):
         self._path=savepath
         Path(savepath).mkdir(parents=True, exist_ok=True)
         self._figname='Figure-'
-        self._ax=ax
+        self.ax=ax
         self.fig_number=0
         self.text_color='white'
-        
+        self.ok_save()
+        self.rows=rows
+        self.cols=cols
+        self.multi = True if self.rows*self.cols > 1 else False
+
+    def plot_row(self):  return self.plot_num // self.cols
+    def plot_col(self):  return self.plot_num % self.cols
+
     def plot(self,sd,cmap='viridis',color_scheme='radial',
              dot_size=0.1,linestyle='',alpha=1.0,
              subsample=None,no_frame=True, save=False,
-             new_fig=True,smooth=False, caption=False):
-        
-        if new_fig or not self._ax:  self.new_fig(no_frame=no_frame)
+             new_fig=True,smooth=False, caption='', fontsize=18):
+
+        if new_fig or self.ax is None or (self.multi and not self.ax.any):
+            self.new_fig(no_frame=no_frame)
 
         r = sqrt(sd.x**2+sd.y**2)
         
@@ -82,7 +110,7 @@ class SpiroFig:
             case _:
                 clr=color_scheme
                 cmap=None
-
+        
         if subsample:
             x = sd.x[::subsample]
             y = sd.y[::subsample]
@@ -95,27 +123,49 @@ class SpiroFig:
             t = sd.t
             p = sd.p
 
-        if (smooth):
-            self._ax.plot(x,y)
+        if self.multi:
+            row = self.plot_row()
+            col = self.plot_col()
+            ax = self.ax[row,col]
         else:
-            self._ax.scatter(x,y,c=clr,linestyle=linestyle,s=dot_size,cmap=cmap,alpha=alpha)
+            ax = self.ax
+            
+        if (smooth):
+            if color_scheme=='radial':  clr='blue'
+            ax.plot(x,y,color=clr)
+        else:
+            ax.scatter(x,y,c=clr,linestyle=linestyle,s=dot_size,
+                       cmap=cmap,alpha=alpha)
 
-        if caption:
-            self._fig.text(0.0, 0.05, f'{color_scheme} Color Scheme, {cmap} color map', ha='left',
-                           color=self.text_color)
-            self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right',color=self.text_color)
-
+        if len(caption)>0:
+            ax.set_title(caption,color=self.text_color,y=-0.1,fontsize=fontsize)
+#            self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right',
+#                           color=self.text_color)
+        if self.multi:
+            self.plot_num+=1
+        
         if save:
             self.save_fig()
 
     def caption(self,text):
-        self._fig.text(0.4, 0.05, text, ha='left',color=self.text_color)
-        
+        if self.multi:
+            self._fig.suptitle(text,color=self.text_color,fontsize=22)
+        else:
+            self._fig.text(0.4, 0.05, text, ha='left',color=self.text_color)
+
+    def no_save(self):  self.allow_save=0
+    def ok_save(self):  self.allow_save=1
+    
     def save_fig(self,filename=None,dpi=None):
-        if filename is None:
-            filename=self._path+self._figname+f'{self.fig_number}.png'
-        self._fig.savefig(filename,bbox_inches='tight',transparent=True,dpi=dpi)
+
+        if self.allow_save:
+            if filename is None:
+                filename=self._path+self._figname+f'{self.fig_number}.png'
+            self._fig.savefig(filename,bbox_inches='tight',
+                              transparent=True,dpi=dpi)
+            self.close()
+        
         self.fig_number+=1
-        self.close()
+        if self.multi: self.plot_num=0     # reset the counter
 
     def close(self):  plt.close(self._fig)

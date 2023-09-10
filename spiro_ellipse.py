@@ -27,7 +27,8 @@ def elliptical_in_ellipse(ring=Ellipse(20,0.5,0,0),
     
     iv = -1 if inside else 1
     
-    # work out start_guard and end_guard effects in invert and reverse situations
+    # work out start_guard and end_guard effects
+    # in invert and reverse situations
 
     p   = t * ring.c / wheel.c * 2 * pi + wheel.o 
     rp  = array([ wheel.r(phi) for phi in p ])

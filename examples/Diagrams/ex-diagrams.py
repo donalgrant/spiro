@@ -239,3 +239,36 @@ for i in range(len(phi)):
 
 F.save_fig()
 
+###
+
+phi0=pi/2
+phi1=phi0
+phi2=2*pi
+n=4
+w=Ellipse(major=8,eccen=0.7,pen=7,offset=phi0,pen_offset=-pi/2)
+r=Ellipse(major=20,eccen=0.5,offset=-pi/3,pen_offset=pi/2)
+F.plot(elliptical_in_ellipse(r,w,inside=True,loops=1))
+phi = linspace(phi1,phi2,n)
+for i in range(len(phi)):
+    w.o=phi[i]
+    F.plot(ee_diagram(r,w,phi0=phi0,inside=True),new_fig=False,
+          alpha=1.0 if phi[i]==phi1 else 0.1)
+
+F.save_fig()
+
+###
+
+phi0=pi/2
+phi1=phi0
+phi2=2*pi
+n=4
+w=Ellipse(major=8,eccen=0.7,pen=7,offset=phi0,pen_offset=-pi/2)
+r=Ellipse(major=20,eccen=0.5,offset=-pi/3,pen_offset=pi/2)
+F.plot(elliptical_in_ellipse(r,w,inside=False,loops=1))
+phi = linspace(phi1,phi2,n)
+for i in range(len(phi)):
+    w.o=phi[i]
+    F.plot(ee_diagram(r,w,phi0=phi0,inside=False),new_fig=False,
+          alpha=1.0 if phi[i]==phi1 else 0.1)
+
+F.save_fig()
