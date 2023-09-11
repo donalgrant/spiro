@@ -5,6 +5,7 @@ from SpiroData import *
 from SpiroDraw import *
 from spiro import *
 from spiro_string import *
+from Ring import *
 
 ###
 
@@ -24,7 +25,7 @@ F.save_fig('fig1.png')
 F = SpiroFig(rows=5,cols=5)
 F.text_color='white'
 t=False
-S = spiro(R=20,wheel=Wheel(1.7,17.8,0),loops=10,orient=0,inside=t,spacing=0.0005)
+S = spiro(Ring(20),wheel=Wheel(1.7,17.8,0),loops=10,inside=t,pts_per_loop=2000)
 F.plot(S,caption='Original',smooth=True,color_scheme='Blue',cmap='ocean')
 for st in [20,40,80,160]:
     for s in [200,400,800,1600,3200,6400]:
@@ -38,7 +39,7 @@ F.save_fig('fig2.png')
 F = SpiroFig(rows=5,cols=5)
 F.text_color='white'
 t=True
-S = spiro(R=20,wheel=Wheel(8,12,0),loops=10,orient=0,inside=t,spacing=0.0005)
+S = spiro(Ring(20),wheel=Wheel(8,12,0),loops=10,inside=t,pts_per_loop=2000)
 F.plot(S,caption='Original',smooth=True,color_scheme='red')
 for st in [25,40,85,155]:
     for s in [150,200,300,400,600,955]:
@@ -52,7 +53,7 @@ F.save_fig('fig3.png')
 F = SpiroFig(rows=3,cols=3)
 F.text_color='white'
 t=True
-S = spiro(R=20,wheel=Wheel(8.2,5.8,0),loops=10,orient=0,inside=t,spacing=0.001)
+S = spiro(Ring(20),wheel=Wheel(8.2,5.8,0),loops=10,inside=t)
 F.plot(S,caption='Original',smooth=True,color_scheme='tan')
 
 for st in [25,40,85,155]:
@@ -69,7 +70,7 @@ F = SpiroFig(rows=3,cols=3)
 F.text_color='white'
 t=True
 fs=10
-S = spiro(R=20,wheel=Wheel(8.2,5.8,0),loops=10,orient=0,inside=t,spacing=0.001)
+S = spiro(Ring(20),wheel=Wheel(8.2,5.8,0),loops=10,inside=t)
 F.plot(S,caption='Original',smooth=False,color_scheme='length',cmap='jet',fontsize=fs)
 s=15
 st=55

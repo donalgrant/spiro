@@ -5,6 +5,7 @@ from SpiroData import *
 from SpiroDraw import *
 from spiro import *
 from spiro_string import *
+from Ring import *
 
 ###
 
@@ -33,7 +34,7 @@ ncols=5
 nrows=nsubs//ncols
 if nsubs % ncols > 0:  nrows += 1
 
-S = spiro_steps(R=8.0,wheel=Wheel(4,4),loops=5,n=10)
+S = spiro_steps(Ring(8.0),wheel=Wheel(4,4),loops=5,n=10)
 F = SpiroFig(rows=nrows,cols=ncols)
 
 F.text_color='white'

@@ -7,6 +7,7 @@ from Ellipse import *
 from spiro import *
 from spiro_string import *
 from spiro_ellipse import *
+from Ring import *
 
 S = SpiroData()
 F = SpiroFig()
@@ -18,8 +19,9 @@ cs = cs_list()
 
 S.reset()
 for j in range(10):
-    S.add(elliptical_arc(x0=-j/5,y0=j/5,orient=0,R=2.0,wheel=Ellipse(6.5,0.8,2,pi/20*j),
-                             loops=3,spacing=0.01,inside=False))
+    r=Ring(2.0,np.array([-j/5,j/5]),0)
+    S.add(ellipse_in_circle(r,Ellipse(6.5,0.8,2,pi/20*j),
+                             loops=3,pts_per_loop=100,inside=False))
 F.plot(S,cmap='Dark2',color_scheme='time',dot_size=10,alpha=1.0)
 
 ###
@@ -36,7 +38,7 @@ ss_vals = [15,30,60]
 for t in [True,False]:
 
     S.reset()
-    S = spiro(R=20,wheel=Wheel(5.5,4,0),loops=10,orient=0,inside=t,spacing=0.001)
+    S = spiro(Ring(20),wheel=Wheel(5.5,4,0),loops=10,inside=t)
     
     for s in s_vals:
         

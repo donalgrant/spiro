@@ -40,7 +40,7 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),
     # Draw the ring
     
     sd = SpiroData()
-    sd.add(spiro(ring.r,wheel=Wheel(0.01,0.0,0.0),loops=1))
+    sd.add(spiro(ring,wheel=Wheel(0.01,0.0,0.0),loops=1))
 
     # Draw the wheel
 
@@ -142,14 +142,12 @@ def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),
     pen_offset should become part of the wheel's attributes
     '''
 
-    sp = 0.001
-    
     iv = -1 if inside else 1
     
     # Draw the ring
     
     sd = SpiroData()
-    sd.add(spiro(ring.r,wheel=Wheel(0.01,0.0,0.0),loops=1,spacing=sp))
+    sd.add(spiro(ring,wheel=Wheel(0.01,0.0,0.0),loops=1))
 
     # find the elliptical wheel along the ring
 

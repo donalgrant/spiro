@@ -3,6 +3,7 @@ import numpy as np
 from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array,arctan,empty,linspace
 from Ellipse import *
 from SpiroGeometry import *
+from Ring import *
 
 def elliptical_in_ellipse(ring=Ellipse(20,0.5,0,0),
                           wheel=Ellipse(3,0.5,2,0),
@@ -77,6 +78,12 @@ def elliptical_in_ellipse(ring=Ellipse(20,0.5,0,0),
     sd.rotate(ring.o)
     
     return sd
+
+def ellipse_in_circle(ring=Ring(10),wheel=Ellipse(3,0.5,2,0,0),
+                      loops=1,pts_per_loop=1000,inside=True):
+    return elliptical_arc(ring.O[0],ring.O[1],ring.o,ring.r,wheel=wheel,
+                          loops=loops,spacing=1/pts_per_loop,inside=inside,
+                          pen_offset=wheel.po)
 
 def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
                    loops=1,spacing=pi/4000,inside=True,pen_offset=0):  

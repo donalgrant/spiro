@@ -7,6 +7,7 @@ from spiro import *
 from spiro_string import *
 from polygon import *
 from diagrams import *
+from Ring import *
 
 S = SpiroData()
 F = SpiroFig()
@@ -18,8 +19,8 @@ phi2=pi*3
 n=6
 orient=0
 ring=Ring(radius=20,orient=orient)
-wheel=Ellipse(5,0.7,4)
-F.plot(elliptical_arc(R=ring.r,wheel=wheel,loops=1,inside=True,pen_offset=pi/4),
+wheel=Ellipse(5,0.7,4,pi/4)
+F.plot(ellipse_in_circle(ring,wheel=wheel,loops=1,inside=True),
        no_frame=False)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
@@ -32,9 +33,8 @@ F.save_fig()
 ###
 
 ring=Ring(radius=20,orient=0)
-wheel=Ellipse(8,0.7,7,phi1)
-F.plot(elliptical_arc(R=ring.r,wheel=wheel,loops=1,inside=False,
-                          orient=orient,pen_offset=pi/4))
+wheel=Ellipse(8,0.7,7,phi1,pi/4)
+F.plot(ellipse_in_circle(ring,wheel=wheel,loops=1,inside=False))
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
@@ -51,7 +51,7 @@ phi2=2*pi
 n=8
 ring=Ring(radius=20,orient=pi/4)
 wheel=Wheel(5,5,phi1)
-F.plot(spiro(ring.r,wheel=wheel,loops=1,inside=True,orient=ring.o))
+F.plot(spiro(ring,wheel,loops=1,inside=True))
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
@@ -63,7 +63,7 @@ F.save_fig()
 ###
 
 wheel=Wheel(8,7,phi1)
-F.plot(spiro(ring.r,wheel=wheel,loops=1,inside=False,orient=ring.o))
+F.plot(spiro(ring,wheel=wheel,loops=1,inside=False))
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
@@ -170,7 +170,7 @@ o=0
 wo=pi/8
 n=8
 wheel=Ellipse(8,0.7,7,phi1,pen_offset=po)
-F.plot(elliptical_arc(R=20,wheel=wheel,inside=True,loops=1))
+F.plot(ellipse_in_circle(Ring(20),wheel=wheel,inside=True,loops=1))
 for phi in linspace(phi1,phi2,n):
     wheel.o=phi
     F.plot(new_elliptical_diagram(wheel=wheel,phi0=0,inside=True),new_fig=False,

@@ -25,13 +25,13 @@ def swoops(n=40,ring=10,radius=2.5,wheel_e=0.0,ring_e=0.0,
             l=max(swoop_min,swoop_mean+swoop_spread*np.random.standard_normal(1)[0])
             if (wheel_e==0):
                 if (ring_e==0):
-                    sd.add(spiro_arc(x0=x0[o],y0=y0[o],orient=o0,
-                                     R=ring,wheel=Wheel(a,bv[i],of0+pi/5*i),loops=l))
+                    r = Ring(ring,origin=np.array([x0[o],y0[o]]),orient=o0)
+                    sd.add(circle_in_circle(r,Wheel(a,bv[i],of0+pi/5*i),loops=l))
                 else:
-                    sd.add(wheel_in_ellipse(x0=x0[o],y0=y0[o],wheel=Wheel(a,bv[i],of0+pi/5*i),
-                                            ellipse=Ellipse(ring,ring_e,0,pi/2+o0),loops=l))
+                    e = Ellipse(ring,ring_e,0,pi/2+o0,origin=np.array([x0[o],y0[o]]))
+                    sd.add(circle_in_ellipse(e,Wheel(a,bv[i],of0+pi/5*i),loops=l))
             else:
-                sd.add(elliptical_arc(x0=x0[o],y0=y0[o],orient=o0,
-                                      R=ring,wheel=Ellipse(a,wheel_e,bv[i],of0+pi/5*i),loops=l))
+                r = Ring(ring,origin=np.array([x0[o],y0[o]]),orient=o0)
+                sd.add(ellipse_in_circle(r,Ellipse(a,wheel_e,bv[i],of0+pi/5*i),loops=l))
 
     return sd

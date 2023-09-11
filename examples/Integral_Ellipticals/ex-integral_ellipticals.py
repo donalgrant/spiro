@@ -6,6 +6,7 @@ from SpiroDraw import *
 from spiro import *
 from spiro_string import *
 from spiro_ellipse import *
+from Ring import *
 
 S = SpiroData()
 F = SpiroFig()
@@ -88,7 +89,7 @@ F.ok_save()
 T=SpiroData()
 Q=SpiroData()
 S=integral_ellipticals(10,0.7,0.8,max_po=0.0,rounds=1,circuits=1)
-S.add(spiro(R=7,loops=2))
+S.add(spiro(Ring(7),loops=2))
 for o in linspace(0,2*pi,11):
     T.reset()
     T.add(S)
