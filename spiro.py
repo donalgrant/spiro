@@ -59,8 +59,8 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     y0_wheel = ync + iv * wheel.r * cos(normal)
     
     sd.t=t
-    sd.x=x0_wheel + m*sin(p)
-    sd.y=y0_wheel + m*cos(p)
+    sd.x=x0_wheel + m*sin(p+normal)
+    sd.y=y0_wheel + m*cos(p+normal)
     sd.p=p
 
     sd.rotate(orient)
@@ -134,6 +134,7 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
     theta = theta_factor * t + orient + guard_offset_angle
     r     = R + iv * a
 
+    normal = theta # what matters for pen loc is normal to ring; just theta for circle
     if quadrants != 0:
         qtheta = 2 * pi / quadrants
         int_th = array([ int(th/qtheta) for th in theta ])
@@ -141,8 +142,8 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
         
     sd.p=p
     sd.t=theta
-    sd.x=x0+r*sin(theta) + b*sin(p)
-    sd.y=y0+r*cos(theta) + b*cos(p)
+    sd.x=x0+r*sin(theta) + b*sin(p+normal)
+    sd.y=y0+r*cos(theta) + b*cos(p+normal)
     
     return sd
 

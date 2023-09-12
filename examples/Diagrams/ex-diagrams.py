@@ -12,34 +12,36 @@ from Ring import *
 S = SpiroData()
 F = SpiroFig()
 
+trace='copper'
+trs='length'
+
 ###
 
-phi1=0
+phi1=pi/4
 phi2=pi*3
 n=6
 orient=0
 ring=Ring(radius=20,orient=orient)
-wheel=Ellipse(5,0.7,4,pi/4)
+wheel=Ellipse(5,0.7,4,phi1,pen_offset=pi/4)
 F.plot(ellipse_in_circle(ring,wheel=wheel,loops=1,inside=True),
-       no_frame=False)
+       no_frame=False,cmap=trace,color_scheme=trs)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
-    S.add(new_elliptical_diagram(ring=ring,wheel=wheel,
-                                  phi0=0,inside=True,orient=0,pen_offset=pi/4))
+    S.add(new_elliptical_diagram(ring=ring,wheel=wheel,phi0=pi/4,inside=True))
     F.plot(S, new_fig=False, color_scheme='cycles',alpha = 1.0 if phi==phi1 else 0.1)
 F.save_fig()
 
 ###
 
 ring=Ring(radius=20,orient=0)
-wheel=Ellipse(8,0.7,7,phi1,pi/4)
-F.plot(ellipse_in_circle(ring,wheel=wheel,loops=1,inside=False))
+wheel=Ellipse(8,0.7,7,phi1,pen_offset=pi/4)
+F.plot(ellipse_in_circle(ring,wheel=wheel,loops=1,inside=False),cmap=trace,color_scheme=trs)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
     S.add(new_elliptical_diagram(ring=ring,wheel=wheel,
-                                  phi0=0,inside=False,orient=0,pen_offset=pi/4))
+                                  phi0=phi1,inside=False))
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
 F.save_fig()
@@ -51,7 +53,7 @@ phi2=2*pi
 n=8
 ring=Ring(radius=20,orient=pi/4)
 wheel=Wheel(5,5,phi1)
-F.plot(spiro(ring,wheel,loops=1,inside=True))
+F.plot(spiro(ring,wheel,loops=1,inside=True),cmap=trace,color_scheme=trs)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
@@ -63,7 +65,7 @@ F.save_fig()
 ###
 
 wheel=Wheel(8,7,phi1)
-F.plot(spiro(ring,wheel=wheel,loops=1,inside=False))
+F.plot(spiro(ring,wheel=wheel,loops=1,inside=False),cmap=trace,color_scheme=trs)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
@@ -78,24 +80,26 @@ e=0.7
 phi1=0
 phi2=2*pi
 n=8
-ring=Ellipse(major=20,eccen=e,offset=pi/4)
-wheel=Wheel(5,6,phi1)
-F.plot(wheel_in_ellipse(wheel=wheel,ellipse=ring,invert=True,orient=pi/4))
+ring=Ellipse(major=20,eccen=e,offset=pi/4,pen_offset=phi1)
+wheel=Wheel(5,6)
+F.plot(circle_in_ellipse(ring,wheel=wheel,inside=True),cmap=trace,color_scheme=trs)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
-    S.add(ring_ellipse_diagram(ring=ring,wheel=wheel,phi0=phi1,orient=pi/4))
+#    S.add(circle_in_ellipse_diagram(ring=ring,wheel=wheel,phi0=phi1))
+    S.add(ee_diagram(ring,Ellipse(wheel.r,0.0,0,wheel.o,0),phi0=phi1))
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
 F.save_fig()
 
 n=8
-wheel=Wheel(8,7,phi1)
-F.plot(wheel_in_ellipse(wheel=wheel,ellipse=ring,invert=False,orient=-pi/4))
+wheel=Wheel(8,7)
+ring.o=-pi/4
+F.plot(circle_in_ellipse(ring,wheel=wheel,inside=False),cmap=trace,color_scheme=trs)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
-    S.add(ring_ellipse_diagram(ring=ring,wheel=wheel,phi0=phi1,inside=False,orient=-pi/4))
+    S.add(circle_in_ellipse_diagram(ring=ring,wheel=wheel,phi0=phi1,inside=False))
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
 F.save_fig()
@@ -170,7 +174,7 @@ o=0
 wo=pi/8
 n=8
 wheel=Ellipse(8,0.7,7,phi1,pen_offset=po)
-F.plot(ellipse_in_circle(Ring(20),wheel=wheel,inside=True,loops=1))
+F.plot(ellipse_in_circle(Ring(20),wheel=wheel,inside=True,loops=1),cmap=trace,color_scheme=trs)
 for phi in linspace(phi1,phi2,n):
     wheel.o=phi
     F.plot(new_elliptical_diagram(wheel=wheel,phi0=0,inside=True),new_fig=False,
@@ -189,7 +193,7 @@ wo=pi/8
 n=8
 ring=Ellipse(major=20,eccen=e,offset=o,pen_offset=wo)
 wheel=Ellipse(5,0.9,4,phi1,pen_offset=po)
-F.plot(elliptical_in_ellipse(ring=ring,wheel=wheel,inside=False,loops=1))
+F.plot(ellipse_in_ellipse(ring=ring,wheel=wheel,inside=False,loops=1),cmap=trace,color_scheme=trs)
 for phi in linspace(phi1,phi2,n):
     wheel.o=phi
     F.plot(ee_diagram(ring=ring,wheel=wheel,phi0=0,inside=False),new_fig=False,
@@ -209,7 +213,7 @@ phi0=0
 n=8
 ring=Ellipse(major=20,eccen=e,offset=o,pen_offset=wo)
 wheel=Ellipse(5,0.8,4,phi1,pen_offset=po)
-F.plot(elliptical_in_ellipse(ring=ring,wheel=wheel,inside=True,loops=1.0))
+F.plot(ellipse_in_ellipse(ring=ring,wheel=wheel,inside=True,loops=1.0),cmap=trace,color_scheme=trs)
 phi = linspace(phi1,phi2,n)
 for i in range(len(phi)):
     wheel.o=phi[i]
@@ -230,7 +234,7 @@ phi0=pi/4
 n=8
 ring=Ellipse(major=20,eccen=e,offset=o,pen_offset=wo)
 wheel=Ellipse(5,0.8,4,phi0,pen_offset=po)
-F.plot(elliptical_in_ellipse(ring=ring,wheel=wheel,inside=True,loops=1.0))
+F.plot(ellipse_in_ellipse(ring=ring,wheel=wheel,inside=True,loops=1.0),cmap=trace,color_scheme=trs)
 phi = linspace(phi1,phi2,n)
 for i in range(len(phi)):
     wheel.o=phi[i]
@@ -247,7 +251,7 @@ phi2=2*pi
 n=4
 w=Ellipse(major=8,eccen=0.7,pen=7,offset=phi0,pen_offset=-pi/2)
 r=Ellipse(major=20,eccen=0.5,offset=-pi/3,pen_offset=pi/2)
-F.plot(elliptical_in_ellipse(r,w,inside=True,loops=1))
+F.plot(ellipse_in_ellipse(r,w,inside=True,loops=1),cmap=trace,color_scheme=trs)
 phi = linspace(phi1,phi2,n)
 for i in range(len(phi)):
     w.o=phi[i]
@@ -264,7 +268,7 @@ phi2=2*pi
 n=4
 w=Ellipse(major=8,eccen=0.7,pen=7,offset=phi0,pen_offset=-pi/2)
 r=Ellipse(major=20,eccen=0.5,offset=-pi/3,pen_offset=pi/2)
-F.plot(elliptical_in_ellipse(r,w,inside=False,loops=1))
+F.plot(ellipse_in_ellipse(r,w,inside=False,loops=1),cmap=trace,color_scheme=trs)
 phi = linspace(phi1,phi2,n)
 for i in range(len(phi)):
     w.o=phi[i]

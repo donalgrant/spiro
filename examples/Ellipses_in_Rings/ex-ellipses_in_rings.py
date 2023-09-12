@@ -126,7 +126,7 @@ F.plot(S,color_scheme='radial',cmap='Wistia',save=True)
 S.reset()
 
 for po in np.linspace(0,pi/4,2):
-    S.add(ellipse_in_circle(Ring(5+pi/5,origin=np.array([po/2,po/2]),orient=pi/7),
+    S.add(ellipse_in_circle(Ring(5+po/5,origin=np.array([po/2,po/2]),orient=pi/7),
                             Ellipse(15,0.9,7,pen_offset=po),loops=60,inside=True,
                             pts_per_loop=3000))
     

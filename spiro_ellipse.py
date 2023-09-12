@@ -5,13 +5,13 @@ from Ellipse import *
 from SpiroGeometry import *
 from Ring import *
 
-def elliptical_in_ellipse(ring=Ellipse(20,0.5,0,0),
-                          wheel=Ellipse(3,0.5,2,0),
-                          loops=1,
-                          slide = lambda t: 1,
-                          start_guard=0,end_guard=0,
-                          start_guard_angle=0,end_guard_angle=0,
-                          pts_per_loop=4000,inside=True,reverse=False):  
+def ellipse_in_ellipse(ring=Ellipse(20,0.5,0,0),
+                       wheel=Ellipse(3,0.5,2,0),
+                       loops=1,
+                       slide = lambda t: 1,
+                       start_guard=0,end_guard=0,
+                       start_guard_angle=0,end_guard_angle=0,
+                       pts_per_loop=4000,inside=True,reverse=False):  
     '''roll on the inside (outside if inside=False) of an *elliptical* arc
     centered on x0, y0, with radius, starting at orientation of
     orient radians cw from the vertical given by ring.o; initial position of
@@ -199,6 +199,6 @@ def integral_ellipticals(n,e_ring,e_wheel,ring_angle=pi/4,
         m  = min_pen + (max_pen-min_pen)*i/(n-1)
         po = min_po  + (max_po -min_po) *i/(n-1)
         wheel = Ellipse(a,e_wheel,m*a,0,pen_offset=po)
-        S.add(elliptical_in_ellipse(ring,wheel,inside=inside,loops=circuits))
+        S.add(ellipse_in_ellipse(ring,wheel,inside=inside,loops=circuits))
 
     return S

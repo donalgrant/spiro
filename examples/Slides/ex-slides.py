@@ -56,7 +56,7 @@ F.ok_save()
 S.reset()
 w=Ellipse(8,0.9,11,0,pi/4)
 l=20
-S.add(elliptical_in_ellipse(wheel=w,slide=lambda t: -0.5,
+S.add(ellipse_in_ellipse(wheel=w,slide=lambda t: -0.5,
                             inside=True,loops=l/0.5,pts_per_loop=10000))
 S.rotate(pi/3)
 F.plot(S,color_scheme='cycles',cmap='autumn')
@@ -67,7 +67,7 @@ F.save_fig()
 S.reset()
 w=Ellipse(10,0.9,11,0,pi/4)
 l=20
-S.add(elliptical_in_ellipse(wheel=w,slide=lambda t: -0.5,
+S.add(ellipse_in_ellipse(wheel=w,slide=lambda t: -0.5,
                             inside=True,loops=l/0.5,pts_per_loop=10000))
 S.rotate(pi/3)
 F.plot(S,color_scheme='l-waves',cmap='autumn',save=True)
@@ -77,7 +77,7 @@ F.plot(S,color_scheme='l-waves',cmap='autumn',save=True)
 S.reset()
 w=Ellipse(9,0.9,11,0,pi/4)
 l=20
-S.add(elliptical_in_ellipse(wheel=w,slide=lambda t: -0.5,
+S.add(ellipse_in_ellipse(wheel=w,slide=lambda t: -0.5,
                             inside=True,loops=l/0.5,pts_per_loop=10000))
 S.rotate(pi/3)
 F.plot(S,color_scheme='t-waves',cmap='autumn',save=True)
@@ -87,7 +87,7 @@ F.plot(S,color_scheme='t-waves',cmap='autumn',save=True)
 S.reset()
 w=Ellipse(9,0.9,17,0,pi/5)
 l=20
-S.add(elliptical_in_ellipse(wheel=w,slide=lambda t: 0.1,inside=True,loops=l/0.5,pts_per_loop=10000))
+S.add(ellipse_in_ellipse(wheel=w,slide=lambda t: 0.1,inside=True,loops=l/0.5,pts_per_loop=10000))
 S.rotate(pi/3)
 F.plot(S,color_scheme='l-waves',cmap='ocean',save=True)
 
@@ -96,7 +96,7 @@ F.plot(S,color_scheme='l-waves',cmap='ocean',save=True)
 S.reset()
 w=Ellipse(9,0.9,17,0,pi/5)
 l=20
-S.add(elliptical_in_ellipse(wheel=w,slide=lambda t: 2.0,
+S.add(ellipse_in_ellipse(wheel=w,slide=lambda t: 2.0,
                             inside=True,loops=l/0.5,pts_per_loop=10000))
 S.rotate(pi/3)
 F.plot(S,color_scheme='s-ripples',cmap='ocean',save=True)
@@ -106,7 +106,7 @@ F.plot(S,color_scheme='s-ripples',cmap='ocean',save=True)
 S.reset()
 w=Ellipse(9,0.3,17,0,pi/5)
 l=20
-S.add(elliptical_in_ellipse(wheel=w,slide=lambda t: 2.0,
+S.add(ellipse_in_ellipse(wheel=w,slide=lambda t: 2.0,
                             inside=True,loops=l/0.5,pts_per_loop=10000))
 S.rotate(pi/3)
 F.plot(S,color_scheme='cycles',cmap='turbo',save=True)
@@ -116,7 +116,7 @@ F.plot(S,color_scheme='cycles',cmap='turbo',save=True)
 S.reset()
 w=Ellipse(9,0.6,17,0,pi/5)
 l=20
-S.add(elliptical_in_ellipse(wheel=w,slide=lambda t: 2.0,
+S.add(ellipse_in_ellipse(wheel=w,slide=lambda t: 2.0,
                             inside=True,loops=l/0.5,pts_per_loop=10000))
 S.rotate(pi/3)
 F.plot(S,color_scheme='cycles',cmap='jet',save=True)
@@ -126,7 +126,7 @@ F.plot(S,color_scheme='cycles',cmap='jet',save=True)
 S.reset()
 w=Ellipse(9,0.6,17,0,pi/5)
 l=40
-S.add(elliptical_in_ellipse(wheel=w,slide=lambda t: 1.7,
+S.add(ellipse_in_ellipse(wheel=w,slide=lambda t: 1.7,
                             inside=True,loops=l/0.5,pts_per_loop=10000))
 S.rotate(pi/3)
 F.plot(S,color_scheme='cycles',cmap='inferno',save=True)
