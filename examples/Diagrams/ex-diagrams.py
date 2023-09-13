@@ -13,7 +13,7 @@ S = SpiroData()
 F = SpiroFig()
 
 trace='copper'
-trs='length'
+trs='red'
 
 ###
 
@@ -30,7 +30,7 @@ for phi in np.linspace(phi1,phi2,n):
     wheel.o=phi
     S.add(new_elliptical_diagram(ring=ring,wheel=wheel,phi0=pi/4,inside=True))
     F.plot(S, new_fig=False, color_scheme='cycles',alpha = 1.0 if phi==phi1 else 0.1)
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -44,7 +44,7 @@ for phi in np.linspace(phi1,phi2,n):
                                   phi0=phi1,inside=False))
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -60,7 +60,7 @@ for phi in np.linspace(phi1,phi2,n):
     S.add(ring_wheel_diagram(ring=ring,wheel=wheel,phi0=phi1))
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -72,7 +72,7 @@ for phi in np.linspace(phi1,phi2,n):
     S.add(ring_wheel_diagram(ring=ring,wheel=wheel,phi0=phi1,inside=False))
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -86,11 +86,10 @@ F.plot(circle_in_ellipse(ring,wheel=wheel,inside=True),cmap=trace,color_scheme=t
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
-#    S.add(circle_in_ellipse_diagram(ring=ring,wheel=wheel,phi0=phi1))
-    S.add(ee_diagram(ring,Ellipse(wheel.r,0.0,0,wheel.o,0),phi0=phi1))
+    S.add(circle_in_ellipse_diagram(ring=ring,wheel=wheel,phi0=phi1))
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 n=8
 wheel=Wheel(8,7)
@@ -102,7 +101,7 @@ for phi in np.linspace(phi1,phi2,n):
     S.add(circle_in_ellipse_diagram(ring=ring,wheel=wheel,phi0=phi1,inside=False))
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 ### arc-continuity
 
@@ -123,7 +122,7 @@ for i in range(1):
     S.add(rotate(0,r,S.xc(),S.yc(),pi))
     
 F.plot(S,new_fig=False,cmap='autumn',color_scheme='time')
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -142,7 +141,7 @@ for i in range(1):
     S.add(spiro_arc(orient=-pi/2+rot,R=r,wheel=Wheel(a,b),loops=0.5,invert=True,reverse=True))
     
 F.plot(S,new_fig=False,cmap='autumn',color_scheme='time')
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -162,7 +161,7 @@ S.add(roll(x2,y2,x1,y1,Wheel(a,b,o-pi),invert=True))
 S.add(rotate(x1,y1,S.xc(),S.yc(),-pi))
 F.plot(S)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###  Elliptical Wheels in Elliptical Rings
 
@@ -180,7 +179,7 @@ for phi in linspace(phi1,phi2,n):
     F.plot(new_elliptical_diagram(wheel=wheel,phi0=0,inside=True),new_fig=False,
           alpha=1.0 if phi==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -199,7 +198,7 @@ for phi in linspace(phi1,phi2,n):
     F.plot(ee_diagram(ring=ring,wheel=wheel,phi0=0,inside=False),new_fig=False,
           alpha=1.0 if phi==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -220,7 +219,7 @@ for i in range(len(phi)):
     F.plot(ee_diagram(ring=ring,wheel=wheel,phi0=phi0,inside=True),new_fig=False,
           alpha=1.0 if phi[i]==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -241,7 +240,7 @@ for i in range(len(phi)):
     F.plot(ee_diagram(ring=ring,wheel=wheel,phi0=phi0,inside=True),new_fig=False,
           alpha=1.0 if phi[i]==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -258,7 +257,7 @@ for i in range(len(phi)):
     F.plot(ee_diagram(r,w,phi0=phi0,inside=True),new_fig=False,
           alpha=1.0 if phi[i]==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)
 
 ###
 
@@ -275,4 +274,4 @@ for i in range(len(phi)):
     F.plot(ee_diagram(r,w,phi0=phi0,inside=False),new_fig=False,
           alpha=1.0 if phi[i]==phi1 else 0.1)
 
-F.save_fig()
+F.save_fig(transparent=False)

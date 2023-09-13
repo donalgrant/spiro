@@ -32,22 +32,30 @@ F.plot(S,save=True)
 
 ###
 
-F.plot(spiro_steps(10.0,Wheel(-6.0,9.0),1.4,10,offset=pi/40),new_fig=True,save=True)
+F.plot(spiro_steps(Ring(10.0),Wheel(-6.0,9.0),1.4,10,offset=pi/40),new_fig=True,save=True)
 
 ###
 
-F.plot(spiro_steps(2.0,Wheel(9.0,0.9*9.0),4,8,pi/100),new_fig=True,save=True)
+F.plot(spiro_steps(Ring(2.0),Wheel(9.0,0.9*9.0),4,8,pi/100),new_fig=True,save=True)
 
 ###
 
 S.reset()
 a=9.0
-bv=[0.9*a-0.03*a*i for i in range(10)]
+bv=[0.7*a-0.03*a*i for i in range(10)]
 for i in range(10):
-    S.add(spiro(Ring(2.0),Wheel(a,bv[i]),9))
+    S.add(spiro(Ring(17.0),Wheel(a,bv[i]),9))
 for cs in ['cycles','radial','time','length','r-waves','s-ripples','l-waves']:
     F.plot(S,color_scheme=cs,save=True)
 F.plot(S,color_scheme='polar',cmap='hsv',save=True)
 
 ###
 
+S.reset()
+a=9.0
+nc=10
+bv=[-0.7*a-0.03*a*i for i in range(nc)]
+for i in range(nc):
+    S.add(spiro(Ring(17),Wheel(a,bv[i]),9))
+for cs in ['length']:
+    F.plot(S,color_scheme=cs,save=True)

@@ -46,9 +46,9 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     
     if reverse: t *= -1
     
-    p = t * ellipse.c / wheel.c * 2 * pi + wheel.o - orient
+    p = t * ellipse.c / wheel.c * 2 * pi + wheel.o
 
-    theta = np.array([ iv * ellipse.phi_at_arc(wheel.arc(phi)) + ellipse.o for phi in p ])
+    theta = np.array([ iv * ellipse.phi_at_arc(wheel.arc(phi)) + ellipse.po for phi in p ])
 
     normal = np.array([ ellipse.normal_at_phi(th) for th in theta ])
 

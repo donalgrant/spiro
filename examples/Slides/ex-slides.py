@@ -10,8 +10,6 @@ from Ring import *
 S = SpiroData()
 F = SpiroFig()
 
-F.no_save()
-
 ###
 
 S.reset()
@@ -50,8 +48,6 @@ F.plot(spiro(ring,Wheel(30,25),40,
 F.save_fig()
 
 ###
-
-F.ok_save()
 
 S.reset()
 w=Ellipse(8,0.9,11,0,pi/4)
@@ -130,3 +126,18 @@ S.add(ellipse_in_ellipse(wheel=w,slide=lambda t: 1.7,
                             inside=True,loops=l/0.5,pts_per_loop=10000))
 S.rotate(pi/3)
 F.plot(S,color_scheme='cycles',cmap='inferno',save=True)
+
+###
+
+S.reset()
+a=9.0
+nc=10
+bv=[0.7*a-0.03*a*i for i in range(nc)]
+F.text_color='white'
+for sl in linspace(1.5,2.0,1):
+    S.reset()
+    for i in range(nc):
+        S.add(spiro(Ring(17),Wheel(a,bv[i]),18,slide=lambda t: sl))
+    for cs in ['length','l-waves','radial','time','t-waves','cycles']:
+        F.plot(S,color_scheme=cs,save=True)
+

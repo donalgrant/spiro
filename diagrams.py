@@ -89,7 +89,9 @@ def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
     # Draw the ring
     
     sd = SpiroData()
-    sd.add(circle_in_ellipse(ring,wheel=Wheel(0.01,0.0),loops=1))
+
+    rframe=Ellipse(major=ring.a,eccen=ring.e)
+    sd.add(circle_in_ellipse(rframe,wheel=Wheel(0.01,0.0),loops=1))
 
     # Draw the wheel
 
@@ -99,7 +101,7 @@ def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
 
     iv = -1 if inside else 1
 
-    phi = wheel.o - ring.o
+    phi = wheel.o
 
     theta = iv * ring.phi_at_arc(wheel.arc(phi-phi0)) + theta_offset
 
@@ -191,6 +193,11 @@ def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),
                                      origin=array([ec[0,0],ec[0,1]])),
                              wheel=Wheel(0.01,0.0), loops=1))
 
+    # Mark the center location
+
+    sd.add(circle_in_circle(Ring(wheel.a/20,np.array([ec[0,0],ec[0,1]])),
+                            Wheel(0.01,0.0),loops=1))
+
     # draw a line from the center of the ellipse wheel to the pen
 
     sd.add(line(ec))
@@ -208,7 +215,7 @@ def ee_diagram(ring,wheel,phi0=0,inside=True):
     # Draw the ring
     
     sd = SpiroData()
-    
+
     sd.add(wheel_in_ellipse(wheel=Wheel(0.01,0.0),ellipse=ring,loops=1))
 
     # find the elliptical wheel along the ring
@@ -251,6 +258,11 @@ def ee_diagram(ring,wheel,phi0=0,inside=True):
     sd.add(wheel_in_ellipse(x0=ec[0,0],y0=ec[0,1],
                             wheel=Wheel(0.01,0.0),ellipse=Ellipse(wheel.a,wheel.e),
                             orient=wheel_n+ring_n,loops=1))
+
+    # Mark the center location
+
+    sd.add(circle_in_circle(Ring(wheel.a/20,np.array([ec[0,0],ec[0,1]])),
+                            Wheel(0.01,0.0),loops=1))
 
     # draw a line from the center of the ellipse wheel to the pen
 

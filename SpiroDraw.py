@@ -156,13 +156,13 @@ class SpiroFig:
     def no_save(self):  self.allow_save=0
     def ok_save(self):  self.allow_save=1
     
-    def save_fig(self,filename=None,dpi=None):
+    def save_fig(self,filename=None,dpi=None,transparent=True):
 
         if self.allow_save:
             if filename is None:
                 filename=self._path+self._figname+f'{self.fig_number}.png'
             self._fig.savefig(filename,bbox_inches='tight',
-                              transparent=True,dpi=dpi)
+                              transparent=transparent,dpi=dpi)
             self.close()
         
         self.fig_number+=1
