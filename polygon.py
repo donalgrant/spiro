@@ -68,33 +68,6 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
     
     return sd
 
-def rotate(x0,y0,xr,yr,angle):
-    '''rotate the coordinate (xr,yr) about the
-    origin (x0,y0) by angle
-    '''
-    t=np.linspace(0.0,np.abs(angle),int(500*np.abs(angle)/pi))
-    r=sqrt((xr-x0)**2+(yr-y0)**2)
-    phi=arctan2(xr-x0,yr-y0)
-
-    p = t
-    
-    if (angle<0):
-        p *= -1
-
-    p += phi
-    
-    sd = SpiroData()
-    
-    sd.x = x0+r*sin(p)
-    sd.y = y0+r*cos(p)
-    sd.p = p
-    sd.t = t
-        
-    return sd
-
-def cos_angle(a,b,c):
-    return arccos( (a**2+b**2-c**2) / (2*a*b) )
-
 def corner_guard(wheel_size=0,corner_angle=pi/2,):
     return wheel_size/tan(corner_angle/2)
 
@@ -247,15 +220,16 @@ def heart(x0=0,y0=0,width=40,depth=20,wheel=Wheel(2.2,1.0),loops=1,
             sd.add(roll(x0,y0-depth,x0-width/2,y0,wheel,
                         start_guard=g*corner_guard(wheel.r,pi/2),end_guard=g*cg,invert=True))
             wheel.o=sd.pc()
-            sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,
-                             loops=0.5,start_guard=g*cg,invert=True))
+            sd.add(circle_in_circle(Ring(width/4),wheel,loops=0.5,
+                                    start_guard=g*cg,inside=True).rotate(-pi/2).move(x0-width/4,y0))
             
             wheel.o = sd.pc()
             rot_angle = pi if fold else -pi
             sd.add(rotate(x0,y0,sd.xc(),sd.yc(),rot_angle))
             wheel.o += rot_angle
-            sd.add(spiro_arc(x0+width/4,y0,-pi/2,width/4,wheel,
-                             loops=0.5,end_guard=g*cg,invert=True))
+            sd.add(circle_in_circle(Ring(width/4),wheel,loops=0.5,inside=True,
+                                    end_guard=g*cg).rotate(-pi/2).move(x0+width/4,y0))
+            
             wheel.o = sd.pc()
             sd.add(roll(x0+width/2,y0,x0,y0-depth,wheel,
                         start_guard=g*corner_guard(wheel.r,pi-pi/4),
@@ -272,12 +246,14 @@ def heart(x0=0,y0=0,width=40,depth=20,wheel=Wheel(2.2,1.0),loops=1,
 
             ca=cos_angle(width/4+wheel.r,width/4+width/4,width/4+wheel.r)
             wheel.o += rot_angle
-            
-            sd.add(spiro_arc(x0-width/4,y0,-pi/2,width/4,wheel,loops=0.5,end_guard_angle=g*ca))
+
+            sd.add(circle_in_circle(Ring(width/4),wheel,loops=0.5,
+                                    end_guard_angle=g*ca).rotate(-pi/2).move(x0-width/4,y0))
 
             ca=cos_angle(width/4+width/4,width/4+wheel.r,width/4+wheel.r)
             wheel.o = sd.pc()
-            sd.add(spiro_arc(x0+width/4,y0,-pi/2,width/4,wheel,loops=0.5,start_guard_angle=g*ca))
+            sd.add(circle_in_circle(Ring(width/4),wheel,loops=0.5,
+                                    start_guard_angle=g*ca).rotate(-pi/2).move(x0+width/4,y0))
             wheel.o = sd.pc()
             rot_angle = pi/4 - 2*pi if fold else pi/4
             sd.add(rotate(x0+width/2,y0,sd.xc(),sd.yc(),rot_angle))

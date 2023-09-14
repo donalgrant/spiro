@@ -72,10 +72,10 @@ def ellipse_in_ellipse(ring=Ellipse(20,0.5,0,0),
     sd.t = t
     sd.p = p
 
-    sd.x = pp[:,0] + ring.O[0]
-    sd.y = pp[:,1] + ring.O[1]
+    sd.x = pp[:,0]
+    sd.y = pp[:,1]
 
-    sd.rotate(ring.o)
+    sd.rotate(ring.o).move(ring.O[0],ring.O[1])
     
     return sd
 
@@ -140,10 +140,10 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
     sd.t = t
     sd.p = p
 
-    sd.x = pp[:,0] + x0
-    sd.y = pp[:,1] + y0
+    sd.x = pp[:,0]
+    sd.y = pp[:,1]
 
-    return sd
+    return sd.move(x0,y0)
 
 def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False):
     '''roll in straight line from (x1,y1) to (x2,y2) using ellipse.

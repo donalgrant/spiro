@@ -1,4 +1,4 @@
-from numpy import sin,cos,empty,array,matmul,linspace
+from numpy import sin,cos,empty,array,matmul,linspace,abs,pi,sqrt,arctan2,arccos
 
 def rot_2D(angle):
     '''Matrix will rotate a coordinate by angle_rads cw'''
@@ -30,3 +30,6 @@ def line(end_pt,npts=20):
         cc[:,1] = end_pt[0,1] + (end_pt[1,1]-end_pt[0,1]) / (end_pt[1,0]-end_pt[0,0]) * (cc[:,0] - end_pt[0,0])
 
     return cc
+
+def cos_angle(a,b,c):
+    return arccos( (a**2+b**2-c**2) / (2*a*b) )

@@ -24,10 +24,11 @@ F.save_fig()
 
 S.reset()
 w = Wheel(5.5,5.3,0)
-S.add(spiro_arc(0,0,0,20.0,wheel=w,loops=1/5,spacing=pi/8000,invert=True))
+S.add(circle_in_circle(Ring(20),w,loops=1/5,inside=True,pts_per_loop=2000))
 for i in range(100): 
     w.o=S.pc()
-    S.add(spiro_arc(0,0,2*pi/5*(i+1),20.0,wheel=w,loops=1/5,spacing=pi/8000,invert=True))
+    S.add(circle_in_circle(Ring(20),w,loops=1/5,
+                           inside=True,pts_per_loop=2000).rotate(2*pi/5*(i+1)))
 F.plot(S,save=True)
 
 ###

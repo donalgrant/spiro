@@ -21,7 +21,8 @@ def line(coords,npts=20):
     # (sd.x,sd.y,sd.t,sd.p) = (x,y,x*0,x*0)
     
     for i in range(npts):
-        sd.add(spiro_arc(x0=x[i],y0=y[i],orient=0,R=0.01,wheel=Wheel(0.01,0.0),loops=1))
+        sd.add(circle_in_circle(Ring(0.01),Wheel(0.01,0.0)).move(x[i],y[i]))
+
     
     return sd
 
@@ -45,8 +46,6 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),
     # Draw the wheel
 
     theta_offset = ring.o
-    x0 = ring.O[0]
-    y0 = ring.O[1]
 
     iv = -1 if inside else 1
     
@@ -56,8 +55,8 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),
     normal = theta
     
     wheel_center_r = ring.r + iv * wheel.r
-    x0_wheel = x0 + wheel_center_r * sin(theta)
-    y0_wheel = y0 + wheel_center_r * cos(theta)
+    x0_wheel = wheel_center_r * sin(theta)
+    y0_wheel = wheel_center_r * cos(theta)
     
     sd.add(circle_in_circle(Ring(wheel.r,np.array([x0_wheel,y0_wheel]),orient=phi),
                             wheel=Wheel(0.01,0.0),loops=1))
@@ -78,7 +77,7 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),
 
     sd.add(line(array([ [x0_wheel,y0_wheel],[x0_pen,y0_pen] ])))
         
-    return sd
+    return sd.move(ring.O[0],ring.O[1])
 
 def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
                               phi0=0,inside=True):
@@ -96,8 +95,6 @@ def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
     # Draw the wheel
 
     theta_offset = ring.po
-    x0 = ring.O[0]
-    y0 = ring.O[1]
 
     iv = -1 if inside else 1
 
@@ -109,8 +106,8 @@ def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
 
     normal = ring.normal_at_phi(theta)
 
-    xnc = x0 + ring.r(theta)*sin(theta)
-    ync = y0 + ring.r(theta)*cos(theta)
+    xnc = ring.r(theta)*sin(theta)
+    ync = ring.r(theta)*cos(theta)
 
     sd.add(line_at_angle(array([xnc,ync]),normal,length=wheel.r/2))
 
@@ -137,7 +134,7 @@ def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
 
     sd.rotate(ring.o)
     
-    return sd
+    return sd.move(ring.O[0],ring.O[1])
 
 def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),
                            phi0=0,inside=True):
@@ -162,8 +159,8 @@ def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),
 
      # coordinate of contact
     
-    cx = ring.O[0] + ring.r * sin(theta)
-    cy = ring.O[1] + ring.r * cos(theta)
+    cx = ring.r * sin(theta)
+    cy = ring.r * cos(theta)
 
     # mark that point of contact, temporarily...
 
@@ -202,7 +199,7 @@ def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),
 
     sd.add(line(ec))
 
-    return sd
+    return sd.move(ring.O[0],ring.O[1])
 
 def ee_diagram(ring,wheel,phi0=0,inside=True):
     '''roll an ellipse on the outside (inside if invert=True) of an elliptical arc
@@ -232,8 +229,8 @@ def ee_diagram(ring,wheel,phi0=0,inside=True):
 
      # coordinate of contact
     
-    cx = ring.O[0] + ring_r * sin(ring_phi)  # move offsets to the end?
-    cy = ring.O[1] + ring_r * cos(ring_phi)
+    cx = ring_r * sin(ring_phi)  # move offsets to the end?
+    cy = ring_r * cos(ring_phi)
 
     # mark that point of contact
 
@@ -270,4 +267,4 @@ def ee_diagram(ring,wheel,phi0=0,inside=True):
 
     sd.rotate(ring.o)
     
-    return sd
+    return sd.move(ring.O[0],ring.O[1])

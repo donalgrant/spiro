@@ -34,7 +34,7 @@ F.plot(heart(wheel=Wheel(w,p),loops=10,inside=True,guarded=True),save=True)
 
 fig, ax=plt.subplots(figsize=(10,10))
 ax.set(aspect=1)
-F._ax=ax
+F.ax=ax
 (w,p)=(1.0,5)
 F._fig=fig  # kludge
 F.plot(heart(wheel=Wheel(0.001,0),loops=1,inside=False,guarded=False),

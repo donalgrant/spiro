@@ -63,11 +63,8 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     sd.y=y0_wheel + m*cos(p+normal)
     sd.p=p
 
-    sd.rotate(orient)
+    sd.rotate(orient).move(x0,y0)
 
-    sd.x += x0
-    sd.y += y0
-    
     return sd
 
 
@@ -142,10 +139,10 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
         
     sd.p=p
     sd.t=theta
-    sd.x=x0+r*sin(theta) + b*sin(p+normal)
-    sd.y=y0+r*cos(theta) + b*cos(p+normal)
+    sd.x=r*sin(theta) + b*sin(p+normal)
+    sd.y=r*cos(theta) + b*cos(p+normal)
     
-    return sd
+    return sd.move(x0,y0)
 
 def spiro_steps(ring=Ring(10),wheel=Wheel(4,3.5,0),loops=1,
                 n=10,offset=pi/10,pts_per_loop=1000):
