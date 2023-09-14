@@ -216,22 +216,22 @@ w0 = Wheel(0.01,0,0)
 
 S.add(roll(0,r,r,r,wheel=w0,invert=False))
 w0.o=S.pc()
-S.add(spiro_arc(r,0,0,r,wheel=w0,loops=0.5,invert=False))
+S.add(circle_in_circle(Ring(r),w0,loops=0.5).move(r,0))
 w0.o=S.pc()
 S.add(roll(r,-r,0,-r,wheel=w0,invert=False))
 w0.o = S.pc()
-S.add(spiro_arc(0,0,pi,r,wheel=w0,loops=0.5,invert=False))
+S.add(circle_in_circle(Ring(r),w0,loops=0.5).rotate(pi))
         
 for q in (False,True):
     offset=0
     for i in range(20):
         S.add(roll(0,r,r,r,wheel=w,invert=q))
         w.o=S.pc()
-        S.add(spiro_arc(r,0,0,r,wheel=w,loops=0.5,invert=q))
+        S.add(circle_in_circle(Ring(r),w,loops=0.5,inside=q).move(r,0))
         w.o=S.pc()
         S.add(roll(r,-r,0,-r,wheel=w,invert=q))
         w.o=S.pc()
-        S.add(spiro_arc(0,0,pi,r,wheel=w,loops=0.5,invert=q))
+        S.add(circle_in_circle(Ring(r),w,loops=0.5,inside=q).rotate(pi))
         w.o=S.pc()
     
 F.plot(S,cmap=c,color_scheme=cs,save=True)

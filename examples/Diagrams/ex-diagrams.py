@@ -15,6 +15,8 @@ F = SpiroFig()
 trace='copper'
 trs='red'
 
+w0 = Wheel(0.01,0.0)   # for tracing paths
+
 ###
 
 phi1=pi/4
@@ -109,15 +111,13 @@ S.reset()
 r=10
 a=1.3
 p=2.3
-F.plot(spiro_arc(orient=0,R=r,wheel=Wheel(0.01,0),
-                 loops=1,invert=False,reverse=False),
-       cmap='hsv',color_scheme='time',new_fig=True)
+F.plot(circle_in_circle(Ring(r),w0),cmap='hsv',color_scheme='time',new_fig=True)
 o=0
 for i in range(1):
-    S.add(spiro_arc(orient=0,R=r,wheel=Wheel(a,p,o+pi),loops=0.25,invert=True,reverse=True))
+    S.add(circle_in_circle(Ring(r),Wheel(a,p,o+pi),loops=0.25,inside=True,reverse=True))
     o=S.pc()
     S.add(rotate(-r,0,S.xc(),S.yc(),pi))
-    S.add(spiro_arc(orient=-pi/2,R=r,wheel=Wheel(a,p,o+pi),loops=0.25,invert=False,reverse=False))
+    S.add(circle_in_circle(Ring(r),Wheel(a,p,o+pi),loops=0.25).rotate(-pi/2))
     o=S.pc()
     S.add(rotate(0,r,S.xc(),S.yc(),pi))
     
@@ -127,18 +127,17 @@ F.save_fig(transparent=False)
 ###
 
 S.reset()
-r=9
-F.plot(spiro_arc(orient=-pi/2,R=r,wheel=Wheel(0.01,0.0),
-                 loops=1,invert=False,reverse=False),
+r=Ring(9)
+F.plot(circle_in_circle(r,w0).rotate(-pi/2),
        cmap='hsv',color_scheme='time',new_fig=True)
 
 rot=pi/10
-(a,b)=(1.5,1.3)
+w=Wheel(1.5,1.3)
 for i in range(1):
-    S.add(spiro_arc(orient=-pi/2+rot,R=r,wheel=Wheel(a,b),loops=0.5,invert=False,reverse=False))
-    S.add(spiro_arc(orient=-pi/2+rot,R=r,wheel=Wheel(a,b),loops=0.5,invert=False,reverse=True))
-    S.add(spiro_arc(orient=-pi/2+rot,R=r,wheel=Wheel(a,b),loops=0.5,invert=True,reverse=False))
-    S.add(spiro_arc(orient=-pi/2+rot,R=r,wheel=Wheel(a,b),loops=0.5,invert=True,reverse=True))
+    S.add(circle_in_circle(r,w,loops=0.5,inside=False,reverse=False).rotate(-pi/2+rot))
+    S.add(circle_in_circle(r,w,loops=0.5,inside=False,reverse=True ).rotate(-pi/2+rot))
+    S.add(circle_in_circle(r,w,loops=0.5,inside=True, reverse=False).rotate(-pi/2+rot))
+    S.add(circle_in_circle(r,w,loops=0.5,inside=True, reverse=True ).rotate(-pi/2+rot))
     
 F.plot(S,new_fig=False,cmap='autumn',color_scheme='time')
 F.save_fig(transparent=False)
@@ -148,7 +147,7 @@ F.save_fig(transparent=False)
 (x1,y1,x2,y2)=(0,0,30,0)
 (a,b)=(2,2)
 S.reset()
-S.add(roll(x1,y1,x2,y2,Wheel(0.01,0.0),invert=False))
+S.add(roll(x1,y1,x2,y2,w0,invert=False))
 S.add(roll(x1,y1,x2,y2,Wheel(a,b),invert=False))
 o=S.pc()
 S.add(rotate(x2,y2,S.xc(),S.yc(),pi))
