@@ -9,3 +9,5 @@ class Wheel:
         self.c = 2*pi*self.r  # circumference
 
     def arc(self,phi): return self.c * phi / (2*pi)
+
+W0 = Wheel(0.01,0.0)   # useful for tracing out paths

@@ -11,7 +11,7 @@ from Ring import *
 
 F=SpiroFig(rows=3,cols=3)
 F.text_color='white'
-T = circle_in_circle(Ring(10),Wheel(4,3.5),loops=50,pts_per_loop=1283)
+T = circle_in_circle(Ring(10),Wheel(4,3.5),loops=50,ppl=1283)
 for cs in ['time']:
     F.plot(T,color_scheme='length',cmap='Reds',caption='Original Figure')
     for ss in [250,300,350,400,500,600,700,850]:
@@ -25,7 +25,7 @@ F.save_fig('fig1.png')
 F = SpiroFig(rows=5,cols=5)
 F.text_color='white'
 t=False
-S = spiro(Ring(20),wheel=Wheel(1.7,17.8,0),loops=10,inside=t,pts_per_loop=2000)
+S = spiro(Ring(20),wheel=Wheel(1.7,17.8,0),loops=10,inside=t,ppl=2000)
 F.plot(S,caption='Original',smooth=True,color_scheme='Blue',cmap='ocean')
 for st in [20,40,80,160]:
     for s in [200,400,800,1600,3200,6400]:
@@ -39,7 +39,7 @@ F.save_fig('fig2.png')
 F = SpiroFig(rows=5,cols=5)
 F.text_color='white'
 t=True
-S = spiro(Ring(20),wheel=Wheel(8,12,0),loops=10,inside=t,pts_per_loop=2000)
+S = spiro(Ring(20),wheel=Wheel(8,12,0),loops=10,inside=t,ppl=2000)
 F.plot(S,caption='Original',smooth=True,color_scheme='red')
 for st in [25,40,85,155]:
     for s in [150,200,300,400,600,955]:

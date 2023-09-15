@@ -21,7 +21,7 @@ S.reset()
 for j in range(10):
     r=Ring(2.0,np.array([-j/5,j/5]),0)
     S.add(ellipse_in_circle(r,Ellipse(6.5,0.8,2,pi/20*j),
-                             loops=3,pts_per_loop=100,inside=False))
+                             loops=3,ppl=100,inside=False))
 F.plot(S,cmap='Dark2',color_scheme='time',dot_size=10,alpha=1.0)
 
 ###

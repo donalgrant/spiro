@@ -21,7 +21,7 @@ def line(coords,npts=20):
     # (sd.x,sd.y,sd.t,sd.p) = (x,y,x*0,x*0)
     
     for i in range(npts):
-        sd.add(circle_in_circle(Ring(0.01),Wheel(0.01,0.0)).move(x[i],y[i]))
+        sd.add(circle_in_circle(Ring(0.01),W0).move(x[i],y[i]))
 
     
     return sd
@@ -59,19 +59,19 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),
     y0_wheel = wheel_center_r * cos(theta)
     
     sd.add(circle_in_circle(Ring(wheel.r,np.array([x0_wheel,y0_wheel]),orient=phi),
-                            wheel=Wheel(0.01,0.0),loops=1))
+                            wheel=W0,loops=1))
 
     # Mark the center location
 
     sd.add(circle_in_circle(Ring(wheel.r/20,np.array([x0_wheel,y0_wheel])),
-                            wheel=Wheel(0.01,0.0),loops=1))
+                            wheel=W0,loops=1))
 
     # Mark the pen location
 
     x0_pen = x0_wheel + wheel.m * sin(phi+normal)
     y0_pen = y0_wheel + wheel.m * cos(phi+normal)
 
-    sd.add(circle_in_circle(Ring(0.01,np.array([x0_pen,y0_pen])),Wheel(0.01,0.0),loops=1))
+    sd.add(circle_in_circle(Ring(0.01,np.array([x0_pen,y0_pen])),W0,loops=1))
 
     # draw a line from center to pen location
 
@@ -90,7 +90,7 @@ def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
     sd = SpiroData()
 
     rframe=Ellipse(major=ring.a,eccen=ring.e)
-    sd.add(circle_in_ellipse(rframe,wheel=Wheel(0.01,0.0),loops=1))
+    sd.add(circle_in_ellipse(rframe,wheel=W0,loops=1))
 
     # Draw the wheel
 
@@ -115,18 +115,18 @@ def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
     y0_wheel = ync + iv * wheel.r * cos(normal)
     
     sd.add(circle_in_circle(Ring(wheel.r,np.array([x0_wheel,y0_wheel]),phi),
-                            Wheel(0.01,0.0),loops=1))
+                            W0,loops=1))
 
     # Mark the center location
 
     sd.add(circle_in_circle(Ring(wheel.r/20,np.array([x0_wheel,y0_wheel]),0),
-                            Wheel(0.01,0.0),loops=1))
+                            W0,loops=1))
     # Mark the pen location
 
     x0_pen = x0_wheel + wheel.m * sin(phi+normal)
     y0_pen = y0_wheel + wheel.m * cos(phi+normal)
 
-    sd.add(circle_in_circle(Ring(0.01,np.array([x0_pen,y0_pen]),0),Wheel(0.01,0.0),loops=1))
+    sd.add(circle_in_circle(Ring(0.01,np.array([x0_pen,y0_pen]),0),W0,loops=1))
     
     # draw a line from center to pen location
 
@@ -188,12 +188,12 @@ def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),
 
     sd.add(circle_in_ellipse(Ellipse(wheel.a,wheel.e,offset=normal+theta,
                                      origin=array([ec[0,0],ec[0,1]])),
-                             wheel=Wheel(0.01,0.0), loops=1))
+                             wheel=W0, loops=1))
 
     # Mark the center location
 
     sd.add(circle_in_circle(Ring(wheel.a/20,np.array([ec[0,0],ec[0,1]])),
-                            Wheel(0.01,0.0),loops=1))
+                            W0,loops=1))
 
     # draw a line from the center of the ellipse wheel to the pen
 
@@ -213,7 +213,7 @@ def ee_diagram(ring,wheel,phi0=0,inside=True):
     
     sd = SpiroData()
 
-    sd.add(wheel_in_ellipse(wheel=Wheel(0.01,0.0),ellipse=ring,loops=1))
+    sd.add(circle_in_ellipse(ring,W0))
 
     # find the elliptical wheel along the ring
 
@@ -252,14 +252,13 @@ def ee_diagram(ring,wheel,phi0=0,inside=True):
 
     # Draw the ellipse wheel
 
-    sd.add(wheel_in_ellipse(x0=ec[0,0],y0=ec[0,1],
-                            wheel=Wheel(0.01,0.0),ellipse=Ellipse(wheel.a,wheel.e),
-                            orient=wheel_n+ring_n,loops=1))
+    sd.add(circle_in_ellipse(Ellipse(wheel.a,wheel.e),
+                             W0).rotate(wheel_n+ring_n).move(ec[0,0],ec[0,1]))
 
     # Mark the center location
 
     sd.add(circle_in_circle(Ring(wheel.a/20,np.array([ec[0,0],ec[0,1]])),
-                            Wheel(0.01,0.0),loops=1))
+                            W0,loops=1))
 
     # draw a line from the center of the ellipse wheel to the pen
 

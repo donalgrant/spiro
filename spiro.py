@@ -8,18 +8,18 @@ from SpiroGeometry import *
 
 def spiro(ring=Ring(10),wheel=Wheel(4,3.5,0.0),loops=5,
           slide = lambda t: 1,
-          pts_per_loop=1000,inside=True):
+          ppl=1000,inside=True):
     return circle_in_circle(ring,wheel,loops=loops,
-                            slide=slide,pts_per_loop=pts_per_loop,inside=inside)
+                            slide=slide,ppl=ppl,inside=inside)
 
 def circle_in_ellipse(ring,wheel,
-                      loops=1,pts_per_loop=1000,
+                      loops=1,ppl=4000,
                       inside=False,reverse=False,
                       quadrants=0, qfuzz=50,
                       slide = lambda t: 1,
                       start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0):
     return wheel_in_ellipse(ring.O[0],ring.O[1],wheel,ring,
-                            loops=loops, pts_per_loop=pts_per_loop,
+                            loops=loops, ppl=ppl,
                             slide=slide,
                             start_guard=start_guard,end_guard=end_guard,
                             start_guard_angle=start_guard_angle,end_guard_angle=end_guard_angle,
@@ -27,7 +27,7 @@ def circle_in_ellipse(ring,wheel,
 
         
 def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
-              loops=1,pts_per_loop=4000,
+              loops=1,ppl=4000,
               slide = lambda t: 1,
               start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
               orient=0,invert=False,reverse=False):  
@@ -42,7 +42,7 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     a = wheel.r
     m = wheel.m
     
-    t=np.linspace(0,loops,int(loops*pts_per_loop))
+    t=np.linspace(0,loops,int(loops*ppl))
     
     if reverse: t *= -1
     
@@ -69,13 +69,13 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
 
 
 def circle_in_circle(ring,wheel,
-                     loops=1,pts_per_loop=1000,
+                     loops=1,ppl=1000,
                      inside=False,reverse=False,
                      quadrants=0, qfuzz=50,
                      slide = lambda t: 1,
                      start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0):
     return spiro_arc(ring.O[0],ring.O[1],ring.o,ring.r,wheel,
-                     loops=loops,spacing=1.0/pts_per_loop,
+                     loops=loops,spacing=1.0/ppl,
                      quadrants=quadrants,qfuzz=qfuzz,slide=slide,
                      start_guard=start_guard,end_guard=end_guard,
                      start_guard_angle=start_guard_angle,end_guard_angle=end_guard_angle,
@@ -145,10 +145,10 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
     return sd.move(x0,y0)
 
 def spiro_steps(ring=Ring(10),wheel=Wheel(4,3.5,0),loops=1,
-                n=10,offset=pi/10,pts_per_loop=1000):
+                n=10,offset=pi/10,ppl=1000):
     sd = SpiroData()
     for i in range(n):
         wheel.o = offset*i
-        sd.add(spiro(ring=ring,wheel=wheel,loops=loops,pts_per_loop=pts_per_loop))
+        sd.add(spiro(ring=ring,wheel=wheel,loops=loops,ppl=ppl))
     return sd
 

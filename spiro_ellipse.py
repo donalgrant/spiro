@@ -11,7 +11,7 @@ def ellipse_in_ellipse(ring=Ellipse(20,0.5,0,0),
                        slide = lambda t: 1,
                        start_guard=0,end_guard=0,
                        start_guard_angle=0,end_guard_angle=0,
-                       pts_per_loop=4000,inside=True,reverse=False):  
+                       ppl=4000,inside=True,reverse=False):  
     '''roll on the inside (outside if inside=False) of an *elliptical* arc
     centered on x0, y0, with radius, starting at orientation of
     orient radians cw from the vertical given by ring.o; initial position of
@@ -23,7 +23,7 @@ def ellipse_in_ellipse(ring=Ellipse(20,0.5,0,0),
 
     RC = ring.c
 
-    t=linspace(0,loops,int(loops*pts_per_loop))
+    t=linspace(0,loops,int(loops*ppl))
     if reverse:  t *= -1
     
     iv = -1 if inside else 1
@@ -80,9 +80,9 @@ def ellipse_in_ellipse(ring=Ellipse(20,0.5,0,0),
     return sd
 
 def ellipse_in_circle(ring=Ring(10),wheel=Ellipse(3,0.5,2,0,0),
-                      loops=1,pts_per_loop=1000,inside=True):
+                      loops=1,ppl=1000,inside=True):
     return elliptical_arc(ring.O[0],ring.O[1],ring.o,ring.r,wheel=wheel,
-                          loops=loops,spacing=1/pts_per_loop,inside=inside,
+                          loops=loops,spacing=1/ppl,inside=inside,
                           pen_offset=wheel.po)
 
 def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
