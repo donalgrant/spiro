@@ -11,7 +11,7 @@ from Ring import *
 
 F=SpiroFig(rows=3,cols=3)
 F.text_color='white'
-T = circle_in_circle(Ring(10),Wheel(4,3.5),loops=50,ppl=1283)
+T = cIc(Ring(10),Wheel(4,3.5),loops=50,ppl=1283)
 for cs in ['time']:
     F.plot(T,color_scheme='length',cmap='Reds',caption='Original Figure')
     for ss in [250,300,350,400,500,600,700,850]:

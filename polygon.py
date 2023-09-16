@@ -220,14 +220,14 @@ def heart(x0=0,y0=0,width=40,depth=20,wheel=Wheel(2.2,1.0),loops=1,
             sd.add(roll(x0,y0-depth,x0-width/2,y0,wheel,
                         start_guard=g*corner_guard(wheel.r,pi/2),end_guard=g*cg,invert=True))
             wheel.o=sd.pc()
-            sd.add(circle_in_circle(Ring(width/4),wheel,loops=0.5,
+            sd.add(cIc(Ring(width/4),wheel,loops=0.5,
                                     start_guard=g*cg,inside=True).rotate(-pi/2).move(x0-width/4,y0))
             
             wheel.o = sd.pc()
             rot_angle = pi if fold else -pi
             sd.add(rotate(x0,y0,sd.xc(),sd.yc(),rot_angle))
             wheel.o += rot_angle
-            sd.add(circle_in_circle(Ring(width/4),wheel,loops=0.5,inside=True,
+            sd.add(cIc(Ring(width/4),wheel,loops=0.5,inside=True,
                                     end_guard=g*cg).rotate(-pi/2).move(x0+width/4,y0))
             
             wheel.o = sd.pc()
@@ -247,12 +247,12 @@ def heart(x0=0,y0=0,width=40,depth=20,wheel=Wheel(2.2,1.0),loops=1,
             ca=cos_angle(width/4+wheel.r,width/4+width/4,width/4+wheel.r)
             wheel.o += rot_angle
 
-            sd.add(circle_in_circle(Ring(width/4),wheel,loops=0.5,
+            sd.add(cIc(Ring(width/4),wheel,loops=0.5,
                                     end_guard_angle=g*ca).rotate(-pi/2).move(x0-width/4,y0))
 
             ca=cos_angle(width/4+width/4,width/4+wheel.r,width/4+wheel.r)
             wheel.o = sd.pc()
-            sd.add(circle_in_circle(Ring(width/4),wheel,loops=0.5,
+            sd.add(cIc(Ring(width/4),wheel,loops=0.5,
                                     start_guard_angle=g*ca).rotate(-pi/2).move(x0+width/4,y0))
             wheel.o = sd.pc()
             rot_angle = pi/4 - 2*pi if fold else pi/4

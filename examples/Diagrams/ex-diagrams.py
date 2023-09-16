@@ -25,7 +25,7 @@ n=6
 orient=0
 ring=Ring(radius=20,orient=orient)
 wheel=Ellipse(5,0.7,4,phi1,pen_offset=pi/4)
-F.plot(ellipse_in_circle(ring,wheel=wheel,loops=1,inside=True),
+F.plot(eIc(ring,wheel=wheel,loops=1,inside=True),
        no_frame=False,cmap=trace,color_scheme=trs)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
@@ -38,7 +38,7 @@ F.save_fig(transparent=False)
 
 ring=Ring(radius=20,orient=0)
 wheel=Ellipse(8,0.7,7,phi1,pen_offset=pi/4)
-F.plot(ellipse_in_circle(ring,wheel=wheel,loops=1,inside=False),cmap=trace,color_scheme=trs)
+F.plot(eIc(ring,wheel=wheel,loops=1,inside=False),cmap=trace,color_scheme=trs)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
@@ -84,11 +84,11 @@ phi2=2*pi
 n=8
 ring=Ellipse(major=20,eccen=e,offset=pi/4,pen_offset=phi1)
 wheel=Wheel(5,6)
-F.plot(circle_in_ellipse(ring,wheel=wheel,inside=True),cmap=trace,color_scheme=trs)
+F.plot(cIe(ring,wheel=wheel,inside=True),cmap=trace,color_scheme=trs)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
-    S.add(circle_in_ellipse_diagram(ring=ring,wheel=wheel,phi0=phi1))
+    S.add(cIe_diagram(ring=ring,wheel=wheel,phi0=phi1))
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
 F.save_fig(transparent=False)
@@ -96,11 +96,11 @@ F.save_fig(transparent=False)
 n=8
 wheel=Wheel(8,7)
 ring.o=-pi/4
-F.plot(circle_in_ellipse(ring,wheel=wheel,inside=False),cmap=trace,color_scheme=trs)
+F.plot(cIe(ring,wheel=wheel,inside=False),cmap=trace,color_scheme=trs)
 for phi in np.linspace(phi1,phi2,n):
     S.reset()
     wheel.o=phi
-    S.add(circle_in_ellipse_diagram(ring=ring,wheel=wheel,phi0=phi1,inside=False))
+    S.add(cIe_diagram(ring=ring,wheel=wheel,phi0=phi1,inside=False))
     F.plot(S, new_fig=False, alpha = 1.0 if phi==phi1 else 0.1)
 
 F.save_fig(transparent=False)
@@ -111,13 +111,13 @@ S.reset()
 r=10
 a=1.3
 p=2.3
-F.plot(circle_in_circle(Ring(r),w0),cmap='hsv',color_scheme='time',new_fig=True)
+F.plot(cIc(Ring(r),w0),cmap='hsv',color_scheme='time',new_fig=True)
 o=0
 for i in range(1):
-    S.add(circle_in_circle(Ring(r),Wheel(a,p,o+pi),loops=0.25,inside=True,reverse=True))
+    S.add(cIc(Ring(r),Wheel(a,p,o+pi),loops=0.25,inside=True,reverse=True))
     o=S.pc()
     S.add(rotate(-r,0,S.xc(),S.yc(),pi))
-    S.add(circle_in_circle(Ring(r),Wheel(a,p,o+pi),loops=0.25).rotate(-pi/2))
+    S.add(cIc(Ring(r),Wheel(a,p,o+pi),loops=0.25).rotate(-pi/2))
     o=S.pc()
     S.add(rotate(0,r,S.xc(),S.yc(),pi))
     
@@ -128,16 +128,16 @@ F.save_fig(transparent=False)
 
 S.reset()
 r=Ring(9)
-F.plot(circle_in_circle(r,w0).rotate(-pi/2),
+F.plot(cIc(r,w0).rotate(-pi/2),
        cmap='hsv',color_scheme='time',new_fig=True)
 
 rot=pi/10
 w=Wheel(1.5,1.3)
 for i in range(1):
-    S.add(circle_in_circle(r,w,loops=0.5,inside=False,reverse=False).rotate(-pi/2+rot))
-    S.add(circle_in_circle(r,w,loops=0.5,inside=False,reverse=True ).rotate(-pi/2+rot))
-    S.add(circle_in_circle(r,w,loops=0.5,inside=True, reverse=False).rotate(-pi/2+rot))
-    S.add(circle_in_circle(r,w,loops=0.5,inside=True, reverse=True ).rotate(-pi/2+rot))
+    S.add(cIc(r,w,loops=0.5,inside=False,reverse=False).rotate(-pi/2+rot))
+    S.add(cIc(r,w,loops=0.5,inside=False,reverse=True ).rotate(-pi/2+rot))
+    S.add(cIc(r,w,loops=0.5,inside=True, reverse=False).rotate(-pi/2+rot))
+    S.add(cIc(r,w,loops=0.5,inside=True, reverse=True ).rotate(-pi/2+rot))
     
 F.plot(S,new_fig=False,cmap='autumn',color_scheme='time')
 F.save_fig(transparent=False)
@@ -172,7 +172,7 @@ o=0
 wo=pi/8
 n=8
 wheel=Ellipse(8,0.7,7,phi1,pen_offset=po)
-F.plot(ellipse_in_circle(Ring(20),wheel=wheel,inside=True,loops=1),cmap=trace,color_scheme=trs)
+F.plot(eIc(Ring(20),wheel=wheel,inside=True,loops=1),cmap=trace,color_scheme=trs)
 for phi in linspace(phi1,phi2,n):
     wheel.o=phi
     F.plot(new_elliptical_diagram(wheel=wheel,phi0=0,inside=True),new_fig=False,
@@ -191,7 +191,7 @@ wo=pi/8
 n=8
 ring=Ellipse(major=20,eccen=e,offset=o,pen_offset=wo)
 wheel=Ellipse(5,0.9,4,phi1,pen_offset=po)
-F.plot(ellipse_in_ellipse(ring=ring,wheel=wheel,inside=False,loops=1),cmap=trace,color_scheme=trs)
+F.plot(eIe(ring=ring,wheel=wheel,inside=False,loops=1),cmap=trace,color_scheme=trs)
 for phi in linspace(phi1,phi2,n):
     wheel.o=phi
     F.plot(ee_diagram(ring=ring,wheel=wheel,phi0=0,inside=False),new_fig=False,
@@ -211,7 +211,7 @@ phi0=0
 n=8
 ring=Ellipse(major=20,eccen=e,offset=o,pen_offset=wo)
 wheel=Ellipse(5,0.8,4,phi1,pen_offset=po)
-F.plot(ellipse_in_ellipse(ring=ring,wheel=wheel,inside=True,loops=1.0),cmap=trace,color_scheme=trs)
+F.plot(eIe(ring=ring,wheel=wheel,inside=True,loops=1.0),cmap=trace,color_scheme=trs)
 phi = linspace(phi1,phi2,n)
 for i in range(len(phi)):
     wheel.o=phi[i]
@@ -232,7 +232,7 @@ phi0=pi/4
 n=8
 ring=Ellipse(major=20,eccen=e,offset=o,pen_offset=wo)
 wheel=Ellipse(5,0.8,4,phi0,pen_offset=po)
-F.plot(ellipse_in_ellipse(ring=ring,wheel=wheel,inside=True,loops=1.0),cmap=trace,color_scheme=trs)
+F.plot(eIe(ring=ring,wheel=wheel,inside=True,loops=1.0),cmap=trace,color_scheme=trs)
 phi = linspace(phi1,phi2,n)
 for i in range(len(phi)):
     wheel.o=phi[i]
@@ -249,7 +249,7 @@ phi2=2*pi
 n=4
 w=Ellipse(major=8,eccen=0.7,pen=7,offset=phi0,pen_offset=-pi/2)
 r=Ellipse(major=20,eccen=0.5,offset=-pi/3,pen_offset=pi/2)
-F.plot(ellipse_in_ellipse(r,w,inside=True,loops=1),cmap=trace,color_scheme=trs)
+F.plot(eIe(r,w,inside=True,loops=1),cmap=trace,color_scheme=trs)
 phi = linspace(phi1,phi2,n)
 for i in range(len(phi)):
     w.o=phi[i]
@@ -266,7 +266,7 @@ phi2=2*pi
 n=4
 w=Ellipse(major=8,eccen=0.7,pen=7,offset=phi0,pen_offset=-pi/2)
 r=Ellipse(major=20,eccen=0.5,offset=-pi/3,pen_offset=pi/2)
-F.plot(ellipse_in_ellipse(r,w,inside=False,loops=1),cmap=trace,color_scheme=trs)
+F.plot(eIe(r,w,inside=False,loops=1),cmap=trace,color_scheme=trs)
 phi = linspace(phi1,phi2,n)
 for i in range(len(phi)):
     w.o=phi[i]

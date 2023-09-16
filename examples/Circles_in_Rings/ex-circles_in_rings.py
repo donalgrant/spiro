@@ -24,10 +24,10 @@ F.save_fig()
 
 S.reset()
 w = Wheel(5.5,5.3,0)
-S.add(circle_in_circle(Ring(20),w,loops=1/5,inside=True,ppl=2000))
+S.add(cIc(Ring(20),w,loops=1/5,inside=True,ppl=2000))
 for i in range(100): 
     w.o=S.pc()
-    S.add(circle_in_circle(Ring(20),w,loops=1/5,
+    S.add(cIc(Ring(20),w,loops=1/5,
                            inside=True,ppl=2000).rotate(2*pi/5*(i+1)))
 F.plot(S,save=True)
 

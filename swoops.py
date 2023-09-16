@@ -26,12 +26,12 @@ def swoops(n=40,ring=10,radius=2.5,wheel_e=0.0,ring_e=0.0,
             if (wheel_e==0):
                 if (ring_e==0):
                     r = Ring(ring,origin=np.array([x0[o],y0[o]]),orient=o0)
-                    sd.add(circle_in_circle(r,Wheel(a,bv[i],of0+pi/5*i),loops=l))
+                    sd.add(cIc(r,Wheel(a,bv[i],of0+pi/5*i),loops=l))
                 else:
                     e = Ellipse(ring,ring_e,0,pi/2+o0,origin=np.array([x0[o],y0[o]]))
-                    sd.add(circle_in_ellipse(e,Wheel(a,bv[i],of0+pi/5*i),loops=l))
+                    sd.add(cIe(e,Wheel(a,bv[i],of0+pi/5*i),loops=l))
             else:
                 r = Ring(ring,origin=np.array([x0[o],y0[o]]),orient=o0)
-                sd.add(ellipse_in_circle(r,Ellipse(a,wheel_e,bv[i],of0+pi/5*i),loops=l))
+                sd.add(eIc(r,Ellipse(a,wheel_e,bv[i],of0+pi/5*i),loops=l))
 
     return sd

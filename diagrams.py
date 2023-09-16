@@ -21,7 +21,7 @@ def line(coords,npts=20):
     # (sd.x,sd.y,sd.t,sd.p) = (x,y,x*0,x*0)
     
     for i in range(npts):
-        sd.add(circle_in_circle(Ring(0.01),W0).move(x[i],y[i]))
+        sd.add(cIc(Ring(0.01),W0).move(x[i],y[i]))
 
     
     return sd
@@ -58,12 +58,12 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),
     x0_wheel = wheel_center_r * sin(theta)
     y0_wheel = wheel_center_r * cos(theta)
     
-    sd.add(circle_in_circle(Ring(wheel.r,np.array([x0_wheel,y0_wheel]),orient=phi),
+    sd.add(cIc(Ring(wheel.r,np.array([x0_wheel,y0_wheel]),orient=phi),
                             wheel=W0,loops=1))
 
     # Mark the center location
 
-    sd.add(circle_in_circle(Ring(wheel.r/20,np.array([x0_wheel,y0_wheel])),
+    sd.add(cIc(Ring(wheel.r/20,np.array([x0_wheel,y0_wheel])),
                             wheel=W0,loops=1))
 
     # Mark the pen location
@@ -71,7 +71,7 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),
     x0_pen = x0_wheel + wheel.m * sin(phi+normal)
     y0_pen = y0_wheel + wheel.m * cos(phi+normal)
 
-    sd.add(circle_in_circle(Ring(0.01,np.array([x0_pen,y0_pen])),W0,loops=1))
+    sd.add(cIc(Ring(0.01,np.array([x0_pen,y0_pen])),W0,loops=1))
 
     # draw a line from center to pen location
 
@@ -79,7 +79,7 @@ def ring_wheel_diagram(ring=Ring(radius=20,origin=np.array([0,0]),orient=0),
         
     return sd.move(ring.O[0],ring.O[1])
 
-def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
+def cIe_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
                               phi0=0,inside=True):
     '''Elliptical ring, with a circular wheel.  phi0 is the initial offset of the
     circular wheel.  The current offset of the wheel is used to calculate its
@@ -90,7 +90,7 @@ def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
     sd = SpiroData()
 
     rframe=Ellipse(major=ring.a,eccen=ring.e)
-    sd.add(circle_in_ellipse(rframe,wheel=W0,loops=1))
+    sd.add(cIe(rframe,wheel=W0,loops=1))
 
     # Draw the wheel
 
@@ -114,19 +114,19 @@ def circle_in_ellipse_diagram(ring=Ellipse(20,0.5),wheel=Wheel(4,3,0.0),
     x0_wheel = xnc + iv * wheel.r * sin(normal)
     y0_wheel = ync + iv * wheel.r * cos(normal)
     
-    sd.add(circle_in_circle(Ring(wheel.r,np.array([x0_wheel,y0_wheel]),phi),
+    sd.add(cIc(Ring(wheel.r,np.array([x0_wheel,y0_wheel]),phi),
                             W0,loops=1))
 
     # Mark the center location
 
-    sd.add(circle_in_circle(Ring(wheel.r/20,np.array([x0_wheel,y0_wheel]),0),
+    sd.add(cIc(Ring(wheel.r/20,np.array([x0_wheel,y0_wheel]),0),
                             W0,loops=1))
     # Mark the pen location
 
     x0_pen = x0_wheel + wheel.m * sin(phi+normal)
     y0_pen = y0_wheel + wheel.m * cos(phi+normal)
 
-    sd.add(circle_in_circle(Ring(0.01,np.array([x0_pen,y0_pen]),0),W0,loops=1))
+    sd.add(cIc(Ring(0.01,np.array([x0_pen,y0_pen]),0),W0,loops=1))
     
     # draw a line from center to pen location
 
@@ -186,13 +186,13 @@ def new_elliptical_diagram(ring=Ring(20),wheel=Ellipse(4,0.7,3,0.0),
 
     # Draw the ellipse wheel
 
-    sd.add(circle_in_ellipse(Ellipse(wheel.a,wheel.e,offset=normal+theta,
+    sd.add(cIe(Ellipse(wheel.a,wheel.e,offset=normal+theta,
                                      origin=array([ec[0,0],ec[0,1]])),
                              wheel=W0, loops=1))
 
     # Mark the center location
 
-    sd.add(circle_in_circle(Ring(wheel.a/20,np.array([ec[0,0],ec[0,1]])),
+    sd.add(cIc(Ring(wheel.a/20,np.array([ec[0,0],ec[0,1]])),
                             W0,loops=1))
 
     # draw a line from the center of the ellipse wheel to the pen
@@ -213,7 +213,7 @@ def ee_diagram(ring,wheel,phi0=0,inside=True):
     
     sd = SpiroData()
 
-    sd.add(circle_in_ellipse(ring,W0))
+    sd.add(cIe(ring,W0))
 
     # find the elliptical wheel along the ring
 
@@ -252,12 +252,12 @@ def ee_diagram(ring,wheel,phi0=0,inside=True):
 
     # Draw the ellipse wheel
 
-    sd.add(circle_in_ellipse(Ellipse(wheel.a,wheel.e),
+    sd.add(cIe(Ellipse(wheel.a,wheel.e),
                              W0).rotate(wheel_n+ring_n).move(ec[0,0],ec[0,1]))
 
     # Mark the center location
 
-    sd.add(circle_in_circle(Ring(wheel.a/20,np.array([ec[0,0],ec[0,1]])),
+    sd.add(cIc(Ring(wheel.a/20,np.array([ec[0,0],ec[0,1]])),
                             W0,loops=1))
 
     # draw a line from the center of the ellipse wheel to the pen

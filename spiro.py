@@ -9,10 +9,10 @@ from SpiroGeometry import *
 def spiro(ring=Ring(10),wheel=Wheel(4,3.5,0.0),loops=5,
           slide = lambda t: 1,
           ppl=1000,inside=True):
-    return circle_in_circle(ring,wheel,loops=loops,
+    return cIc(ring,wheel,loops=loops,
                             slide=slide,ppl=ppl,inside=inside)
 
-def circle_in_ellipse(ring,wheel,
+def cIe(ring,wheel,
                       loops=1,ppl=4000,
                       inside=False,reverse=False,
                       quadrants=0, qfuzz=50,
@@ -68,7 +68,7 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     return sd
 
 
-def circle_in_circle(ring,wheel,
+def cIc(ring,wheel,
                      loops=1,ppl=1000,
                      inside=False,reverse=False,
                      quadrants=0, qfuzz=50,

@@ -121,9 +121,9 @@ for j in range(5):
     for i in range(10):
         S.add(roll(20,depth,0,20,wheel=Wheel(w,pen+j*pen_inc,offset)))
         S.add(rotate(0,20,S.xc(),S.yc(),pi))
-        S.add(circle_in_circle(Ring(10),Wheel(w,pen+j*pen_inc,S.pc()),loops=0.5).rotate(-pi/2).move(10,20))
+        S.add(cIc(Ring(10),Wheel(w,pen+j*pen_inc,S.pc()),loops=0.5).rotate(-pi/2).move(10,20))
         S.add(rotate(20,20,S.xc(),S.yc(),pi/2))
-        S.add(circle_in_circle(Ring(10),Wheel(w,pen+j*pen_inc,S.pc()),loops=0.5).rotate(-pi/2).move(30,20))
+        S.add(cIc(Ring(10),Wheel(w,pen+j*pen_inc,S.pc()),loops=0.5).rotate(-pi/2).move(30,20))
         S.add(rotate(40,20,S.xc(),S.yc(),pi))
         S.add(roll(40,20,20,depth,wheel=Wheel(w,pen+j*pen_inc,S.pc())))
         S.add(rotate(20,depth,S.xc(),S.yc(),pi/2))
@@ -139,8 +139,8 @@ depth=-3
 for j in range(1):
     for i in range(22):
         S.add(roll(20,depth,0,20,wheel=Wheel(w,pen+j*pen_inc,offset),invert=True))
-        S.add(circle_in_circle(Ring(10),Wheel(w,pen+j*pen_inc,S.pc()),loops=0.5,inside=True).rotate(-pi/2).move(10,20))
-        S.add(circle_in_circle(Ring(10),Wheel(w,pen+j*pen_inc,S.pc()),loops=0.5,inside=True).rotate(-pi/2).move(30,20))
+        S.add(cIc(Ring(10),Wheel(w,pen+j*pen_inc,S.pc()),loops=0.5,inside=True).rotate(-pi/2).move(10,20))
+        S.add(cIc(Ring(10),Wheel(w,pen+j*pen_inc,S.pc()),loops=0.5,inside=True).rotate(-pi/2).move(30,20))
         S.add(roll(40,20,20,depth,wheel=Wheel(w,pen+j*pen_inc,S.pc()),invert=True))
         offset=S.pc()
     

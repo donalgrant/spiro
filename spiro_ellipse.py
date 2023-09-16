@@ -5,7 +5,7 @@ from Ellipse import *
 from SpiroGeometry import *
 from Ring import *
 
-def ellipse_in_ellipse(ring=Ellipse(20,0.5,0,0),
+def eIe(ring=Ellipse(20,0.5,0,0),
                        wheel=Ellipse(3,0.5,2,0),
                        loops=1,
                        slide = lambda t: 1,
@@ -79,7 +79,7 @@ def ellipse_in_ellipse(ring=Ellipse(20,0.5,0,0),
     
     return sd
 
-def ellipse_in_circle(ring=Ring(10),wheel=Ellipse(3,0.5,2,0,0),
+def eIc(ring=Ring(10),wheel=Ellipse(3,0.5,2,0,0),
                       loops=1,ppl=1000,inside=True):
     return elliptical_arc(ring.O[0],ring.O[1],ring.o,ring.r,wheel=wheel,
                           loops=loops,spacing=1/ppl,inside=inside,
@@ -199,6 +199,6 @@ def integral_ellipticals(n,e_ring,e_wheel,ring_angle=pi/4,
         m  = min_pen + (max_pen-min_pen)*i/(n-1)
         po = min_po  + (max_po -min_po) *i/(n-1)
         wheel = Ellipse(a,e_wheel,m*a,0,pen_offset=po)
-        S.add(ellipse_in_ellipse(ring,wheel,inside=inside,loops=circuits))
+        S.add(eIe(ring,wheel,inside=inside,loops=circuits))
 
     return S

@@ -9,7 +9,7 @@ from Ring import *
 
 ###
 
-T = spiro_string(circle_in_circle(Ring(10),Wheel(4,3.5),loops=50,
+T = spiro_string(cIc(Ring(10),Wheel(4,3.5),loops=50,
                                   ppl=1283),subsample=500)
 print(T.n())
 nsubs=len(cmap_list())
