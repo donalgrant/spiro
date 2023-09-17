@@ -5,6 +5,7 @@ from numpy import array,linspace
 def spiro_string(sd,subsample=100,line_pts=500):
     s = sd.subsample(subsample)
     st = SpiroData()
+    i=0
     for i in range(s.n()-1):
         cc = line(array([ [s.x[i],s.y[i]], [s.x[i+1],s.y[i+1]] ]),line_pts)
         sti = SpiroData()
@@ -98,3 +99,26 @@ def strings_from_pts(sd,n=3,offset=100,line_pts=500,nLines=30,fixed=0):
         
     return st
 
+def strings_from_multi(sd,offset_array,line_pts=500,max_strings=0):
+    st = SpiroData()
+    n=len(offset_array)
+    i=0
+    i1=0
+    i2=(i1+offset_array[0]) % sd.n()
+    jstring=0
+    while True:
+        cc = line(array([ [sd.x[i1],sd.y[i1]], [sd.x[i2],sd.y[i2]] ]),line_pts)
+        sti = SpiroData()
+        sti.x=cc[:,0]
+        sti.y=cc[:,1]
+        sti.t=linspace(0,sti.x.shape[0],sti.x.shape[0])
+        sti.p=sti.t*0+sd.p[i1]
+        st.add(sti)
+        jstring+=1
+        i+=1
+        i1=i2
+        if (max_strings<=0) and (i1+offset_array[i%n])>=sd.n(): break
+        i2 = (i2+offset_array[i%n]) % sd.n()  # wrap around if necessary
+        if (max_strings>0) and (jstring>=max_strings): break
+            
+    return st

@@ -7,6 +7,12 @@ from spiro import *
 from spiro_string import *
 from Ring import *
 
+import matplotlib as mpl
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+cmap1 = LinearSegmentedColormap.from_list("RedOrangePink",["Red","Orange","Pink"])
+cmap2 = LinearSegmentedColormap.from_list("Pinks",["rebeccapurple","darkmagenta","orchid","pink"])
+cmap3 = LinearSegmentedColormap.from_list("DarkGreen",["seagreen","teal","cornflowerblue","mediumblue","indigo"])
+
 ###
 
 F=SpiroFig(rows=3,cols=3)
@@ -122,3 +128,40 @@ F.plot(strings_from_pts(S,n,offset=s,nLines=10),
        caption=f'from {n} pts:  Off {s}',new_fig=False,color_scheme=cs,cmap=c,fontsize=fs)
 
 F.save_fig('fig5.png')
+
+###
+
+F = SpiroFig(rows=3,cols=3)
+F.text_color='white'
+
+T = cIc(Ring(10),Wheel(4,3.5),loops=100,ppl=1283)
+
+F.plot(T,caption='Original')
+
+cs='t-waves'
+
+offsets=[658]
+F.plot(strings_from_multi(T,offsets),cmap='Reds',color_scheme=cs,caption=f'{offsets}',new_fig=False)
+
+offsets.append(340)
+F.plot(strings_from_multi(T,offsets),cmap=cmap1,color_scheme=cs,caption=f'{offsets}',new_fig=False)
+
+offsets.append(25)
+F.plot(strings_from_multi(T,offsets),cmap=cmap2,color_scheme=cs,caption=f'{offsets}',new_fig=False)
+
+offsets.append(174)
+F.plot(strings_from_multi(T,offsets),cmap=cmap3,color_scheme=cs,caption=f'{offsets}',new_fig=False)
+
+offsets=[657,852]
+F.plot(strings_from_multi(T,offsets),cmap='summer',color_scheme=cs,caption=f'{offsets}',new_fig=False)
+
+offsets=[658,340,25,174,1,5]
+F.plot(strings_from_multi(T,offsets),cmap='autumn',color_scheme=cs,caption=f'{offsets}',new_fig=False)
+
+offsets=[657,880]
+F.plot(strings_from_multi(T,offsets),cmap='jet',color_scheme=cs,caption=f'{offsets}',new_fig=False)
+
+offsets=[658,340,25,174,1,5,41,360]
+F.plot(strings_from_multi(T,offsets),cmap='terrain',color_scheme=cs,caption=f'{offsets}',new_fig=False)
+
+F.save_fig('fig6.png')

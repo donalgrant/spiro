@@ -132,6 +132,7 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
     r     = R + iv * a
 
     normal = theta # what matters for pen loc is normal to ring; just theta for circle
+    
     if quadrants != 0:
         qtheta = 2 * pi / quadrants
         int_th = array([ int(th/qtheta) for th in theta ])
