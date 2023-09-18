@@ -122,3 +122,42 @@ def strings_from_multi(sd,offset_array,line_pts=500,max_strings=0):
         if (max_strings>0) and (jstring>=max_strings): break
             
     return st
+
+def arcs_from_multi(sd,offset_array,arc_radius=100,invert=False,
+                    line_pts=500,max_strings=0,arc_only=True):
+    st = SpiroData()
+    n=len(offset_array)
+    i=0
+    i1=0
+    i2=(i1+offset_array[0]) % sd.n()
+    jstring=0
+    while True:
+        end_pt = array([ [sd.x[i1],sd.y[i1]], [sd.x[i2],sd.y[i2]] ])
+
+        
+        sti = SpiroData()
+        
+        if dist(end_pt) <= 2*arc_radius:
+            cc = arc(end_pt,arc_radius,invert=invert,npts=line_pts)
+            sti.x=cc[:,0]
+            sti.y=cc[:,1]
+            sti.t=linspace(0,sti.x.shape[0],sti.x.shape[0])
+            sti.p=sti.t*0+sd.p[i1]
+            st.add(sti)
+        else:
+            if not arc_only:                
+                cc = line(end_pt,line_pts)
+                sti.x=cc[:,0]
+                sti.y=cc[:,1]
+                sti.t=linspace(0,sti.x.shape[0],sti.x.shape[0])
+                sti.p=sti.t*0+sd.p[i1]
+                st.add(sti)
+
+        jstring+=1
+        i+=1
+        i1=i2
+        if (max_strings<=0) and (i1+offset_array[i%n])>=sd.n(): break
+        i2 = (i2+offset_array[i%n]) % sd.n()  # wrap around if necessary
+        if (max_strings>0) and (jstring>=max_strings): break
+            
+    return st

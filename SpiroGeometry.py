@@ -1,4 +1,4 @@
-from numpy import sin,cos,empty,array,matmul,linspace,abs,pi,sqrt,arctan2,arccos
+from numpy import sin,cos,empty,array,matmul,linspace,abs,pi,sqrt,arctan2,arccos,arcsin
 
 def rot_2D(angle):
     '''Matrix will rotate a coordinate by angle_rads cw'''
@@ -30,6 +30,41 @@ def line(end_pt,npts=20):
         cc[:,1] = end_pt[0,1] + (end_pt[1,1]-end_pt[0,1]) / (end_pt[1,0]-end_pt[0,0]) * (cc[:,0] - end_pt[0,0])
 
     return cc
+
+def dist(end_pt):
+    return sqrt((end_pt[1,0]-end_pt[0,0])**2+(end_pt[1,1]-end_pt[0,1])**2)
+
+def arc(end_pt,radius,invert=False,npts=20):
+
+    cc = empty((npts,2))
+
+    sign = -1 if invert else 1
+    
+    D = dist(end_pt)
+    theta = arctan2(end_pt[1,0]-end_pt[0,0],end_pt[1,1]-end_pt[0,1])
+
+    if radius < D/2:
+        print('Illegal radius < D/2')
+        return
+
+    yc = D/2
+    
+    if (radius == yc):  # protect against precision-induced float-error in sqrt
+        xc = 0
+    else:
+        xc = sqrt(radius**2-(D/2)**2)
+
+    phi = arcsin(D/(2*radius))
+    
+    for i in range(npts):
+        p = 2*phi*(i/(npts-1) - 0.5)
+        cc[i,0] = sign*(xc - radius*cos(p))
+        cc[i,1] = yc + radius*sin(p)
+
+    cr  = rot_about(array([0,0]),theta,cc)  # rotate by -theta
+    cr += end_pt[0]   # move to beginning of line (arc)
+
+    return cr
 
 def cos_angle(a,b,c):
     return arccos( (a**2+b**2-c**2) / (2*a*b) )
