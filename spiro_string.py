@@ -124,7 +124,7 @@ def strings_from_multi(sd,offset_array,line_pts=500,max_strings=0):
     return st
 
 def arcs_from_multi(sd,offset_array,arc_radius=100,invert=False,
-                    line_pts=500,max_strings=0,arc_only=True):
+                    line_pts=300,max_strings=0,arc_only=True):
     st = SpiroData()
     n=len(offset_array)
     i=0
