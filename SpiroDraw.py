@@ -4,7 +4,13 @@ import numpy as np
 from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array,linspace
 
 from pathlib import Path
-        
+
+import matplotlib as mpl
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+cmap1 = LinearSegmentedColormap.from_list("RedOrangePink",["Red","Orange","Pink"])
+cmap2 = LinearSegmentedColormap.from_list("Pinks",["rebeccapurple","darkmagenta","orchid","pink"])
+cmap3 = LinearSegmentedColormap.from_list("DarkGreen",["seagreen","teal","cornflowerblue","mediumblue","indigo"])
+
 def cmap_list():
     return ['viridis','magma','inferno','plasma','cividis',
             'spring','summer','winter','autumn','Wistia','cool',
@@ -19,6 +25,16 @@ def cmap_list():
             'YlOrRd','OrRd','PuRd','RdPu','BuPu','GnBu','PuBu',
             'YlGnBu','PuBuGn','BuGn','YlGn'
             ]
+
+def cmap_from_list(clist,cname=None):
+    if cname is None:
+        cname=''
+        for c in clist: cname+=c[:2]
+    return LinearSegmentedColormap.from_list(cname,clist)
+
+cmap1 = cmap_from_list(["Red","Orange","Pink"])
+cmap2 = cmap_from_list(["rebeccapurple","darkmagenta","orchid","pink"])
+cmap3 = cmap_from_list(["seagreen","teal","cornflowerblue","mediumblue","indigo"])
 
 # would like a better way to capture the color_scheme name with the encoding in a single
 # place, rather than both here and in the match statement.
@@ -72,10 +88,17 @@ class SpiroFig:
         self.cols=cols
         self.multi = True if self.rows*self.cols > 1 else False
 
+        self.set_default_cmap('viridis')
+        self.set_default_color_scheme('radial')
+        
+    def set_default_dpi(self,dpi):  self.dpi=dpi
+    def set_default_cmap(self,color):  self.cmap=color
+    def set_default_color_scheme(self,cs):  self.cs=cs
+
     def plot_row(self):  return self.plot_num // self.cols
     def plot_col(self):  return self.plot_num % self.cols
 
-    def plot(self,sd,cmap='viridis',color_scheme='radial',
+    def plot(self,sd,cmap=None,color_scheme=None,
              dot_size=0.1,linestyle='',alpha=1.0,
              subsample=None,no_frame=True, save=False,
              new_fig=True,smooth=False, caption='', fontsize=18):
@@ -84,6 +107,9 @@ class SpiroFig:
             self.new_fig(no_frame=no_frame)
 
         r = sqrt(sd.x**2+sd.y**2)
+
+        if color_scheme is None:  color_scheme=self.cs
+        if cmap         is None:  cmap        =self.cmap
         
         match color_scheme:
             case 'radial':    clr=r
@@ -158,6 +184,7 @@ class SpiroFig:
     
     def save_fig(self,filename=None,dpi=None,transparent=True):
 
+        if dpi is None:  dpi = self.dpi
         if self.allow_save:
             if filename is None:
                 filename=self._path+self._figname+f'{self.fig_number}.png'

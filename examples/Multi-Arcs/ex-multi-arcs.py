@@ -124,3 +124,29 @@ for ar in linspace(18,53,6):
     Q.add(arcs_from_multi(T,Q_offsets,ar,invert=True, line_pts=500,max_strings=50, arc_only=True))
 
 F.plot(Q,cmap='ocean',color_scheme='time',save=True)
+
+###
+
+S=SpiroData()
+N=201
+S.add(cIc(Ring(50),Wheel(8.7,10),inside=True,ppl=N))
+T=SpiroData()
+for f in range(15):
+    T.add(arcs_from_multi(S,array([int(N/2)]),100-f*3,invert=True,line_pts=400,max_strings=12,first=f*5))
+
+F.plot(T,cmap='inferno_r',color_scheme='radial',save=True)
+
+###
+
+S=SpiroData()
+N=600
+S.add(cIc(Ring(50),Wheel(8.7,10),inside=True,ppl=N))
+T=SpiroData()
+for f in range(15):
+    for invert in [True,False]:
+        T.add(arcs_from_multi(S,array([200]),100-(f%5)*6,invert=invert,line_pts=400,
+                              max_strings=15,first=f*3)).move(0,0).rotate(0)
+        T.add(arcs_from_multi(S,array([200]),100,invert=invert,line_pts=400,
+                              max_strings=15,first=f*3)).move(0,0).rotate(0)
+
+F.plot(T,cmap='Blues',color_scheme='length',save=True)
