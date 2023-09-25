@@ -1,6 +1,6 @@
 from SpiroData import *
 from SpiroGeometry import *
-from numpy import array,linspace
+from numpy import array,linspace,fmod
 
 def spiro_string(sd,subsample=100,line_pts=500):
     s = sd.subsample(subsample)
@@ -124,7 +124,7 @@ def strings_from_multi(sd,offset_array,line_pts=500,max_strings=0):
     return st
 
 def arcs_from_multi(sd,offset_array,arc_radius=100,invert=False,
-                    line_pts=300,max_strings=0,first=0,arc_only=True):
+                    line_pts=300,max_strings=0,first=0,arc_only=True,arc_always=True):
     st = SpiroData()
     n=len(offset_array)
     i=0
@@ -136,28 +136,88 @@ def arcs_from_multi(sd,offset_array,arc_radius=100,invert=False,
 
         
         sti = SpiroData()
+
+        d = dist(end_pt)
+
+        phase = sd.p[i1]
         
-        if dist(end_pt) <= 2*arc_radius:
-            cc = arc(end_pt,arc_radius,invert=invert,npts=line_pts)
-            sti.x=cc[:,0]
-            sti.y=cc[:,1]
-            sti.t=linspace(0,sti.x.shape[0],sti.x.shape[0])
-            sti.p=sti.t*0+sd.p[i1]
-            st.add(sti)
+        if d <= 2*arc_radius:
+            st.load(arc(end_pt,arc_radius,invert=invert,npts=line_pts),phase)
         else:
-            if not arc_only:                
-                cc = line(end_pt,line_pts)
-                sti.x=cc[:,0]
-                sti.y=cc[:,1]
-                sti.t=linspace(0,sti.x.shape[0],sti.x.shape[0])
-                sti.p=sti.t*0+sd.p[i1]
-                st.add(sti)
+            if arc_always:
+                st.load(arc(end_pt,d/2,invert=invert,npts=line_pts),phase)
+            elif not arc_only:
+                st.load(line(end_pt,line_pts),phase)
+            else:
+                pass
 
         jstring+=1
         i+=1
         i1=i2
         if (max_strings<=0) and (i1+offset_array[i%n])>=sd.n(): break
         i2 = (i2+offset_array[i%n]) % sd.n()  # wrap around if necessary
+        if (max_strings>0) and (jstring>=max_strings): break
+            
+    return st
+
+
+def centered_arcs(sd,arc_radius=100,arc_subtended=None,angle_offset=None,
+                  arc_scale=0.1,theta_phase=False,line_pts=300,max_strings=0,first=0):
+    st = SpiroData()
+    i=0
+    i1=first % sd.n()
+    i2=(i1+1) % sd.n()
+    jstring=0
+    while True:
+        end_pt = array([ [sd.x[i1],sd.y[i1]], [sd.x[i2],sd.y[i2]] ])
+        d = dist(end_pt)
+        phase = sd.p[i1]
+        theta = arctan2(sd.y[i2]-sd.y[i1],sd.x[i2]-sd.x[i1])
+        angle_phase = theta if theta_phase else phase
+        if angle_offset is None:
+            offset=fmod(angle_phase+pi,2*pi)
+        else:
+            offset=angle_offset
+        if arc_subtended is None:
+            arc_subtended=2*pi*d*arc_scale
+
+        s = arc_on_center(end_pt[0],radius=arc_radius,
+                          arc_subtended=arc_subtended,angle_offset=offset,
+                          npts=line_pts)
+        st.load(s,phase)
+        jstring+=1
+        i+=1
+        i1=i2
+        if (max_strings<=0) and (i1+1 >= sd.n()): break
+        i2 = (i2+1) % sd.n()  # wrap around if necessary
+        if (max_strings>0) and (jstring>=max_strings): break
+            
+    return st
+
+def rotating_arcs(sd,arc_radius=100,rotation_rate=1,arc_subtended=None,
+                  arc_offset_angle=0,arc_scale=0.1,line_pts=300,max_strings=0,first=0):
+    st = SpiroData()
+    i=0
+    i1=first % sd.n()
+    i2=(i1+1) % sd.n()
+    jstring=0
+    while True:
+        end_pt = array([ [sd.x[i1],sd.y[i1]], [sd.x[i2],sd.y[i2]] ])
+        d = dist(end_pt)
+        phase = sd.p[i1]
+        theta = arctan2(sd.y[i2]-sd.y[i1],sd.x[i2]-sd.x[i1])
+        angle_offset=fmod(jstring*2*pi/sd.n()*rotation_rate+arc_offset_angle,2*pi)
+        if arc_subtended is None:
+            arc_subtended=2*pi*d*arc_scale
+        s = arc_on_center(end_pt[0],radius=arc_radius,
+                          arc_subtended=arc_subtended,angle_offset=angle_offset,
+                          npts=line_pts)
+        st.load(s,phase)
+        jstring+=1
+        i+=1
+        i1=i2
+        if (max_strings<=0) and (i1+1 >= sd.n()): break
+        i2 = (i2+1) % sd.n()  # wrap around if necessary
         if (max_strings>0) and (jstring>=max_strings): break
             
     return st

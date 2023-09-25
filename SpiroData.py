@@ -66,7 +66,15 @@ class SpiroData:
         self.p = p
         self.t = t
         return self
-    
+
+    def load(self,xy_array,phase):
+        s = SpiroData()
+        s.x=xy_array[:,0]
+        s.y=xy_array[:,1]
+        s.t=linspace(0,s.x.shape[0],s.x.shape[0])
+        s.p=s.t*0+phase
+        return self.add(s);
+        
     def xc(self):  return self.x[-1] 
     def yc(self):  return self.y[-1] 
     def pc(self):  return self.p[-1]

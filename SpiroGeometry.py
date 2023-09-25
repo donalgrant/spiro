@@ -34,6 +34,14 @@ def line(end_pt,npts=20):
 def dist(end_pt):
     return sqrt((end_pt[1,0]-end_pt[0,0])**2+(end_pt[1,1]-end_pt[0,1])**2)
 
+def arc_on_center(center,radius,arc_subtended,angle_offset=0,npts=20):
+    cc = empty((npts,2))
+    for i in range(npts):
+        angle = (i/(npts-1)-0.5)*arc_subtended
+        cc[i,0] = radius*(cos(angle)-1)
+        cc[i,1] = radius*sin(angle)
+    return rot_coords(angle_offset,cc)+center
+        
 def arc(end_pt,radius,invert=False,npts=20):
 
     cc = empty((npts,2))
