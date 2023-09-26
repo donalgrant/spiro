@@ -160,7 +160,17 @@ def arcs_from_multi(sd,offset_array,arc_radius=100,invert=False,
             
     return st
 
+def array_val(a,i): return a[i%len(a)] if hasattr(a,"__len__") else a
 
+def arcs_on_frame(sd,radius,subtended,offset,pts,centers):
+    '''Every argument may be an array'''
+    st = SpiroData()
+    for i in range(sd.n()):
+        s = arc_on_center(sd.xy(i),array_val(radius,i),array_val(subtended,i),
+                          array_val(offset,i),array_val(pts,i),array_val(centers,i))
+        st.load(s,sd.p[i])
+    return st
+        
 def centered_arcs(sd,arc_radius=100,arc_subtended=None,angle_offset=None,
                   arc_scale=0.1,theta_phase=False,line_pts=300,max_strings=0,first=0):
     st = SpiroData()

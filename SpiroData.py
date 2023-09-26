@@ -79,6 +79,8 @@ class SpiroData:
     def yc(self):  return self.y[-1] 
     def pc(self):  return self.p[-1]
     def tc(self):  return self.t[-1]
+
+    def xy(self,index):  return array([ self.x[index % self.n()], self.y[index % self.n()] ])
     
     def rotate(self,angle):
         coords = rot_coords(angle,column_stack((self.x,self.y)))
