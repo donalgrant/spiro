@@ -88,6 +88,7 @@ class SpiroFig:
         self.cols=cols
         self.multi = True if self.rows*self.cols > 1 else False
 
+        self.set_default_dpi(100)
         self.set_default_cmap('viridis')
         self.set_default_color_scheme('radial')
         

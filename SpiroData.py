@@ -4,6 +4,12 @@ from numpy import array, append, column_stack, abs, sqrt, arctan2, linspace
 from SpiroGeometry import *
 import pickle
 
+def array_val(a,i):
+    '''Generic function to extract an element of an array, with
+    wrapping on the element number.  If what is passed is a scalar,
+    then the scalar itself is returned.'''
+    
+    return a[i%len(a)] if hasattr(a,"__len__") else a
 
 def read_SD(filename):
     with open(filename,'rb') as f:
@@ -81,6 +87,19 @@ class SpiroData:
     def tc(self):  return self.t[-1]
 
     def xy(self,index):  return array([ self.x[index % self.n()], self.y[index % self.n()] ])
+
+    def direction(self,i1):
+        i2 = (i1+1) % self.n()
+        return arctan2(self.y[i2]-self.y[i1],self.x[i2]-self.x[i1])
+
+    def directions(self):
+        return array([ self.direction(i) for i in range(self.n()) ])
+
+    def neighbor_dist(self,i):
+        return dist(array([ self.xy(i), self.xy(i+1) ]))
+
+    def neighbor_distances(self):
+        return array([ self.neighbor_dist(i) for i in range(self.n()) ])
     
     def rotate(self,angle):
         coords = rot_coords(angle,column_stack((self.x,self.y)))

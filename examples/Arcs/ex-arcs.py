@@ -5,7 +5,7 @@ from SpiroData import *
 from SpiroDraw import *
 from spiro import *
 from spiro_ellipse import *
-from spiro_string import *
+from spiro_arcs import *
 from Ring import *
 
 import matplotlib as mpl
