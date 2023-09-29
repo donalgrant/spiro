@@ -39,8 +39,8 @@ def arcs_from_multi(sd,offset_array,arc_radius=100,invert=False,
             
     return st
 
-def arcs_on_frame(sd,radius,subtended,offset,pts,centers):
-    '''Every argument may be an array:
+def arcs_on_frame(sd,radius,subtended,offset,pts,centers,first=0,n=None):
+    '''Every argument except the first two may be an array:
     sd = SpiroData frame on which to draw the arcs
     radius:     radius of curvature for each arc
     subtended:  angular extent of arc (0 <= subtended <= 2*pi)
@@ -50,7 +50,8 @@ def arcs_on_frame(sd,radius,subtended,offset,pts,centers):
     (0 for arc going through frame point, 1 for curvature origin at frame point)
     '''
     st = SpiroData()
-    for i in range(sd.n()):
+    last = first+sd.n() if n is None else first+n
+    for i in range(first,last):
         s = arc_on_center(sd.xy(i),array_val(radius,i),array_val(subtended,i),
                           array_val(offset,i),array_val(pts,i),array_val(centers,i))
         st.load(s,sd.p[i])
@@ -70,4 +71,7 @@ def rotating_arcs(sd,arc_radius=100,rotation_rate=1,arc_subtended=None,
     arc_subtended = 2*pi * d * arc_scale if arc_subtended is None else arc_subtended
     offset=fmod(arange(sd.n())*2*pi/sd.n()*rotation_rate+arc_offset_angle,2*pi)
     return arcs_on_frame(sd,arc_radius,arc_subtended,offset,line_pts,0)
+
+def connected_bubbles(sd,pts=300):
+    return arcs_on_frame(sd,sd.neighbor_distances()/2,2*pi,pi-sd.directions(),pts,0,n=sd.n()-1)
 

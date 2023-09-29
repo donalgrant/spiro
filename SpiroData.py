@@ -95,6 +95,12 @@ class SpiroData:
     def directions(self):
         return array([ self.direction(i) for i in range(self.n()) ])
 
+    def radius(self,i):
+        return dist(array([ self.xy(i), [0,0] ]))
+
+    def radii(self):
+        return array([ self.radius(i) for i in range(self.n()) ])
+    
     def neighbor_dist(self,i):
         return dist(array([ self.xy(i), self.xy(i+1) ]))
 
@@ -112,13 +118,13 @@ class SpiroData:
         self.y+=y0
         return self
         
-    def subsample(self,n):
+    def subsample(self,n,first=0):
         '''return a subsampled version of the current data'''
         sd = SpiroData()
-        sd.x=self.x[::n]
-        sd.y=self.y[::n]
-        sd.p=self.p[::n]
-        sd.t=self.t[::n]
+        sd.x=self.x[first::n]
+        sd.y=self.y[first::n]
+        sd.p=self.p[first::n]
+        sd.t=self.t[first::n]
         return sd
 
     def n(self):  return self.x.shape[0]
