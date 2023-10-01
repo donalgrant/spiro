@@ -75,3 +75,11 @@ def rotating_arcs(sd,arc_radius=100,rotation_rate=1,arc_subtended=None,
 def connected_bubbles(sd,pts=300):
     return arcs_on_frame(sd,sd.neighbor_distances()/2,2*pi,pi-sd.directions(),pts,0,n=sd.n()-1)
 
+def ribbon(sd,width,arc_subtended=pi/4,twists=0,twist_start=0,pts=300,trim=False):
+    radius = width/arc_subtended
+    n = sd.n()-1 if trim else sd.n()
+    offsets = linspace(twist_start,twist_start+2*pi*twists,sd.n())
+    return arcs_on_frame(sd,radius,arc_subtended,pi-sd.directions()+offsets,pts,0,n=n)
+    # sd.directions() may have one more element than necessary if trim, but
+    # the extra element will be ignored.
+

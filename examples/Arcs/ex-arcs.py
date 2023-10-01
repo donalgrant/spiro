@@ -85,3 +85,53 @@ offsets=[43,86]
 Q=arcs_from_multi(T,offsets,40,invert=True,line_pts=500,max_strings=300)
 Q.add(arcs_from_multi(T,offsets,20,invert=False,line_pts=500,max_strings=300))
 F.plot(Q,cmap='ocean',color_scheme='length',save=True)
+
+###  (poster)
+
+for t in [True,False]:
+    
+    F = SpiroFig(rows=3,cols=3)
+    F.text_color='white'
+    
+    T = cIc(Ring(10),Wheel(4,3.5),loops=100,ppl=1283)
+    
+    F.plot(T,caption='Original')
+    
+    cs='t-waves'
+    arc_radius=30
+    
+    F.caption(f'arc_radius={arc_radius}; invert={t}')
+    
+    offsets=[658]
+    F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
+           cmap='Reds',color_scheme=cs,caption=f'{offsets}',new_fig=False)
+    
+    offsets.append(340)
+    F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
+           cmap=cmap1,color_scheme=cs,caption=f'{offsets}',new_fig=False)
+    
+    offsets.append(25)
+    F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
+           cmap=cmap2,color_scheme=cs,caption=f'{offsets}',new_fig=False)
+    
+    offsets.append(174)
+    F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
+           cmap=cmap3,color_scheme=cs,caption=f'{offsets}',new_fig=False)
+    
+    offsets=[657,852]
+    F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
+           cmap='summer',color_scheme=cs,caption=f'{offsets}',new_fig=False)
+    
+    offsets=[658,340,25,174,1,5]
+    F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
+           cmap='autumn',color_scheme=cs,caption=f'{offsets}',new_fig=False)
+    
+    offsets=[657,880]
+    F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
+           cmap='jet',color_scheme=cs,caption=f'{offsets}',new_fig=False)
+    
+    offsets=[658,340,25,174,1,5,41,360]
+    F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
+           cmap='terrain',color_scheme=cs,caption=f'{offsets}',new_fig=False)
+    
+    F.save_fig(f'arc-poster-{arc_radius}-{t}.png')
