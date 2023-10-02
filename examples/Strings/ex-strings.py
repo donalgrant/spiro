@@ -21,7 +21,7 @@ T = cIc(Ring(10),Wheel(4,3.5),loops=50,ppl=1283)
 for cs in ['time']:
     F.plot(T,color_scheme='length',cmap='Reds',caption='Original Figure')
     for ss in [250,300,350,400,500,600,700,850]:
-        F.plot(spiro_string(T,subsample=ss),color_scheme=cs,cmap='OrRd',
+        F.plot(spiro_string(T.subsample(ss)),color_scheme=cs,cmap='OrRd',
                new_fig=False,caption=f'Subsample {ss}')
 
 F.save_fig('fig1.png')
@@ -83,7 +83,7 @@ st=55
 cs='length'
 c='jet'
 s=93
-F.plot(spiro_string(S,subsample=s),caption=f'Subsample {s}',                  
+F.plot(spiro_string(S.subsample(s)),caption=f'Subsample {s}',                  
        new_fig=False,color_scheme=cs,cmap=c,fontsize=fs)
 s=213
 st=33

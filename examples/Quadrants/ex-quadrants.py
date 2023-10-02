@@ -25,5 +25,5 @@ for o in linspace(w.m,w.r,10):
     w.m=o
     S.add(cIc(Ring(15),w,loops=7,inside=True,quadrants=10, qfuzz=100).rotate(o))
 
-F.plot(S,color_scheme='cycles',cmap='ocean',subsample=0,dot_size=.1,save=True)
+F.plot(S,color_scheme='cycles',cmap='ocean',save=True)
 

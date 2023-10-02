@@ -57,8 +57,8 @@ for t in [True,False]:
         for ss in ss_vals:
             cs=csl[fig_number % len(csl)]
             c=cmaps[fig_number % len(cmaps)]
-            F.plot(S,new_fig=False,
-                   subsample=ss,dot_size=ds,caption=f'O: {ss}/{ds} {cs}/{c}',
+            F.plot(S.subsample(ss),new_fig=False,
+                   dot_size=ds,caption=f'O: {ss}/{ds} {cs}/{c}',
                    fontsize=10,
                    color_scheme=cs,cmap=c)
     
@@ -71,10 +71,9 @@ for t in [True,False]:
             for ss in ss_vals:
                 cs=csl[fig_number % len(csl)]
                 c=cmaps[fig_number % len(cmaps)]
-                F.plot(SO,new_fig=False,
-                       subsample=ss,dot_size=ds,caption=f'S: {ss}/{ds} {cs}/{c}',
-                       fontsize=10,
-                       color_scheme=cs,cmap=c)
+                F.plot(SO.subsample(ss),new_fig=False,
+                       dot_size=ds,caption=f'S: {ss}/{ds} {cs}/{c}',
+                       fontsize=10,color_scheme=cs,cmap=c)
     
                 fig_number+=1
 

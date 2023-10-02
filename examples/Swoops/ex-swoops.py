@@ -27,8 +27,8 @@ S.add(swoops(n=40,ring_e=0.8,exponential=True,
              xscale=50,yscale=10,swoop_min=0.03,
              swoop_mean=0.1,swoop_spread=0.1))
 F.plot(S,color_scheme='x-y',cmap='inferno')
-F.plot(S,color_scheme='x-y',cmap='inferno',
-       dot_size=100,alpha=0.03,new_fig=False,subsample=100)
+F.plot(S.subsample(100),color_scheme='x-y',cmap='inferno',
+       dot_size=100,alpha=0.03,new_fig=False)
 
 S.reset()
 S.add(swoops(n=15,wheel_e=0.8,yscale=20,xscale=20,

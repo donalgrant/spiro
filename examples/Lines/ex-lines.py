@@ -13,8 +13,8 @@ F = SpiroFig()
 
 F.plot(spiro_line(50,Wheel(5,4),orient=0,loops=4,fold=False),
        new_fig=True,color_scheme='time')
-F.plot(spiro_line(50,Wheel(5,4),orient=0,loops=4,fold=False),
-       new_fig=False,color_scheme='time',alpha=0.1,subsample=5,dot_size=50)
+F.plot(spiro_line(50,Wheel(5,4),orient=0,loops=4,fold=False).subsample(5),
+       new_fig=False,color_scheme='time',alpha=0.1,dot_size=50)
 F.save_fig()
 
 ###
