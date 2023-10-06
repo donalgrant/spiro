@@ -32,7 +32,7 @@ def cmap_from_list(clist,cname=None):
         for c in clist: cname+=c[:2]
     return LinearSegmentedColormap.from_list(cname,clist)
 
-cmap1 = cmap_from_list(["Red","Orange","Pink"])
+cmap1 = cmap_from_list(["Red","Orange","hotpink"])
 cmap2 = cmap_from_list(["rebeccapurple","darkmagenta","orchid","pink"])
 cmap3 = cmap_from_list(["seagreen","teal","cornflowerblue","mediumblue","indigo"])
 
@@ -101,7 +101,7 @@ class SpiroFig:
 
     def plot(self,sd,cmap=None,color_scheme=None,
              dot_size=0.1,linestyle='',alpha=1.0,
-             subsample=None,no_frame=True, save=False,
+             subsample=None,no_frame=True, save=False, no_multi_inc=False,
              new_fig=True,smooth=False, caption='', fontsize=18):
 
         if new_fig or self.ax is None or (self.multi and not self.ax.any):
@@ -168,7 +168,7 @@ class SpiroFig:
             ax.set_title(caption,color=self.text_color,y=-0.1,fontsize=fontsize)
 #            self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right',
 #                           color=self.text_color)
-        if self.multi:
+        if self.multi and not no_multi_inc:
             self.plot_num+=1
         
         if save:

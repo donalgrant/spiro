@@ -92,3 +92,26 @@ F.plot(Q,cmap=c,color_scheme=cs,alpha=0.3)
 F.plot(S,cmap=c,color_scheme=cs,new_fig=False,alpha=0.2)
 
 F.save_fig()
+
+###
+
+cs = 'l-waves'
+c = 'tab20b'
+S=SpiroData()
+Q=SpiroData()
+T = SpiroData()
+
+seed=3 # np.random.randint(0,1000)
+np.random.seed(seed)
+for sweep in range(15):
+    wo = np.random.uniform(0,2*pi)
+    R = 20 + np.random.uniform(-10,5)
+    for i in range(20):
+        T.reset()
+        m=5+i/3
+        w=Ellipse(major=3, eccen=0.4,pen=4, offset=i*pi/20, pen_offset=0)
+        r=Ellipse(major=R, eccen=0.0,       offset=0, pen_offset=wo)
+        T.add(connected_bubbles(eIe(ring=r,wheel=w,inside=True,loops=0.06).subsample(43)))
+        S.add(T)
+        
+F.plot(S,cmap=c,color_scheme=cs,alpha=0.2,save=True)

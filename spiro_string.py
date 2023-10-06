@@ -53,6 +53,27 @@ def strings_from_coord(sd,coord=array([0,0]),offset=100,line_pts=500,nLines=0,i2
         
     return st
 
+def closed_paths(sd,offsets,skip=1,first=0,n=0,line_pts=500):
+    st = SpiroData()
+    if n==0:  n = sd.n()//3  # number of closed paths to do
+    i1=first % sd.n()        # offset to first closed path starting point
+    j=0                      # counter for number of closed paths
+    while True:
+        i0=i1
+        for o in offsets:
+            st.load(line(array([ sd.xy(i1), sd.xy(i1+o) ]),line_pts), sd.p[i1%sd.n()])
+            i1 += o
+
+        # now close the loop
+        st.load(line(array([ sd.xy(i1),sd.xy(i0) ]),line_pts), sd.p[i1%sd.n()])
+        j+=1
+        
+        if (n<=0) and (i0+skip)>=sd.n(): break
+        i1 = (i0 + skip) % sd.n()
+        if (n>0)  and (j>=n): break
+
+    return st
+
 def strings_from_pts(sd,n=3,offset=100,line_pts=500,nLines=30,fixed=0):
     st = SpiroData()
     for i in range(n):

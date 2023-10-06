@@ -107,7 +107,30 @@ def arcs_on_frame(sd,radius,subtended,offset,pts,centers,first=0,n=None):
                           array_val(offset,i),array_val(pts,i),array_val(centers,i))
         st.load(s,sd.p[i])
     return st
+
+def closed_arcs(sd,offsets,radii,invert=True,skip=1,first=0,n=0,line_pts=500):
+    st = SpiroData()
+    if n==0:  n = sd.n()//3  # number of closed paths to do
+    i1=first % sd.n()        # offset to first closed path starting point
+    j=0                      # counter for number of closed paths
+    while True:
+        i0=i1
+        for o in offsets:
+            st.load(arc(array([ sd.xy(i1), sd.xy(i1+o) ]),array_val(radii,o),
+                        invert=array_val(invert,o),npts=line_pts), sd.p[i1%sd.n()])
+            i1 += o
+
+        # now close the loop
+        st.load(arc(array([ sd.xy(i1),sd.xy(i0) ]),array_val(radii,o+1),
+                     invert=array_val(invert,o+1),npts=line_pts), sd.p[i1%sd.n()])
+        j+=1
         
+        if (n<=0) and (i0+skip)>=sd.n(): break
+        i1 = (i0 + skip) % sd.n()
+        if (n>0)  and (j>=n): break
+
+    return st
+
 def centered_arcs(sd,arc_radius=100,arc_subtended=None,angle_offset=None,
                   arc_scale=0.1,theta_phase=False,line_pts=300):
     d = sd.neighbor_distances()
