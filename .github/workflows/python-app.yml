@@ -44,8 +44,3 @@ jobs:
         name: spiro-generated-files
         # A file, directory or wildcard pattern that describes what to upload
         path: examples/Circles_in_Rings/*.png
-
-
-
-
-    retention-days: # optional
