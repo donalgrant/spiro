@@ -36,4 +36,11 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        echo "pwd:"
+        pwd
+        ls
+        echo "PYTHONPATH:"
+        PWD=$(pwd)
+        export PYTHONPATH=$PWD
+        echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
         pytest examples/Circles_in_Rings/*.py
