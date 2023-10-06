@@ -35,7 +35,7 @@ jobs:
         export PYTHONPATH=$PWD
         echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
         python examples/Circles_in_Rings/*.py
-        ls examples/Circles_in_Rings/*.png
+        ls examples/Circles_in_Rings/*
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.3
       with:
