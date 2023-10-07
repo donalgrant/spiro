@@ -34,7 +34,7 @@ jobs:
         PWD=$(pwd)
         export PYTHONPATH=$PWD
         echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
-        (cd examples/Circles_in_Rings; python *.py; ls *.png)
+        find examples -name "*.py" -execdir python {} \;
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.3
       with:
