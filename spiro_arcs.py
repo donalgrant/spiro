@@ -1,6 +1,6 @@
 from SpiroData import *
 from SpiroGeometry import *
-from numpy import array,linspace,fmod,arange
+from numpy import array,linspace,fmod,arange,sin
 
 def arcs_from_coord(sd,coord=array([0,0]),offset=100,npts=500,arc_radius=30,invert=False,
                     nLines=0,i2_start=-1,arc_only=True,arc_always=True):
@@ -108,7 +108,7 @@ def arcs_on_frame(sd,radius,subtended,offset,pts,centers,first=0,n=None):
         st.load(s,sd.p[i])
     return st
 
-def closed_arcs(sd,offsets,radii,invert=True,skip=1,first=0,n=0,line_pts=500):
+def closed_arcs_orig(sd,offsets,radii,invert=True,skip=1,first=0,n=0,line_pts=500):
     st = SpiroData()
     if n==0:  n = sd.n()//3  # number of closed paths to do
     i1=first % sd.n()        # offset to first closed path starting point
@@ -123,6 +123,108 @@ def closed_arcs(sd,offsets,radii,invert=True,skip=1,first=0,n=0,line_pts=500):
         # now close the loop
         st.load(arc(array([ sd.xy(i1),sd.xy(i0) ]),array_val(radii,o+1),
                      invert=array_val(invert,o+1),npts=line_pts), sd.p[i1%sd.n()])
+        j+=1
+        
+        if (n<=0) and (i0+skip)>=sd.n(): break
+        i1 = (i0 + skip) % sd.n()
+        if (n>0)  and (j>=n): break
+
+    return st
+
+def closed_arcs(sd,offsets,radii,invert=True,skip=1,first=0,n=0,line_pts=500):
+    st = SpiroData()
+    if n==0:  n = sd.n()//3  # number of closed paths to do
+    i1=first % sd.n()        # offset to first closed path starting point
+    j=0                      # counter for number of closed paths
+    while True:
+        i0=i1
+        for k in range(len(offsets)):
+            o = offsets[k]
+            st.load(arc(array([ sd.xy(i1), sd.xy(i1+o) ]),array_val(radii,k),
+                        invert=array_val(invert,k),npts=line_pts), sd.p[i1%sd.n()])
+            i1 += o
+
+        # now close the loop
+        st.load(arc(array([ sd.xy(i1),sd.xy(i0) ]),array_val(radii,k+1),
+                     invert=array_val(invert,k+1),npts=line_pts), sd.p[i1%sd.n()])
+        j+=1
+        
+        if (n<=0) and (i0+skip)>=sd.n(): break
+        i1 = (i0 + skip) % sd.n()
+        if (n>0)  and (j>=n): break
+
+    return st
+
+def closed_subarcs(sd,offsets,sub_angle,invert=True,skip=1,first=0,n=0,line_pts=500,interp_phase=False):
+    st = SpiroData()
+    if n==0:  n = sd.n()//3  # number of closed paths to do
+    i1=first % sd.n()        # offset to first closed path starting point
+    j=0                      # counter for number of closed paths
+    while True:
+        i0=i1
+        for k in range(len(offsets)):
+            o = offsets[k]
+            end_points=array([ sd.xy(i1), sd.xy(i1+o) ])
+            radius = dist(end_points)/ 2 / sin(array_val(sub_angle,k)/2)
+            phase = linspace(sd.p[i1%sd.n()],sd.p[(i1+o)%sd.n()],line_pts) if interp_phase else sd.p[i1%sd.n()]
+            st.load(arc(end_points,radius,invert=array_val(invert,k),npts=line_pts),phase)
+            i1 += o
+
+        # now close the loop
+        end_points=array([ sd.xy(i1), sd.xy(i0) ])
+        radius = dist(end_points)/ 2 / sin(array_val(sub_angle,k+1)/2)
+        phase = linspace(sd.p[i1%sd.n()],sd.p[i0%sd.n()],line_pts) if interp_phase else sd.p[i1%sd.n()]
+        st.load(arc(end_points,radius,invert=array_val(invert,k+1),npts=line_pts),phase)
+
+        j+=1
+        
+        if (n<=0) and (i0+skip)>=sd.n(): break
+        i1 = (i0 + skip) % sd.n()
+        if (n>0)  and (j>=n): break
+
+    return st
+
+def snake(nSnakes,end_pts,sub_angle,invert,line_pts,ph0,phf):
+    phase = linspace(ph0,phf,nSnakes)
+    W = SpiroData()
+    W.load(line(end_pts,npts=nSnakes),linspace(ph0,phf,nSnakes))
+    S = SpiroData()
+    inv_snake=invert
+    for j in range(W.n()-1):
+        ep = array([ W.xy(j), W.xy(j+1) ])
+        ph = linspace(phase[j],phase[j+1],line_pts)
+        radius = dist(ep)/ 2 / sin(sub_angle/2)
+        S.load(arc(ep,radius,invert=inv_snake,npts=line_pts),ph)
+        inv_snake = not inv_snake
+    # and final arc to connect to the end
+    ep = array([ W.xy(W.n()-1), end_pts[1] ])
+    ph = linspace(phase[W.n()-1],phf,line_pts)
+    radius = dist(ep)/ 2 / sin(sub_angle/2)
+    S.load(arc(ep,radius,invert=inv_snake,npts=line_pts),ph)
+    return S
+
+def closed_snakes(sd,offsets,sub_angle,invert=True,skip=1,first=0,
+                  nSnakes=2,n=0,line_pts=500,interp_phase=False):
+    st = SpiroData()
+    if n==0:  n = sd.n()//3  # number of closed paths to do
+    i1=first % sd.n()        # offset to first closed path starting point
+    j=0                      # counter for number of closed paths
+    while True:
+        i0=i1
+        for k in range(len(offsets)):
+            o = offsets[k]
+            end_points=array([ sd.xy(i1), sd.xy(i1+o) ])
+            ph0 = sd.p[i1    %sd.n()]
+            phf = sd.p[(i1+o)%sd.n()] if interp_phase else ph0 
+            st.add(snake(nSnakes+1,end_points,sub_angle,invert,line_pts,ph0,phf))
+            i1 += o
+
+        # now close the loop
+        end_points=array([ sd.xy(i1), sd.xy(i0) ])
+        ph0 = sd.p[i1%sd.n()]
+        phf = sd.p[i0%sd.n()] if interp_phase else ph0 
+        st.add(snake(nSnakes+1,end_points,sub_angle,invert,line_pts,ph0,phf))
+
         j+=1
         
         if (n<=0) and (i0+skip)>=sd.n(): break
