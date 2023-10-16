@@ -138,3 +138,40 @@ for sweep in range(15):
         S.add(T)
 
 F.plot(S,'tab20b',color_scheme='l-waves',save=True)
+
+###
+
+T=cIc(Ring(30),Wheel(25,15),loops=5,inside=True)
+osc = 10
+tw = 5
+samp=5
+subs=array([ 0.001 + pi * sin(2*pi*j*osc/(T.n()//samp)) for j in range(T.n()//samp)])
+Q=ribbon(T.subsample(samp),7,subs,tw,0)
+F.plot(Q,cmap='Wistia',color_scheme='t-waves',color_dither=0.15,save=True)
+
+###
+
+a=13
+e=0.3
+c=circum(a,semi_minor(a,e))
+T=eIc(Ring(c*(7/3)/(2*pi)),Ellipse(13,0.3,17),loops=3,inside=True)
+osc = 10
+tw = 0
+samp=2
+subs=array([ 0.001 + pi * sin(2*pi*j*osc/(T.n()//samp)) for j in range(T.n()//samp)])
+Q=ribbon(T.subsample(samp),40,subs,tw,pi/2,trim=True)
+F.plot(Q,cmap='ocean',color_scheme='time',alpha=0.4,save=True)
+
+###
+
+a=13
+e=0.3
+c=circum(a,semi_minor(a,e))
+T=eIc(Ring(c*(7/3)/(2*pi)),Ellipse(13,0.3,20),loops=3,inside=False)
+
+osc = 10
+tw = 0
+samp=1
+subs=array([ 0.001 + pi * sin(2*pi*j*osc/(T.n()//samp)) for j in range(T.n()//samp)])
+Q=ribbon(T.subsample(samp).inverted_radii(),.1,subs,tw,pi/2,trim=True)
+F.plot(Q,cmap='autumn',color_scheme='cycles',alpha=0.4,save=True)

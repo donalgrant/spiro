@@ -92,12 +92,20 @@ class SpiroData:
     def xy(self,index):  return array([ self.x[index % self.n()], self.y[index % self.n()] ])
 
     def direction(self,i1):
+        i1 = i1 % self.n()
         i2 = (i1+1) % self.n()
         return arctan2(self.y[i2]-self.y[i1],self.x[i2]-self.x[i1])
 
     def directions(self):
         return array([ self.direction(i) for i in range(self.n()) ])
 
+    def polar(self,i):
+        i = i % self.n()
+        return arctan2(self.y[i],self.x[i])
+
+    def polars(self):
+        return array([ self.polar(i) for i in range(self.n()) ])
+    
     def radius(self,i):
         return dist(array([ self.xy(i), [0,0] ]))
 
@@ -116,11 +124,29 @@ class SpiroData:
         self.y = coords[:,1]
         return self
 
+    def scale(self,factor):
+        self.x*=factor
+        self.y*=factor
+        return self
+
     def move(self,x0,y0):
         self.x+=x0
         self.y+=y0
         return self
-        
+
+    def disp(self,coord): return self.move(coord[0],coord[1])
+
+    def inverted_radii(self):
+        '''return an inverted version of the current data'''
+        sd = SpiroData()
+        sd.p=self.p
+        sd.t=self.t
+        inv_r = 1/self.radii()
+        pp = self.polars()
+        sd.x = inv_r * cos(pp)
+        sd.y = inv_r * sin(pp)
+        return sd
+    
     def subsample(self,n,first=0):
         '''return a subsampled version of the current data'''
         sd = SpiroData()
@@ -137,7 +163,7 @@ class SpiroData:
             pickle.dump(self,f,pickle.HIGHEST_PROTOCOL)
         f.close()
 
-    def read(filename):
-        with open(filename,'rb') as f:
-            U = pickle.load(f)
-        return U
+def read(filename):
+    with open(filename,'rb') as f:
+        U = pickle.load(f)
+    return U

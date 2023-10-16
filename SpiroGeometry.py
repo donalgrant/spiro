@@ -74,5 +74,35 @@ def arc(end_pt,radius,invert=False,npts=20):
 
     return cr
 
+def eradius(eccen,phi):   return sqrt((1-eccen**2)/(1-(eccen*cos(phi))**2))
+
+def ecoords(eccen,npts=50):
+    '''unit-semi-major ellipse.  Can scale coords by semi-major axis'''
+    cc = empty((npts,2))
+    phi = linspace(0,2*pi,npts)
+    ur = eradius(eccen,phi)
+    cc[:,0]=ur*cos(phi)
+    cc[:,1]=ur*sin(phi)
+    return cc
+
+def ellipse_between_pts(end_pt,eccen,npts=50):
+
+    cc = empty((npts,2))
+
+    D = dist(end_pt)
+    theta = arctan2(end_pt[1,0]-end_pt[0,0],end_pt[1,1]-end_pt[0,1])
+
+    phi = linspace(0,2*pi,npts)
+    a = D/2
+    r = a*eradius(eccen,phi)
+
+    cc[:,0] = r*cos(phi)
+    cc[:,1] = r*sin(phi)
+    
+    cr  = rot_about(array([0,0]),-theta,cc)  # rotate by -theta
+    cr += (end_pt[0]+end_pt[1])/2           # move ellipse to center of pts
+
+    return cr
+
 def cos_angle(a,b,c):
     return arccos( (a**2+b**2-c**2) / (2*a*b) )

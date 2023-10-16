@@ -46,13 +46,19 @@ def cs_list():
             'r-waves','ripples','s-ripples'
             ]
 
+def apply_dither(c,dfactor):
+    if dfactor==0: return c
+    spread = max(c)-min(c)
+    g = np.random.standard_normal(len(c))*spread*dfactor
+    return c+g
+
 class SpiroFig:
 
-    def new_fig(self,no_frame=True,**kw_args):
+    def new_fig(self,no_frame=True,fig_dim=10,**kw_args):
         
         n_subs = self.rows*self.cols
         expansion = int(sqrt(n_subs))*10
-        sub_expansion = expansion / 2 if expansion > 20 else 10
+        sub_expansion = expansion / 2 if expansion > 20 else fig_dim
         if self.multi:
             self._fig = plt.figure(figsize=(expansion,expansion))
             self._fig, self.ax = plt.subplots(self.rows,self.cols,
@@ -68,7 +74,7 @@ class SpiroFig:
             return self.ax
                                                 
         else:
-            self._fig = plt.figure(figsize=(10,10))
+            self._fig = plt.figure(figsize=(fig_dim,fig_dim))
             self.ax=self._fig.add_subplot(frameon=False)
             self.ax.set(aspect=1)
             if no_frame:
@@ -100,12 +106,12 @@ class SpiroFig:
     def plot_col(self):  return self.plot_num % self.cols
 
     def plot(self,sd,cmap=None,color_scheme=None,
-             dot_size=0.1,linestyle='',alpha=1.0,
-             subsample=None,no_frame=True, save=False, no_multi_inc=False,
+             dot_size=0.1,linestyle='',alpha=1.0, color_dither=0.0,
+             subsample=None,no_frame=True, fig_dim=10, save=False, no_multi_inc=False,
              new_fig=True,smooth=False, caption='', fontsize=18):
 
         if new_fig or self.ax is None or (self.multi and not self.ax.any):
-            self.new_fig(no_frame=no_frame)
+            self.new_fig(no_frame=no_frame,fig_dim=fig_dim)
 
         r = sqrt(sd.x**2+sd.y**2)
 
@@ -162,7 +168,7 @@ class SpiroFig:
             if color_scheme=='radial':  clr='blue'
             ax.plot(x,y,color=clr)
         else:
-            ax.scatter(x,y,c=clr,linestyle=linestyle,s=dot_size,
+            ax.scatter(x,y,c=apply_dither(clr,color_dither),linestyle=linestyle,s=dot_size,
                        cmap=cmap,alpha=alpha)
 
         if len(caption)>0:

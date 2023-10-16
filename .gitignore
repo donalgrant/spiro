@@ -2,6 +2,7 @@
 Untitled*
 *.png
 *.ipynb
+*.pickle
 .DS_Store
 \#*\#
 *~
