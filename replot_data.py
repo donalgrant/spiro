@@ -22,8 +22,8 @@ F.text_color='white'
 
 parser = argparse.ArgumentParser(description="replot stored pickle file")
 parser.add_argument("file", help="input data file(s)", nargs='+')
-parser.add_argument("--cmap", help="matlab colormap to use")
-parser.add_argument("--cs", help="color scheme")
+parser.add_argument("--cmap", help="comma-separated list of colormaps")
+parser.add_argument("--cs", help="comma-separated list of color schemes")
 parser.add_argument("--cmap_list", help="list all colormap options", action="store_true")
 parser.add_argument("--cs_list", help="list all color scheme options", action="store_true")
 parser.add_argument("--full_res", help="use high-definition mode", action="store_true")
@@ -41,8 +41,8 @@ if args.cmap_list:
     print_list(cmap_list())
     quit()
     
-cmap = 'viridis' if args.cmap      is None else args.cmap
-cs   = 'length'  if args.cs        is None else args.cs
+cmap = ['ocean']   if args.cmap      is None else args.cmap.split(',')
+cs   = ['length']  if args.cs        is None else args.cs.split(',')
 ss   = 5         if args.subsample is None else args.subsample
 fd   = 10        if args.fd        is None else args.fd
 dpi  = 150       if args.dpi       is None else args.dpi
@@ -55,6 +55,9 @@ if args.full_res:
 for data_file in args.file:
     print(f'replotting {data_file}')
     S = SpiroData.read(data_file)
-    filename=f'{data_file}-{cmap}-{cs}-{ss}-{fd}.png'
-    F.plot(S.subsample(ss),cmap=cmap,color_scheme=cs,fig_dim=fd,alpha=0.4)
-    F.save_fig(filename,dpi=dpi)
+    for cmap_i in cmap:
+        for cs_i in cs:
+            filename=f'{data_file}-{cmap_i}-{cs_i}-{ss}-{fd}.png'
+            print(f'Plotting and saving {filename}')
+            F.plot(S.subsample(ss),cmap=cmap_i,color_scheme=cs_i,fig_dim=fd,alpha=0.4)
+            F.save_fig(filename,dpi=dpi)

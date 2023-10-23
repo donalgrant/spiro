@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import SpiroData
 import numpy as np
 from numpy import sin,cos,arctan2,arccos,pi,sqrt,tan,array,linspace
+import scipy
 
 from pathlib import Path
 
@@ -40,7 +41,8 @@ cmap3 = cmap_from_list(["seagreen","teal","cornflowerblue","mediumblue","indigo"
 # place, rather than both here and in the match statement.
 
 def cs_list():
-    return ['radial','cycles','phase','polar','time','length','random',
+    return ['radial','cycles','phase','spacing','direction','x-direction','y-direction',
+            'polar','time','length','random',
             'x','xrand','y','yrand','rrand','xy','x+y',
             'x-y','h-waves','t-waves','l-waves','v-waves',
             'r-waves','ripples','s-ripples'
@@ -123,6 +125,10 @@ class SpiroFig:
             case 'cycles':    clr=sin(sd.p)
             case 'phase':     clr=sd.p
             case 'polar':     clr=arctan2(sd.x,sd.y)
+            case 'x-direction': clr=cos(scipy.signal.medfilt(sd.directions()))
+            case 'y-direction': clr=sin(scipy.signal.medfilt(sd.directions()))
+            case 'direction': clr=scipy.signal.medfilt(sd.directions())
+            case 'spacing':   clr=scipy.signal.medfilt(sd.neighbor_distances())
             case 'time':      clr=sd.t
             case 'length':    clr=linspace(0,sd.x.shape[0],sd.x.shape[0])
             case 'random':    clr=np.random.rand(len(sd.x)) 

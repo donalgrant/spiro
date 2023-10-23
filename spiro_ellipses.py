@@ -1,47 +1,50 @@
 from SpiroData import *
 from SpiroGeometry import *
 from Ellipse import *
+import numpy as np
 from numpy import array,linspace,fmod,arange,sin,cos
 
-'''
-def ellipses_from_coord(sd,coord=array([0,0]),offset=100,npts=500,arc_radius=30,invert=False,
-                    nLines=0,i2_start=-1,arc_only=True,arc_always=True):
+
+def ellipses_from_coord(sd,coord=array([0,0]),offset=100,npts=500,
+                        off_major=-1.0,off_minor=0.0,
+                        eccen=0.8,nfigs=0,i2_start=-1):
     
-    st = SpiroData()
-    if nLines==0: nLines = int(sd.n()/offset)
+    S = SpiroData()
+    if nfigs==0: nfigs = int(sd.n()/offset)
     x0=coord[0]
     y0=coord[1]
     if i2_start<0:
-        initial_i2 = np.random.random_integers(0,sd.n())
+        initial_i2 = np.random.randint(0,sd.n())
     else:
         initial_i2 = i2_start
     if initial_i2 < 0:  initial_i2=0
 
-    for j in range(array_or_scalar_len(arc_radius)):
-        r = array_val(arc_radius,j)
+    for i in range(0,nfigs):
+ 
+        e = array_val(eccen,i)
+        n = array_val(npts,i)
             
-        for i in range(0,nLines):
-            
-            i2=(i*offset+initial_i2) % sd.n()
+        i2=(i*offset+initial_i2) % sd.n()
         
-            end_pt = array([ [x0,y0], [sd.x[i2],sd.y[i2]] ])
+        end_pt = array([ coord, sd.xy(i2) ])
+        orient = arctan2(sd.y[i2]-y0,sd.x[i2]-x0)
         
-            d = dist(end_pt)
+        a = dist(end_pt)/2
+        b = semi_minor(a,e)
+        oM = array_val(off_major,i)
+        om = array_val(off_minor,i)
         
-            phase = sd.p[i2]
-        
-            if d <= 2*r:
-                st.load(arc(end_pt,r,invert=invert,npts=npts),phase)
-            else:
-                if arc_always:
-                    st.load(arc(end_pt,d/2,invert=invert,npts=npts),phase)
-                elif not arc_only:
-                    st.load(line(end_pt,pts),phase)
-                else:
-                    pass
-        
-    return st
+        phase = sd.p[i2]
 
+        s = ecoords(e,n)*a
+        st = SpiroData()
+        st.load(s,phase).move(oM*a,om*b).rotate(orient).move(x0,y0)
+            
+        S.add(st)
+        
+    return S
+
+'''
 def ellipses_from_pts(sd,n=3,offset=100,npts=500,arc_radius=30,
                   invert=False,nLines=30,fixed=0,arc_only=True,arc_always=True):
     st = SpiroData()
@@ -111,29 +114,7 @@ def ellipses_on_frame(sd,major,eccen,orient,pts,first=0,n=None):
     return S
 
 '''
-def closed_ellipses(sd,offsets,radii,invert=True,skip=1,first=0,n=0,line_pts=500):
-    st = SpiroData()
-    if n==0:  n = sd.n()//3  # number of closed paths to do
-    i1=first % sd.n()        # offset to first closed path starting point
-    j=0                      # counter for number of closed paths
-    while True:
-        i0=i1
-        for k in range(len(offsets)):
-            o = offsets[k]
-            st.load(arc(array([ sd.xy(i1), sd.xy(i1+o) ]),array_val(radii,k),
-                        invert=array_val(invert,k),npts=line_pts), sd.p[i1%sd.n()])
-            i1 += o
 
-        # now close the loop
-        st.load(arc(array([ sd.xy(i1),sd.xy(i0) ]),array_val(radii,k+1),
-                     invert=array_val(invert,k+1),npts=line_pts), sd.p[i1%sd.n()])
-        j+=1
-        
-        if (n<=0) and (i0+skip)>=sd.n(): break
-        i1 = (i0 + skip) % sd.n()
-        if (n>0)  and (j>=n): break
-
-    return st
 
 def centered_ellipses(sd,arc_radius=100,arc_subtended=None,angle_offset=None,
                   arc_scale=0.1,theta_phase=False,line_pts=300):
@@ -149,9 +130,6 @@ def rotating_ellipses(sd,arc_radius=100,rotation_rate=1,arc_subtended=None,
     arc_subtended = 2*pi * d * arc_scale if arc_subtended is None else arc_subtended
     offset=fmod(arange(sd.n())*2*pi/sd.n()*rotation_rate+arc_offset_angle,2*pi)
     return ellipses_on_frame(sd,arc_radius,arc_subtended,offset,line_pts,0)
-
-def connected_bubbles(sd,pts=300):
-    return ellipses_on_frame(sd,sd.neighbor_distances()/2,2*pi,pi-sd.directions(),pts,0,n=sd.n()-1)
 
 def ribbon(sd,width,arc_subtended=pi/4,twists=0,twist_start=0,pts=300,trim=False):
     radius = width/arc_subtended

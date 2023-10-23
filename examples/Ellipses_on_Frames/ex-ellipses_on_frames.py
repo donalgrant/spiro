@@ -14,7 +14,7 @@ from Ring import *
 F=SpiroFig()
 F.text_color='white'
 
-hd = 0  # high-def
+hd = 1  # high-def
 
 def_factor = (1+4*hd)
 
@@ -246,3 +246,22 @@ if hd:
     data_set+=1
 
 F.plot(S,color_scheme='l-waves',cmap='tab20b',alpha=0.4,fig_dim=fd,save=True)
+
+###
+
+S = SpiroData()
+T = cIc(Ring(30),wheel=Wheel(5,12),loops=1).subsample(1).inverted_radii().scale(500)
+ppl=T.n()
+F.plot(T,no_frame=False)
+ne=ppl-1
+first=0 
+major =[ 14/(T.neighbor_dist(j))**0.25 for j in arange(first,first+ne) ]
+orient=[ T.direction(j)+pi/3           for j in arange(first,first+ne) ]
+eccen=0.99
+S.add(ellipses_on_frame(T,major,eccen,orient,1000*def_factor,first=first,n=ne))
+
+if hd:
+    S.save(f'figure-{data_set}.pickle')
+    data_set+=1
+    
+F.plot(S,color_scheme='cycles',cmap='copper',alpha=0.4,fig_dim=fd,save=True)

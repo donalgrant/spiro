@@ -74,7 +74,8 @@ def arc(end_pt,radius,invert=False,npts=20):
 
     return cr
 
-def eradius(eccen,phi):   return sqrt((1-eccen**2)/(1-(eccen*cos(phi))**2))
+def eccen_from_flat(f):  return sqrt(2*f-f*f)
+def eradius(eccen,phi):  return sqrt((1-eccen**2)/(1-(eccen*cos(phi))**2))
 
 def ecoords(eccen,npts=50):
     '''unit-semi-major ellipse.  Can scale coords by semi-major axis'''
