@@ -14,7 +14,7 @@ from Ring import *
 F=SpiroFig()
 F.text_color='white'
 
-hd = 1  # high-def
+hd = 0  # high-def
 
 def_factor = (1+4*hd)
 

@@ -75,7 +75,6 @@ def ellipses_on_frame(sd,major,eccen,orient,pts,first=0,n=None):
     S = SpiroData()
     last = first+sd.n() if n is None else first+n
     for i in range(first,last):
-        ne = array_val(pts,i)
         s = ecoords(array_val(eccen,i),array_val(pts,i))*array_val(major,i)
         st = SpiroData()
         st.load(s,array_val(sd.p,i)).rotate(array_val(orient,i)).disp(sd.xy(i))
@@ -87,4 +86,33 @@ def ellipses_between_frames(s1,s2,step1,step2,
                             nfigs,pts,istart1=0,istart2=0):
     S=SpiroData()
 
+    i1 = istart1
+    i2 = istart2
+
+    for k in range(nfigs):
+        sm = array_val(scale_major,k)
+        oo = array_val(orient_offset,k)
+        oM = array_val(off_major,k)
+        om = array_val(off_minor,k)
+        e  = array_val(eccen,k)
+        np = array_val(pts,k)
+
+        ph = array_val(s1.p,k) # could also choose 2 or some combination (phase-unwrapped avg?) of both
+
+        c1 = s1.xy(i1)
+        c2 = s2.xy(i2)
+        ep = array([ c1, c2 ])
+        
+        o = dir(ep)
+        a = sm * dist(ep) / 2
+        b = semi_minor(a,e)
+        
+        s = ecoords(e,np)*a
+        st = SpiroData()
+        st.load(s,ph).move(oM*a,om*b).rotate(oo-o).disp((c1+c2)/2)
+        S.add(st)
+        
+        i1 += step1
+        i2 += step2
+        
     return S

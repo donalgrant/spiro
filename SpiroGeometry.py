@@ -34,6 +34,10 @@ def line(end_pt,npts=20):
 def dist(end_pt):
     return sqrt((end_pt[1,0]-end_pt[0,0])**2+(end_pt[1,1]-end_pt[0,1])**2)
 
+def dir(end_pt):
+    return arctan2(end_pt[1,1]-end_pt[0,1],end_pt[1,0]-end_pt[0,0])
+
+    
 def arc_on_center(center,radius,arc_subtended,angle_offset=0,npts=20,to_origin=0):
     cc = empty((npts,2))
     for i in range(npts):
