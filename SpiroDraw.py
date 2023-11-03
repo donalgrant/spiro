@@ -8,9 +8,6 @@ from pathlib import Path
 
 import matplotlib as mpl
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
-cmap1 = LinearSegmentedColormap.from_list("RedOrangePink",["Red","Orange","Pink"])
-cmap2 = LinearSegmentedColormap.from_list("Pinks",["rebeccapurple","darkmagenta","orchid","pink"])
-cmap3 = LinearSegmentedColormap.from_list("DarkGreen",["seagreen","teal","cornflowerblue","mediumblue","indigo"])
 
 def cmap_list():
     return ['viridis','magma','inferno','plasma','cividis',
@@ -62,10 +59,11 @@ class SpiroFig:
         expansion = int(sqrt(n_subs))*10
         sub_expansion = expansion / 2 if expansion > 20 else fig_dim
         if self.multi:
-            self._fig = plt.figure(figsize=(expansion,expansion))
+            self._fig = plt.figure(figsize=(expansion,expansion),facecolor=(.0, .0, .0))
             self._fig, self.ax = plt.subplots(self.rows,self.cols,
                                               figsize=(sub_expansion,sub_expansion),
-                                                layout='compressed')
+                                              facecolor=(.0, .0, .0),
+                                              layout='compressed')
             self.plot_num=0
             for i in range(self.rows):
                 for j in range(self.cols):
@@ -73,10 +71,12 @@ class SpiroFig:
                     if no_frame:
                         self.ax[i,j].set(xticks=[], yticks=[])
                         self.ax[i,j].set_axis_off()
+                    else:
+                        self.ax[i,j].tick_params(labelcolor='white')
             return self.ax
                                                 
         else:
-            self._fig = plt.figure(figsize=(fig_dim,fig_dim))
+            self._fig = plt.figure(figsize=(fig_dim,fig_dim),facecolor='black')
             self.ax=self._fig.add_subplot(frameon=False)
             self.ax.set(aspect=1)
             if no_frame:
