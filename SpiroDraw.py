@@ -34,6 +34,15 @@ cmap1 = cmap_from_list(["Red","Orange","hotpink"])
 cmap2 = cmap_from_list(["rebeccapurple","darkmagenta","orchid","pink"])
 cmap3 = cmap_from_list(["seagreen","teal","cornflowerblue","mediumblue","indigo"])
 
+clist = [ 'xkcd:'+i for i in ['sapphire','vibrant blue','carolina blue','navy blue','azul','sapphire'] ]
+pretty_blues = cmap_from_list(clist,'pretty_blues')
+
+clist = [ 'xkcd:'+i for i in ['blood red','raw umber','light forest green','forest green'] ]
+wreath = cmap_from_list(clist,'wreath')
+
+clist = [ 'xkcd:'+i for i in ['kelly green','light green','vivid green','grass green'] ]
+emerald_woman= cmap_from_list(clist,'emerald_woman')
+
 # would like a better way to capture the color_scheme name with the encoding in a single
 # place, rather than both here and in the match statement.
 

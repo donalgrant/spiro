@@ -83,7 +83,7 @@ def ellipses_on_frame(sd,major,eccen,orient,pts,first=0,n=None):
 
 def ellipses_between_frames(s1,s2,step1,step2,
                             scale_major,orient_offset,off_major,off_minor,eccen,
-                            nfigs,pts,istart1=0,istart2=0):
+                            nfigs,pts,bias=0.5,istart1=0,istart2=0):
     S=SpiroData()
 
     i1 = istart1
@@ -96,23 +96,27 @@ def ellipses_between_frames(s1,s2,step1,step2,
         om = array_val(off_minor,k)
         e  = array_val(eccen,k)
         np = array_val(pts,k)
+        fb = array_val(bias,k)
 
-        ph = array_val(s1.p,k) # could also choose 2 or some combination (phase-unwrapped avg?) of both
+        ph = (1-fb)*array_val(s1.p,k)+fb*array_val(s2.p,k)
 
         c1 = s1.xy(i1)
         c2 = s2.xy(i2)
         ep = array([ c1, c2 ])
         
         o = dir(ep)
-        a = sm * dist(ep) / 2
+        if sm < 0:
+            a = -sm
+        else:
+            a = sm * dist(ep) / 2
         b = semi_minor(a,e)
         
         s = ecoords(e,np)*a
         st = SpiroData()
-        st.load(s,ph).move(oM*a,om*b).rotate(oo-o).disp((c1+c2)/2)
+        st.load(s,ph).move(oM*a,om*b).rotate(oo-o).disp( (1-fb)*c1 + fb*c2 )
         S.add(st)
         
-        i1 += step1
-        i2 += step2
+        i1 += array_val(step1,k)
+        i2 += array_val(step2,k)
         
     return S
