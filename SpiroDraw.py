@@ -119,7 +119,7 @@ class SpiroFig:
     def plot(self,sd,cmap=None,color_scheme=None,
              dot_size=0.1,linestyle='',alpha=1.0, color_dither=0.0,
              subsample=None,no_frame=True, fig_dim=10, save=False, no_multi_inc=False,
-             new_fig=True,smooth=False, caption='', fontsize=18):
+             new_fig=True,smooth=False, caption='', fontsize=18, rgb=None):
 
         if new_fig or self.ax is None or (self.multi and not self.ax.any):
             self.new_fig(no_frame=no_frame,fig_dim=fig_dim)
@@ -183,8 +183,13 @@ class SpiroFig:
             if color_scheme=='radial':  clr='blue'
             ax.plot(x,y,color=clr)
         else:
-            ax.scatter(x,y,c=apply_dither(clr,color_dither),linestyle=linestyle,s=dot_size,
-                       cmap=cmap,alpha=alpha)
+            if rgb is None:
+                ax.scatter(x,y,c=apply_dither(clr,color_dither),linestyle=linestyle,s=dot_size,
+                           cmap=cmap,alpha=alpha)
+            else:
+                print('color is: ',rgb)
+                ax.scatter(x,y,color=rgb,linestyle=linestyle,s=dot_size,alpha=alpha)
+                
 
         if len(caption)>0:
             ax.set_title(caption,color=self.text_color,y=-0.1,fontsize=fontsize)

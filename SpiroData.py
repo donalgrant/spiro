@@ -76,11 +76,11 @@ class SpiroData:
         self.t = t
         return self
 
-    def load(self,xy_array,phase):
+    def load(self,xy_array,phase,time_offset=0):
         s = SpiroData()
         s.x=xy_array[:,0]
         s.y=xy_array[:,1]
-        s.t=linspace(0,s.x.shape[0],s.x.shape[0])
+        s.t=linspace(time_offset,s.x.shape[0],s.x.shape[0])
         s.p=s.t*0+phase
         return self.add(s);
         
@@ -91,6 +91,8 @@ class SpiroData:
 
     def xy(self,index):  return array([ self.x[index % self.n()], self.y[index % self.n()] ])
 
+    def wrap(self,i):  return i % self.n()
+    
     def direction(self,i1):
         i1 = i1 % self.n()
         i2 = (i1+1) % self.n()
@@ -99,6 +101,11 @@ class SpiroData:
     def directions(self):
         return array([ self.direction(i) for i in range(self.n()) ])
 
+    def chord_direction(self,i1,i2):
+        i1w = self.wrap(i1)
+        i2w = self.wrap(i2)
+        return arctan2(self.y[i2w]-self.y[i1w],self.x[i2w]-self.x[i1w])
+                       
     def polar(self,i):
         i = i % self.n()
         return arctan2(self.y[i],self.x[i])
@@ -111,6 +118,9 @@ class SpiroData:
 
     def radii(self):
         return array([ self.radius(i) for i in range(self.n()) ])
+    
+    def chord_dist(self,i1,i2):
+        return dist(array([ self.xy(i1), self.xy(i2) ]))
     
     def neighbor_dist(self,i):
         return dist(array([ self.xy(i), self.xy(i+1) ]))
