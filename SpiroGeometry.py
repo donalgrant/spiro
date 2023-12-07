@@ -97,6 +97,28 @@ def tcoords(oangle,asym,fb,fh):
     cc[2,1] = h - ho
     return cc
 
+def pcoords(oangle,asym,fb,fh):
+    '''unit-area parallelogram with origin angle oangle and asymmetry asym;
+       fb, fh are base/height offsets'''
+
+    c = (1+asym)/(1-asym)
+    a = c
+    h = 1 / a
+    b = h / sin(oangle)
+
+    bo = b*fb
+    ho = h*fh
+    cc = empty((4,2))
+    cc[0,0] = -bo
+    cc[0,1] = -ho
+    cc[1,0] = a-bo
+    cc[1,1] = -ho
+    cc[2,0] = a+b*cos(oangle) - bo
+    cc[2,1] = h - ho
+    cc[3,0] = b*cos(oangle) - bo
+    cc[3,1] = h - ho
+    return cc
+
 def eccen_from_flat(f):  return sqrt(2*f-f*f)
 def eradius(eccen,phi):  return sqrt((1-eccen**2)/(1-(eccen*cos(phi))**2))
 

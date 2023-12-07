@@ -13,7 +13,7 @@ from spiro_triangles import *
 from polygon import *
 from Ring import *
 
-parser = argparse.ArgumentParser(description="replot stored pickle file")
+parser = argparse.ArgumentParser(description="Examples of a 'Fabric' of Triangles")
 parser.add_argument("--full_res", help="use high-definition mode", action="store_true")
 args = parser.parse_args()
 
