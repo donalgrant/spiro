@@ -1,0 +1,125 @@
+import sys
+sys.path.append('../..')
+import argparse
+
+from SpiroData import *
+from SpiroDraw import *
+from spiro import *
+from spiro_ellipse import *
+from spiro_ellipses import *
+from spiro_arcs import *
+from spiro_string import *
+from spiro_triangles import *
+from polygon import *
+from Ring import *
+
+import imageio
+import glob
+
+parser = argparse.ArgumentParser(description="Parallelogram Examples")
+parser.add_argument("--full_res", help="use high-definition mode", action="store_true")
+args = parser.parse_args()
+
+
+F=SpiroFig()
+F.text_color='white'
+
+if args.full_res:
+    hd = 1
+else:
+    hd = 0
+
+def_factor = (1+4*hd)
+save=True
+
+F.set_default_dpi(150*(1+hd))
+fd = 10*(1+2*hd) # figure dimensions
+
+def figure(S,cs,cmap,alpha=0.4,dot_size=0.1):
+    if hd:
+        if not hasattr(figure,"data_set"):  figure.data_set=0
+        S.save(f'figure-{figure.data_set}.pickle')
+        figure.data_set+=1
+
+    F.plot(S,color_scheme=cs,cmap=cmap,alpha=alpha,fig_dim=fd,dot_size=dot_size,save=save)
+
+###
+
+cs = 'spacing'
+c = 'turbo'
+
+S = SpiroData()
+T = cIc(Ring(30),wheel=Wheel(6,17),loops=1,inside=True,ppl=3000).subsample(1)
+ppl=T.n()
+
+m = T.n()//20
+
+ne=ppl//12
+first=np.random.randint(0,ppl-ne-2)
+
+for i in range(m):
+    
+    tnd = [ T.direction(j)+pi for j in arange(first,first+ne) ]
+    flat_scale = max(tnd)-min(tnd)
+    flat=[ 0.2 + 0.6 * (tnd[j]-min(tnd))/flat_scale for j in range(len(tnd)) ]
+
+    eccen_t = [ eccen_from_flat(flat[j]) for j in range(len(flat)) ]
+    eccen = [ 0.97 if eccen_t[j]>0.97 else eccen_t[j] for j in range(len(eccen_t)) ]
+    major =20
+    orient=[ 100*T.neighbor_dist(j) for j in arange(first,first+ne) ]
+    
+    S = ellipses_on_frame(T,major,eccen,orient,1000*def_factor,first=first,n=ne)
+
+    F.plot(S,color_scheme=cs,cmap=c,alpha=0.4,fig_dim=fd,dot_size=0.1,
+           save=True,limits=[-50,50,-50,50],transparent=False)
+
+    first+=1
+
+images=[]
+
+for image in sorted(glob.glob("Figure-*.png")):
+    images.append(imageio.imread(image))
+
+for image in sorted(glob.glob("Figure-*.png"),reverse=True):
+    images.append(imageio.imread(image))
+    
+imageio.mimsave("animate_more_ellipses.gif", images, duration=0.1, loop=0)
+
+
+###
+
+R1=5
+ppl=300
+T1 = cIc(Ring(R1),wheel=Wheel(R1/4,R1/3),ppl=ppl,loops=1,inside=True)
+
+skip=1
+n=T1.n()//skip
+first=0 
+offset=n//30
+oa=pi/3
+
+m=n//4
+ao = linspace(0,2*pi,m)
+asym = linspace(0.0,0.3,m)
+scale=2
+
+cs = 'cycles'
+my_cmap = emerald_woman
+
+for i in range(m):
+    S=pars_on_frame(T1,skip=skip,scale=scale,oangle=oa,n=n,first=first,fh=0.5,fb=0.5,
+                    pts=500*def_factor,asym=asym[i],orient_follow=offset,orient=ao[i]).rotate(i*pi/4/m)
+
+    F.plot(S,color_scheme=cs,cmap=my_cmap,alpha=0.4,fig_dim=fd,dot_size=0.1,
+           save=True,limits=[-10,10,-10,10],transparent=False)
+
+
+images=[]
+
+for image in sorted(glob.glob("Figure-*.png")):
+    images.append(imageio.imread(image))
+
+for image in sorted(glob.glob("Figure-*.png"),reverse=True):
+    images.append(imageio.imread(image))
+    
+imageio.mimsave("animate_green_polygons.gif", images, duration=0.1, loop=0)

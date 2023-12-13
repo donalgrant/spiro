@@ -66,8 +66,9 @@ for data_file in args.file:
     print(f'replotting {data_file}')
     S = SpiroData.read(data_file)
     for cmap_i in cmap:
+        cmap_name = cmap_name.name if hasattr(cmap_i,'name') else cmap_i
         for cs_i in cs:
-            filename=f'{data_file}-{cmap_i}-{cs_i}-{ss}-{fd}.png'
+            filename=f'{data_file}-{cmap_name}-{cs_i}-{ss}-{fd}.png'
             print(f'Plotting and saving {filename} with dot_size={ds}, alpha={alpha}')
             F.plot(S.subsample(ss),cmap=cmap_i,color_scheme=cs_i,fig_dim=fd,alpha=alpha,dot_size=ds)
             F.save_fig(filename,dpi=dpi)

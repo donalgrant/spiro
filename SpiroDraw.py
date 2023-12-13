@@ -9,8 +9,47 @@ from pathlib import Path
 import matplotlib as mpl
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
+def cmap_from_list(clist,cname=None):
+    if cname is None:
+        cname=''
+        for c in clist: cname+=c[:2]
+    return LinearSegmentedColormap.from_list(cname,clist)
+
+cmap1 = cmap_from_list(["Red","Orange","hotpink"],'cmap1')
+mpl.colormaps.register(cmap=cmap1)
+cmap2 = cmap_from_list(["rebeccapurple","darkmagenta","orchid","pink"],'cmap2')
+mpl.colormaps.register(cmap=cmap2)
+cmap3 = cmap_from_list(["seagreen","teal","cornflowerblue","mediumblue","indigo"],'cmap3')
+mpl.colormaps.register(cmap=cmap3)
+
+clist = [ 'xkcd:'+i for i in ['sapphire','vibrant blue','carolina blue','navy blue','azul','sapphire'] ]
+pretty_blues = cmap_from_list(clist,'pretty_blues')
+mpl.colormaps.register(cmap=pretty_blues)
+
+clist = [ 'xkcd:'+i for i in ['blood red','raw umber','light forest green','forest green'] ]
+wreath = cmap_from_list(clist,'wreath')
+mpl.colormaps.register(cmap=wreath)
+
+clist = [ 'xkcd:'+i for i in ['dark gold','gold','dark gold','muddy green','dark gold'] ]
+gold = cmap_from_list(clist,'gold')
+mpl.colormaps.register(cmap=gold)
+
+clist = [ 'xkcd:'+i for i in ['kelly green','light green','vivid green','grass green'] ]
+emerald_woman= cmap_from_list(clist,'emerald_woman')
+mpl.colormaps.register(cmap=emerald_woman)
+
+clist = [ 'xkcd:'+i for i in ['carnation pink','baby pink','lipstick red','darkish pink','powder pink'] ]
+pinks = cmap_from_list(clist,'pinks')
+mpl.colormaps.register(cmap=pinks)
+
+clist = [ 'xkcd:'+i for i in ['lavender pink','pale mauve','pinky purple','purpleish','lavender pink'] ]
+pale_pink = cmap_from_list(clist,'pale_pink')
+mpl.colormaps.register(cmap=pale_pink)
+
 def cmap_list():
-    return ['viridis','magma','inferno','plasma','cividis',
+    return ['pretty_blues','wreath','gold','emerald_woman','pinks','pale_pink',
+            'cmap1','cmap2','cmap3',
+            'viridis','magma','inferno','plasma','cividis',
             'spring','summer','winter','autumn','Wistia','cool',
             'hot','gist_heat','copper',
             'Dark2','tab10','tab20','tab20b','Set1','Set2','Set3',
@@ -23,28 +62,6 @@ def cmap_list():
             'YlOrRd','OrRd','PuRd','RdPu','BuPu','GnBu','PuBu',
             'YlGnBu','PuBuGn','BuGn','YlGn'
             ]
-
-def cmap_from_list(clist,cname=None):
-    if cname is None:
-        cname=''
-        for c in clist: cname+=c[:2]
-    return LinearSegmentedColormap.from_list(cname,clist)
-
-cmap1 = cmap_from_list(["Red","Orange","hotpink"])
-cmap2 = cmap_from_list(["rebeccapurple","darkmagenta","orchid","pink"])
-cmap3 = cmap_from_list(["seagreen","teal","cornflowerblue","mediumblue","indigo"])
-
-clist = [ 'xkcd:'+i for i in ['sapphire','vibrant blue','carolina blue','navy blue','azul','sapphire'] ]
-pretty_blues = cmap_from_list(clist,'pretty_blues')
-
-clist = [ 'xkcd:'+i for i in ['blood red','raw umber','light forest green','forest green'] ]
-wreath = cmap_from_list(clist,'wreath')
-
-clist = [ 'xkcd:'+i for i in ['kelly green','light green','vivid green','grass green'] ]
-emerald_woman= cmap_from_list(clist,'emerald_woman')
-
-clist = [ 'xkcd:'+i for i in ['carnation pink','baby pink','lipstick red','darkish pink','powder pink'] ]
-pinks = cmap_from_list(clist,'pinks')
 
 # would like a better way to capture the color_scheme name with the encoding in a single
 # place, rather than both here and in the match statement.
@@ -65,7 +82,7 @@ def apply_dither(c,dfactor):
 
 class SpiroFig:
 
-    def new_fig(self,no_frame=True,fig_dim=10,**kw_args):
+    def new_fig(self,no_frame=True,fig_dim=10,limits=None,**kw_args):
         
         n_subs = self.rows*self.cols
         expansion = int(sqrt(n_subs))*10
@@ -94,6 +111,10 @@ class SpiroFig:
             if no_frame:
                 self.ax.set(xticks=[],yticks=[])
                 self.ax.set_axis_off()
+            if not limits is None:
+                self.ax.set_xlim([limits[0],limits[1]])
+                self.ax.set_ylim([limits[2],limits[3]])
+                                 
             return self.ax
         
     def __init__(self,ax=None,savepath='./',rows=1,cols=1):
@@ -122,10 +143,11 @@ class SpiroFig:
     def plot(self,sd,cmap=None,color_scheme=None,
              dot_size=0.1,linestyle='',alpha=1.0, color_dither=0.0,
              subsample=None,no_frame=True, fig_dim=10, save=False, no_multi_inc=False,
-             new_fig=True,smooth=False, caption='', fontsize=18, rgb=None):
+             new_fig=True,smooth=False, caption='', fontsize=18, rgb=None, limits=None,
+             filename=None, transparent=True):
 
         if new_fig or self.ax is None or (self.multi and not self.ax.any):
-            self.new_fig(no_frame=no_frame,fig_dim=fig_dim)
+            self.new_fig(no_frame=no_frame,fig_dim=fig_dim,limits=limits)
 
         r = sqrt(sd.x**2+sd.y**2)
 
@@ -202,7 +224,7 @@ class SpiroFig:
             self.plot_num+=1
         
         if save:
-            self.save_fig()
+            self.save_fig(filename=filename,transparent=transparent)
 
     def caption(self,text):
         if self.multi:
@@ -218,7 +240,8 @@ class SpiroFig:
         if dpi is None:  dpi = self.dpi
         if self.allow_save:
             if filename is None:
-                filename=self._path+self._figname+f'{self.fig_number}.png'
+                fnz = str(self.fig_number).zfill(4)
+                filename=self._path+self._figname+f'{fnz}.png'
             self._fig.savefig(filename,bbox_inches='tight',
                               transparent=transparent,dpi=dpi)
             self.close()

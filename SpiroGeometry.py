@@ -45,6 +45,13 @@ def arc_on_center(center,radius,arc_subtended,angle_offset=0,npts=20,to_origin=0
         cc[i,0] = radius*(cos(angle)-1+to_origin)
         cc[i,1] = radius*sin(angle)
     return rot_coords(angle_offset,cc)+center
+
+def arc_between_pts(end_pt,arc_subtended,npts=20):
+    cc = empty((npts,2))
+    if arc_subtended == 0:  return line(end_pt,npts)
+    invert=True if arc_subtended<0 else False
+    D=dist(end_pt)
+    return arc(end_pt,dist(end_pt)/abs(arc_subtended),invert=invert,npts=npts)
         
 def arc(end_pt,radius,invert=False,npts=20):
 
