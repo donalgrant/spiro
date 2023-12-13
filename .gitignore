@@ -1,6 +1,7 @@
 *.ipynb_checkpoints
 Untitled*
 *.png
+*.gif
 *.ipynb
 *.pickle
 .DS_Store
