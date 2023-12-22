@@ -1,4 +1,5 @@
 from numpy import sin,cos,tan,empty,array,matmul,linspace,full,abs,pi,sqrt,arctan2,arccos,arcsin
+from scipy.spatial.transform import Rotation as R
 
 def rot_2D(angle):
     '''Matrix will rotate a coordinate by angle_rads cw'''
@@ -17,6 +18,18 @@ def rot_about(origin,angle,coords):
     for i in range(cc.shape[0]):
         cc[i] = matmul(rot_2D(angle),coords[i]-origin)+origin
     return cc
+
+def rotmat3D(axis,theta):  return R.from_rotvec(theta*axis).as_matrix()
+
+def rot3D(xyz,rot_matrix):
+    cc = empty((xyz.shape[0],3))
+    for i in range(cc.shape[0]):
+        cc[i] = matmul(rot_matrix,xyz[i])
+    return cc
+
+def rotX(xyz,theta): return rot3D(xyz,rotmat3D(array([1,0,0]),theta))
+def rotY(xyz,theta): return rot3D(xyz,rotmat3D(array([0,1,0]),theta))
+def rotZ(xyz,theta): return rot3D(xyz,rotmat3D(array([0,0,1]),theta))
 
 def line(end_pt,npts=20):
 
@@ -51,7 +64,7 @@ def arc_between_pts(end_pt,arc_subtended,npts=20):
     if arc_subtended == 0:  return line(end_pt,npts)
     invert=True if arc_subtended<0 else False
     D=dist(end_pt)
-    return arc(end_pt,dist(end_pt)/abs(arc_subtended),invert=invert,npts=npts)
+    return arc(end_pt,abs((D/2)/sin(arc_subtended/2)),invert=invert,npts=npts)
         
 def arc(end_pt,radius,invert=False,npts=20):
 
@@ -63,7 +76,7 @@ def arc(end_pt,radius,invert=False,npts=20):
     theta = arctan2(end_pt[1,0]-end_pt[0,0],end_pt[1,1]-end_pt[0,1])
 
     if radius < D/2:
-        print('Illegal radius < D/2')
+        print(f'Illegal radius={radius} < D/2={D/2} with pi/theta={pi/theta}')
         return
 
     yc = D/2

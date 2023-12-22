@@ -75,14 +75,15 @@ def cIc(ring,wheel,
                      slide = lambda t: 1,
                      start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0):
     return spiro_arc(ring.O[0],ring.O[1],ring.o,ring.r,wheel,
-                     loops=loops,spacing=1.0/ppl,
+                     loops=loops,ppl=ppl,
                      quadrants=quadrants,qfuzz=qfuzz,slide=slide,
                      start_guard=start_guard,end_guard=end_guard,
                      start_guard_angle=start_guard_angle,end_guard_angle=end_guard_angle,
                      invert=inside, reverse=reverse)
                      
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
-                    loops=1,spacing=pi/4000,
+#                    loops=1,spacing=pi/4000,
+                    loops=1,ppl=1000,
                     quadrants=0, qfuzz=50,
                     slide = lambda t: 1,
                     start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
@@ -103,7 +104,7 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
     if start_guard_angle==0:  start_guard_angle = start_guard/(R+iv*a)
     if end_guard_angle==0:    end_guard_angle   = end_guard/(R+iv*a)
 
-    t=np.linspace(0.0,(2*pi*R/a)*loops-(start_guard_angle+end_guard_angle)*R/a,int(loops/spacing))
+    t=np.linspace(0.0,(2*pi*R/a)*loops-(start_guard_angle+end_guard_angle)*R/a,int(loops*ppl))
 
     p = t
     

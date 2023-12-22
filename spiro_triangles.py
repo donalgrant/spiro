@@ -13,9 +13,9 @@ def triangles_on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orie
     i = first
     for k in range(n):
         if not orient_follow is None:
-            orient_angle = sd.chord_direction(i,i+array_val(orient_follow,k))+array_val(orient,k)
+            orient_angle = -sd.chord_direction(i,i+array_val(orient_follow,k))-array_val(orient,k)
         else:
-            orient_angle = array_val(orient,k)
+            orient_angle = -array_val(orient,k)
         T = SpiroData()  # for the triangle vertices
         T.load(tcoords(array_val(oangle,k),array_val(asym,k),array_val(fb,k),array_val(fh,k)),
                array_val(sd.p,k))
@@ -50,9 +50,9 @@ def pars_on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,
     i = first
     for k in range(n):
         if not orient_follow is None:
-            orient_angle = sd.chord_direction(i,i+array_val(orient_follow,k))+array_val(orient,k)
+            orient_angle = -sd.chord_direction(i,i+array_val(orient_follow,k))-array_val(orient,k)
         else:
-            orient_angle = array_val(orient,k)
+            orient_angle = -array_val(orient,k)
         T = SpiroData()  # for the parallelogram vertices
         T.load(pcoords(array_val(oangle,k),array_val(asym,k),array_val(fb,k),array_val(fh,k)),
                array_val(sd.p,k))

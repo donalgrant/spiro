@@ -13,38 +13,31 @@ def cmap_from_list(clist,cname=None):
     if cname is None:
         cname=''
         for c in clist: cname+=c[:2]
-    return LinearSegmentedColormap.from_list(cname,clist)
+    cmap=LinearSegmentedColormap.from_list(cname,clist)
+    mpl.colormaps.register(cmap=cmap)
+    return cmap
 
 cmap1 = cmap_from_list(["Red","Orange","hotpink"],'cmap1')
-mpl.colormaps.register(cmap=cmap1)
 cmap2 = cmap_from_list(["rebeccapurple","darkmagenta","orchid","pink"],'cmap2')
-mpl.colormaps.register(cmap=cmap2)
 cmap3 = cmap_from_list(["seagreen","teal","cornflowerblue","mediumblue","indigo"],'cmap3')
-mpl.colormaps.register(cmap=cmap3)
 
 clist = [ 'xkcd:'+i for i in ['sapphire','vibrant blue','carolina blue','navy blue','azul','sapphire'] ]
 pretty_blues = cmap_from_list(clist,'pretty_blues')
-mpl.colormaps.register(cmap=pretty_blues)
 
 clist = [ 'xkcd:'+i for i in ['blood red','raw umber','light forest green','forest green'] ]
 wreath = cmap_from_list(clist,'wreath')
-mpl.colormaps.register(cmap=wreath)
 
 clist = [ 'xkcd:'+i for i in ['dark gold','gold','dark gold','muddy green','dark gold'] ]
 gold = cmap_from_list(clist,'gold')
-mpl.colormaps.register(cmap=gold)
 
 clist = [ 'xkcd:'+i for i in ['kelly green','light green','vivid green','grass green'] ]
 emerald_woman= cmap_from_list(clist,'emerald_woman')
-mpl.colormaps.register(cmap=emerald_woman)
 
 clist = [ 'xkcd:'+i for i in ['carnation pink','baby pink','lipstick red','darkish pink','powder pink'] ]
 pinks = cmap_from_list(clist,'pinks')
-mpl.colormaps.register(cmap=pinks)
 
 clist = [ 'xkcd:'+i for i in ['lavender pink','pale mauve','pinky purple','purpleish','lavender pink'] ]
 pale_pink = cmap_from_list(clist,'pale_pink')
-mpl.colormaps.register(cmap=pale_pink)
 
 def cmap_list():
     return ['pretty_blues','wreath','gold','emerald_woman','pinks','pale_pink',
@@ -69,8 +62,8 @@ def cmap_list():
 def cs_list():
     return ['radial','cycles','phase','spacing','direction','x-direction','y-direction',
             'polar','time','length','random',
-            'x','xrand','y','yrand','rrand','xy','x+y',
-            'x-y','h-waves','t-waves','l-waves','v-waves',
+            'x','xrand','y','yrand','rrand', # 'prand','crand','drand','srand',  # add these?
+            'xy','x+y','x-y','h-waves','t-waves','l-waves','v-waves',
             'r-waves','ripples','s-ripples'
             ]
 
@@ -111,6 +104,8 @@ class SpiroFig:
             if no_frame:
                 self.ax.set(xticks=[],yticks=[])
                 self.ax.set_axis_off()
+            else:
+                self.ax.tick_params(labelcolor='white')
             if not limits is None:
                 self.ax.set_xlim([limits[0],limits[1]])
                 self.ax.set_ylim([limits[2],limits[3]])

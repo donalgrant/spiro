@@ -91,6 +91,30 @@ class SpiroData:
 
     def xy(self,index):  return array([ self.x[index % self.n()], self.y[index % self.n()] ])
 
+    def xyp(self,scale=1.0):
+        cc = empty((self.n(),3))
+        prange=max(self.p)-min(self.p)
+        for i in range(self.n()):
+            cc[i]=array([self.x[i],self.y[i],scale*(self.p[i]-prange/2.0)/prange])
+        return cc
+
+    
+    def xyt(self,scale=1.0):
+        cc = empty((self.n(),3))
+        trange=max(self.t)-min(self.t)
+        for i in range(self.n()):
+            cc[i]=array([self.x[i],self.y[i],scale*(self.t[i]-trange/2.0)/trange])
+        return cc
+
+    
+    def xyl(self,scale=1.0):
+        cc = empty((self.n(),3))
+        lrange=self.n()
+        for i in range(self.n()):
+            cc[i]=array([self.x[i],self.y[i],scale*cos(pi*(i-lrange/2.0)/lrange)])
+            
+        return cc
+    
     def wrap(self,i):  return i % self.n()
     
     def direction(self,i1):
