@@ -30,9 +30,6 @@ a=major_from_circum(2*pi*4,e)*7
 T = cIe(Ellipse(a,e,0,pi/4),wheel=Wheel(4,18),loops=1,inside=True,ppl=1000).subsample(1)
 
 cs = 'spacing'
-clist = [ 'xkcd:'+i for i in ['sapphire','vibrant blue','carolina blue','navy blue','azul'] ]
-
-my_cmap = cmap_from_list(clist,'pretty_blues')
 
 S=SpiroData()
 nstarts=5
@@ -250,8 +247,7 @@ a=major_from_circum(2*pi*4,e)*5
 T = cIe(Ellipse(a,e,0,pi/4),wheel=Wheel(4,4),loops=1,inside=True,ppl=2000)
 
 cs = 'y-direction'
-my_cmap = cmap_from_list(["Red","Orange","hotpink"])
-
+my_cmap = cmap1
 
 S=SpiroData()
 

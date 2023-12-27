@@ -104,7 +104,8 @@ for i in range(20):
     T.rotate(pi/64*i)
     S.add(T)
 
-F.plot(S,cmap_from_list(['mediumblue','blue','cornflowerblue','deepskyblue']),color_scheme='time',save=True)
+cmap_b=cmap_from_list(['mediumblue','blue','cornflowerblue','deepskyblue'])
+F.plot(S,cmap_b),color_scheme='time',save=True)
 
 ###
 
@@ -117,7 +118,7 @@ for i in range(20):
     T.add(ribbon(eIe(wheel=w,inside=True,loops=.55).subsample(15),5,pi/8,4,pi/2,pts=50,trim=True))
     T.rotate(pi/64*i)
     S.add(T)
-dark_blue_cmap=cmap_from_list(['mediumblue','blue','cornflowerblue','deepskyblue'])
+
 F.plot(S,'OrRd',color_scheme='time',save=True)
 
 ###

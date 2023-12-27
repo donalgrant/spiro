@@ -141,7 +141,6 @@ r=major_from_circum(2*pi*wheel_r*rf,e)
 T = cIe(Ellipse(r*(1+eps),e),Wheel(wheel_r,wheel_r*0.8),inside=True,loops=2.0,ppl=ppl).rotate(pi/4)
     
 N=T.n()
-cmap1 = cmap_from_list(["Red","Orange","hotpink"])
 
 cs = 'length'
 c = [cmap1,'Reds','Wistia']

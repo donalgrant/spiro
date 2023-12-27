@@ -63,9 +63,6 @@ figure(directed_triangles(T1,skip=skip,offset=offset,scale=scale,oangle=oa,n=n,f
 R1=2
 T1 = spiro_nstar(7,r1=R1,wheel=Wheel(R1/20,R1/40),loops=1,inside=True).subsample(20)
 
-clist = [ 'xkcd:'+i for i in ['dark gold','gold','dark gold','muddy green','dark gold'] ]
-gold = cmap_from_list(clist,'gold')
-
 skip=1
 n=T1.n()
 s = T1.neighbor_distances()
