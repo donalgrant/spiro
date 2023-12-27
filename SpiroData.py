@@ -49,10 +49,12 @@ class SpiroData:
         self.reset()
         
     def reset(self):
-        self.x = array([])
-        self.y = array([])
-        self.p = array([])
-        self.t = array([])   # parameterize the drawing data (not sure if this is needed yet)
+        self.x = array([])  # x-coord
+        self.y = array([])  # y-coord
+        self.p = array([])  # wheel phase
+        self.t = array([])  # overall parameterization
+        self.o = array([])  # object number
+        self.s = array([])  # segment number
         return self
 
     def add(self, sd):
@@ -60,58 +62,71 @@ class SpiroData:
         self.y = append(self.y,sd.y)
         self.p = append(self.p,sd.p)
         self.t = append(self.t,sd.t)
+        self.o = append(self.o,sd.o)
+        self.s = append(self.s,sd.s)
         return self
 
-    def set(self,x=0,y=0,p=0,t=0,m=1):
+    def set(self,x=0,y=0,p=0,t=0,o=0,s=0):
         self.x = array([x])
         self.y = array([y])
         self.p = array([p])
         self.t = array([t])
+        self.o = array([o])
+        self.s = array([s])
         return self
 
-    def set_array(self,x,y,p,t):
+    def set_array(self,x,y,p,t,o,s):
         self.x = x
         self.y = y
         self.p = p
         self.t = t
+        self.o = o
+        self.s = s
         return self
 
-    def load(self,xy_array,phase,time_offset=0):
+    def load(self,xy_array,phase,time_offset=0,object=0,segment=0):
         s = SpiroData()
         s.x=xy_array[:,0]
         s.y=xy_array[:,1]
         s.t=linspace(time_offset,s.x.shape[0],s.x.shape[0])
         s.p=s.t*0+phase
+        s.o=np.full((s.n()),object)
+        s.s=np.full((s.n()),segment)
         return self.add(s);
         
     def xc(self):  return self.x[-1] 
     def yc(self):  return self.y[-1] 
     def pc(self):  return self.p[-1]
     def tc(self):  return self.t[-1]
+    def oc(self):  return self.o[-1]
+    def sc(self):  return self.s[-1]
 
     def xy(self,index):  return array([ self.x[index % self.n()], self.y[index % self.n()] ])
 
     def xyp(self,scale=1.0):
         cc = empty((self.n(),3))
         prange=max(self.p)-min(self.p)
+        pavg=min(self.p)+prange/2.0
         for i in range(self.n()):
-            cc[i]=array([self.x[i],self.y[i],scale*(self.p[i]-prange/2.0)/prange])
+            cc[i]=array([self.x[i],self.y[i],scale*(self.p[i]-pavg)/prange])
         return cc
 
     
     def xyt(self,scale=1.0):
         cc = empty((self.n(),3))
         trange=max(self.t)-min(self.t)
+        tavg=min(self.t)+trange/2.0
         for i in range(self.n()):
-            cc[i]=array([self.x[i],self.y[i],scale*(self.t[i]-trange/2.0)/trange])
+            cc[i]=array([self.x[i],self.y[i],scale*(self.t[i]-tavg)/trange])
         return cc
 
     
     def xyl(self,scale=1.0):
         cc = empty((self.n(),3))
         lrange=self.n()
+        lavg=self.n()/2
         for i in range(self.n()):
-            cc[i]=array([self.x[i],self.y[i],scale*cos(pi*(i-lrange/2.0)/lrange)])
+            cc[i]=array([self.x[i],self.y[i],scale*cos(pi*(i-lavg)/lrange)])
             
         return cc
     
@@ -175,6 +190,8 @@ class SpiroData:
         sd = SpiroData()
         sd.p=self.p
         sd.t=self.t
+        sd.o=self.o
+        sd.s=self.s
         inv_r = 1/self.radii()
         pp = self.polars()
         sd.x = inv_r * cos(pp)
@@ -188,6 +205,8 @@ class SpiroData:
         sd.y=self.y[first::n]
         sd.p=self.p[first::n]
         sd.t=self.t[first::n]
+        sd.o=self.o[first::n]
+        sd.s=self.s[first::n]
         return sd
 
     def n(self):  return self.x.shape[0]

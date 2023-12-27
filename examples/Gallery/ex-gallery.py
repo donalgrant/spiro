@@ -135,83 +135,76 @@ for i in range(15):
 
 figure(S,'cycles','turbo')
 
-###
-
-# demonstration of rotating, zooming in, and showing the spirograph frame, while evolving
-
-F._figname='Animate-'
+### experiment with color:  color groups of triangles
 
 e=0.0
 R=7
 ppl=1000
+
 a=circum(R,semi_minor(R,e))/(2*pi)
-T = cIe(Ellipse(R,e),wheel=Wheel(a/3,a/2.5),ppl=ppl,loops=1,inside=True)
-
-
-my_cmap='turbo'
-cs = 'cycles'
+T = cIe(Ellipse(R,e),wheel=Wheel(a/3,a/2),ppl=ppl,loops=1,inside=True)
 
 skip=1
-n=40
+n=50
 
-
-scale=3
 oa=pi/3
 ao=0.0
 asym=0
 of=1
-pts=[200,0,200]
 
-nr=120
+nr=15
 
 theta = linspace(0,2*pi,nr)
 aa = linspace(0,pi/2,nr)
 lmax = append(linspace(25,3,nr//2),linspace(3,25,nr//2))
+rr = np.random.poisson(3,nr)+2.0
+scale = rr
+
+S=SpiroData()
 
 for i in range(nr):
-    if i%10==0:  print(i)
     
     first=i*T.n()//nr
-    S=triangles_on_frame(T,first=first,skip=skip,scale=scale,oangle=oa,n=n,fh=0,fb=0,
-                         asym=asym,orient_follow=1,orient=ao,arc_angle=aa[i],pts=pts)
-    first=i*T.n()//nr+T.n()//2
-    S.add(pars_on_frame(T,first=first,skip=skip,scale=scale,oangle=oa,n=n,fh=0,fb=0,
-                        asym=asym,orient_follow=1,orient=ao,arc_angle=aa[i],pts=200))
+    S.add(triangles_on_frame(T,first=first,skip=skip,scale=scale[i],n=n,fh=0,fb=0,
+                             asym=asym,orient_follow=1,orient=0,arc_angle=pi/4,pts=200))
 
-    xscale=max(S.x)-min(S.x)
+cmap='turbo'
+cs=np.mod(linspace(0,S.n(),S.n()),200)
+figure(S,cs,cmap)
 
-    xyz=rotY(S.xyl(scale=xscale/4),theta[i])
-    x = xyz[:,0]
-    y = xyz[:,1]
-    z = xyz[:,2]
+## experiment with color:  overlapping groups of parallelograms
 
-    U = SpiroData()
+skip=1
+n=120
 
-    l=lmax[i]
-    ds = 62.5/(l*l)
+oa=pi/3
+ao=0.0
+asym=0
+of=1
+
+nr=5
+
+theta = linspace(0,2*pi,nr)
+aa = linspace(0,pi/2,nr)
+lmax = append(linspace(25,3,nr//2),linspace(3,25,nr//2))
+rr = np.random.poisson(3,nr)+2.0
+scale = rr  
+
+cs=[]
+
+S=SpiroData()
+
+for i in range(nr):
     
-    F.plot(U.set_array(x,y,S.p,S.t),color_scheme=cs,cmap=my_cmap,alpha=.4,fig_dim=fd,dot_size=ds,save=False,
-           limits=[-l,l,-l,l],transparent=False)
-    
-    v = rotY(T.xyl(scale=1.0),theta[i])
-    x = v[:,0]
-    y = v[:,1]
-    z = v[:,2]
+    npts=int(30*scale[i])
+    first=i*T.n()//nr
+    S.add(pars_on_frame(T,first=first,skip=skip,scale=scale[i],n=n,fh=0,fb=0,
+                             asym=asym,orient_follow=1,orient=0,arc_angle=pi/4,pts=npts))
 
-    U = SpiroData()
+    color_sequence=np.full((npts),0)
+    for j in range(n):  
+        for k in range(2):
+            cs.extend(color_sequence*0+i+2*j/n)
+            cs.extend(color_sequence*0+i+2*j/n+3)
 
-    F.plot(U.set_array(x,y,T.p,T.t),color_scheme=cs,cmap='pale_pink',alpha=.2,fig_dim=fd,dot_size=ds*10,save=True,
-           limits=[-l,l,-l,l],transparent=False,new_fig=False)
-
-import imageio
-import glob
-
-images=[]
-
-for image in sorted(glob.glob("Animate-*.png")):
-    images.append(imageio.imread(image))
-
-for image in sorted(glob.glob("Animate-*.png"),reverse=True):
-    images.append(imageio.imread(image))
-    
-imageio.mimsave("animate_evolve-zoom-w-frame.gif", images, duration=0.2, loop=0)
+figure(S,cs,'turbo')

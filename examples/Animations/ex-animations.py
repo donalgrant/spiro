@@ -13,7 +13,7 @@ from spiro_triangles import *
 from polygon import *
 from Ring import *
 
-import imageio
+import imageio.v2 as imageio
 import glob
 
 parser = argparse.ArgumentParser(description="Parallelogram Examples")
@@ -43,6 +43,8 @@ def figure(S,cs,cmap,alpha=0.4,dot_size=0.1):
 
     F.plot(S,color_scheme=cs,cmap=cmap,alpha=alpha,fig_dim=fd,dot_size=dot_size,save=save)
 
+filename='animate-image.png'
+
 ###
 
 cs = 'spacing'
@@ -52,12 +54,16 @@ S = SpiroData()
 T = cIc(Ring(30),wheel=Wheel(6,17),loops=1,inside=True,ppl=3000).subsample(1)
 ppl=T.n()
 
-m = T.n()//20
+m = T.n()//50
 
 ne=ppl//12
-first=np.random.randint(0,ppl-ne-2)
+first=100 # np.random.randint(0,ppl-ne-2)
+
+images=[]
 
 for i in range(m):
+
+    if i % 10 == 0:  print(i,m)
     
     tnd = [ T.direction(j)+pi for j in arange(first,first+ne) ]
     flat_scale = max(tnd)-min(tnd)
@@ -71,19 +77,14 @@ for i in range(m):
     S = ellipses_on_frame(T,major,eccen,orient,1000*def_factor,first=first,n=ne)
 
     F.plot(S,color_scheme=cs,cmap=c,alpha=0.4,fig_dim=fd,dot_size=0.1,
-           save=True,limits=[-50,50,-50,50],transparent=False)
+           save=True,limits=[-30,70,-30,70],transparent=False,filename=filename)
 
+    images.append(imageio.imread(filename))
+    
     first+=1
 
-images=[]
-
-for image in sorted(glob.glob("Figure-*.png")):
-    images.append(imageio.imread(image))
-
-for image in sorted(glob.glob("Figure-*.png"),reverse=True):
-    images.append(imageio.imread(image))
-    
-imageio.mimsave("animate_more_ellipses.gif", images, duration=0.1, loop=0)
+images.extend(np.flip(images,axis=0))
+imageio.mimsave("animate_more_ellipses.gif", images, duration=0.2, loop=0)
 
 
 ###
@@ -98,7 +99,7 @@ first=0
 offset=n//30
 oa=pi/3
 
-m=n//4
+m=67 # n//4  # filesize constraint
 ao = linspace(0,2*pi,m)
 asym = linspace(0.0,0.3,m)
 scale=2
@@ -106,20 +107,19 @@ scale=2
 cs = 'cycles'
 my_cmap = emerald_woman
 
+images=[]
+
 for i in range(m):
+    
+    if i % 10 == 0:  print(i,m)
+
     S=pars_on_frame(T1,skip=skip,scale=scale,oangle=oa,n=n,first=first,fh=0.5,fb=0.5,
                     pts=500*def_factor,asym=asym[i],orient_follow=offset,orient=ao[i]).rotate(i*pi/4/m)
 
     F.plot(S,color_scheme=cs,cmap=my_cmap,alpha=0.4,fig_dim=fd,dot_size=0.1,
-           save=True,limits=[-10,10,-10,10],transparent=False)
+           save=True,limits=[-10,10,-10,10],transparent=False,filename=filename)
 
+    images.append(imageio.imread(filename))
 
-images=[]
-
-for image in sorted(glob.glob("Figure-*.png")):
-    images.append(imageio.imread(image))
-
-for image in sorted(glob.glob("Figure-*.png"),reverse=True):
-    images.append(imageio.imread(image))
-    
-imageio.mimsave("animate_green_polygons.gif", images, duration=0.1, loop=0)
+images.extend(np.flip(images,axis=0))
+imageio.mimsave("animate_green_polygons.gif", images, duration=0.2, loop=0)

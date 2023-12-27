@@ -13,7 +13,7 @@ from spiro_triangles import *
 from polygon import *
 from Ring import *
 
-import imageio
+import imageio.v2 as imageio
 import glob
 
 parser = argparse.ArgumentParser(description="Parallelogram Examples")
@@ -48,13 +48,14 @@ def figure(S,cs,cmap,alpha=0.4,dot_size=0.1,filename=None,color_dither=0.0):
         F.plot(S,color_scheme=cs,cmap=cmap,alpha=alpha,fig_dim=fd,dot_size=dot_size,
                save=save,filename=filename,color_dither=color_dither)
 
+filename='animate-figure-3d.png'
+
 ###
 
 e=0.0
 R=7
 ppl=1000
 
-#T1 = spiro_line(R,Wheel(3*R/(2*pi)/4,R/5),loops=3,fold=True,invert=False)
 a=circum(R,semi_minor(R,e))/(2*pi)
 T = cIe(Ellipse(R,e),wheel=Wheel(a/4,a/6),ppl=ppl,loops=1,inside=True)
 
@@ -81,6 +82,8 @@ my_cmap='turbo'
 
 xscale=max(S.x)-min(S.x)
 
+images=[]
+
 for theta in linspace(0,2*pi,96):
     
     xyz=rotY(S.xyp(scale=xscale),theta)
@@ -90,8 +93,10 @@ for theta in linspace(0,2*pi,96):
 
     U = SpiroData()
     F.plot(U.set_array(x,y,S.p,S.t),color_scheme='cycles',cmap=my_cmap,alpha=.4,fig_dim=fd,dot_size=0.1,save=True,
-           limits=[-15,15,-15,15],transparent=False)
+           limits=[-15,15,-15,15],transparent=False,filename=filename)
 
+    images.append(imageio.imread(filename))
+    
 for theta in linspace(0,2*pi,96):
     
     xyz=rotX(S.xyp(scale=xscale),theta)
@@ -101,17 +106,78 @@ for theta in linspace(0,2*pi,96):
 
     U = SpiroData()
     F.plot(U.set_array(x,y,S.p,S.t),color_scheme='cycles',cmap=my_cmap,alpha=.4,fig_dim=fd,dot_size=0.1,save=True,
-           limits=[-15,15,-15,15],transparent=False)
+           limits=[-15,15,-15,15],transparent=False,filename=filename)
 
-import imageio
-import glob
+    images.append(imageio.imread(filename))
+
+    
+imageio.mimsave("animate_rot-triangle_sets-p.gif", images, duration=0.1, loop=0)
+
+###
+
+# demonstration of rotating, zooming in, and showing the spirograph frame, while evolving
+
+e=0.0
+R=7
+ppl=1000
+a=circum(R,semi_minor(R,e))/(2*pi)
+T = cIe(Ellipse(R,e),wheel=Wheel(a/3,a/2.5),ppl=ppl,loops=1,inside=True)
+
+my_cmap='turbo'
+cs = 'cycles'
+
+skip=1
+n=40
+
+scale=3
+oa=pi/3
+ao=0.0
+asym=0
+of=1
+pts=[200,0,200]
+
+nr=120
+
+theta = linspace(0,2*pi,nr)
+aa = linspace(0,pi/2,nr)
+lmax = append(linspace(25,3,nr//2),linspace(3,25,nr//2))
 
 images=[]
 
-for image in sorted(glob.glob("Figure-*.png")):
-    images.append(imageio.imread(image))
-
-for image in sorted(glob.glob("Figure-*.png"),reverse=True):
-    images.append(imageio.imread(image))
+for i in range(nr):
+    if i%10==0:  print(i)
     
-imageio.mimsave("animate_rot-triangle_sets-p.gif", images, duration=0.1, loop=0)
+    first=i*T.n()//nr
+    S=triangles_on_frame(T,first=first,skip=skip,scale=scale,oangle=oa,n=n,fh=0,fb=0,
+                         asym=asym,orient_follow=1,orient=ao,arc_angle=aa[i],pts=pts)
+
+    xscale=max(S.x)-min(S.x)
+
+    xyz=rotY(S.xyl(scale=xscale/4),theta[i])
+    x = xyz[:,0]
+    y = xyz[:,1]
+    z = xyz[:,2]
+
+    U = SpiroData()
+
+    l=lmax[i]
+    ds = 62.5/(l*l)
+    
+    F.plot(U.set_array(x,y,S.p,S.t),color_scheme=cs,cmap=my_cmap,alpha=.4,fig_dim=fd,dot_size=ds,save=False,
+           limits=[-l,l,-l,l],transparent=False,filename=filename)
+
+    images.append(imageio.imread(filename))
+    
+    v = rotY(T.xyl(scale=1.0),theta[i])
+    x = v[:,0]
+    y = v[:,1]
+    z = v[:,2]
+
+    U = SpiroData()
+
+    F.plot(U.set_array(x,y,T.p,T.t),color_scheme=cs,cmap='pale_pink',alpha=.2,fig_dim=fd,dot_size=ds*10,save=True,
+           limits=[-l,l,-l,l],transparent=False,new_fig=False,filename=filename)
+
+    images.append(imageio.imread(filename))
+    
+imageio.mimsave("animate_evolve-zoom-w-frame.gif", images, duration=0.2, loop=0)

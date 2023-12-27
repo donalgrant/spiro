@@ -8,29 +8,25 @@ from SpiroGeometry import *
 
 def spiro(ring=Ring(10),wheel=Wheel(4,3.5,0.0),loops=5,
           slide = lambda t: 1,
-          ppl=1000,inside=True):
+          ppl=1000,inside=True,object=0):
     return cIc(ring,wheel,loops=loops,
-                            slide=slide,ppl=ppl,inside=inside)
+               slide=slide,ppl=ppl,inside=inside,object=object)
 
-def cIe(ring,wheel,
-                      loops=1,ppl=4000,
-                      inside=False,reverse=False,
-                      quadrants=0, qfuzz=50,
-                      slide = lambda t: 1,
-                      start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0):
-    return wheel_in_ellipse(ring.O[0],ring.O[1],wheel,ring,
-                            loops=loops, ppl=ppl,
+def cIe(ring,wheel,loops=1,ppl=4000,inside=False,reverse=False,
+        quadrants=0, qfuzz=50, slide = lambda t: 1,
+        start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,object=0):
+    return wheel_in_ellipse(ring.O[0],ring.O[1],wheel,ring, loops=loops, ppl=ppl,
                             slide=slide,
                             start_guard=start_guard,end_guard=end_guard,
                             start_guard_angle=start_guard_angle,end_guard_angle=end_guard_angle,
-                            orient=ring.o,invert=inside,reverse=reverse)
+                            orient=ring.o,invert=inside,reverse=reverse,object=object)
 
         
 def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
-              loops=1,ppl=4000,
-              slide = lambda t: 1,
-              start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
-              orient=0,invert=False,reverse=False):  
+                     loops=1,ppl=4000,
+                     slide = lambda t: 1,
+                     start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
+                     orient=0,invert=False,reverse=False,object=0):  
     '''roll on the outside (inside if invert=True) of an elliptical arc
     centered on x0, y0.  Direction of motion can be reversed by setting reverse=True
     '''
@@ -62,24 +58,23 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     sd.x=x0_wheel + m*sin(p+normal)
     sd.y=y0_wheel + m*cos(p+normal)
     sd.p=p
+    sd.o=np.full((sd.n()),object)
+    sd.s=linspace(0,int(loops*ppl),int(loops*ppl))//ppl
 
     sd.rotate(orient).move(x0,y0)
 
     return sd
 
 
-def cIc(ring,wheel,
-                     loops=1,ppl=1000,
-                     inside=False,reverse=False,
-                     quadrants=0, qfuzz=50,
-                     slide = lambda t: 1,
-                     start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0):
+def cIc(ring,wheel, loops=1,ppl=1000, inside=False,reverse=False,
+        quadrants=0, qfuzz=50, slide = lambda t: 1,
+        start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,object=0):
     return spiro_arc(ring.O[0],ring.O[1],ring.o,ring.r,wheel,
                      loops=loops,ppl=ppl,
                      quadrants=quadrants,qfuzz=qfuzz,slide=slide,
                      start_guard=start_guard,end_guard=end_guard,
                      start_guard_angle=start_guard_angle,end_guard_angle=end_guard_angle,
-                     invert=inside, reverse=reverse)
+                     invert=inside, reverse=reverse, object=object)
                      
 def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
 #                    loops=1,spacing=pi/4000,
@@ -87,7 +82,7 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
                     quadrants=0, qfuzz=50,
                     slide = lambda t: 1,
                     start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
-                    invert=False,reverse=False):  
+                    invert=False,reverse=False,object=0):  
     '''roll on the outside (inside if invert=True) of an arc
     centered on x0, y0, with radius, starting at orientation of
     orient radians cw from the vertical.  Arc has length loops * 2pi
@@ -143,6 +138,8 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
     sd.t=theta
     sd.x=r*sin(theta) + b*sin(p+normal)
     sd.y=r*cos(theta) + b*cos(p+normal)
+    sd.o=np.full((sd.n()),object)
+    sd.s=linspace(0,int(loops*ppl),int(loops*ppl))//ppl
     
     return sd.move(x0,y0)
 
@@ -151,6 +148,6 @@ def spiro_steps(ring=Ring(10),wheel=Wheel(4,3.5,0),loops=1,
     sd = SpiroData()
     for i in range(n):
         wheel.o = offset*i
-        sd.add(spiro(ring=ring,wheel=wheel,loops=loops,ppl=ppl))
+        sd.add(spiro(ring=ring,wheel=wheel,loops=loops,ppl=ppl,object=i))
     return sd
 

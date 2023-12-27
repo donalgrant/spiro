@@ -148,37 +148,40 @@ class SpiroFig:
 
         if color_scheme is None:  color_scheme=self.cs
         if cmap         is None:  cmap        =self.cmap
-        
-        match color_scheme:
-            case 'radial':    clr=r
-            case 'cycles':    clr=sin(sd.p)
-            case 'phase':     clr=sd.p
-            case 'polar':     clr=arctan2(sd.x,sd.y)
-            case 'x-direction': clr=cos(scipy.signal.medfilt(sd.directions()))
-            case 'y-direction': clr=sin(scipy.signal.medfilt(sd.directions()))
-            case 'direction': clr=scipy.signal.medfilt(sd.directions())
-            case 'spacing':   clr=scipy.signal.medfilt(sd.neighbor_distances())
-            case 'time':      clr=sd.t
-            case 'length':    clr=linspace(0,sd.x.shape[0],sd.x.shape[0])
-            case 'random':    clr=np.random.rand(len(sd.x)) 
-            case 'x':         clr=sd.x
-            case 'xrand':     clr=sd.x+np.random.normal(0,max(sd.x)/3,sd.n())
-            case 'y':         clr=sd.y
-            case 'yrand':     clr=sd.y+np.random.normal(0,max(sd.y)/3,sd.n())
-            case 'rrand':     clr=r+np.random.normal(0,max(r)/3,sd.n())
-            case 'xy':        clr=sd.x*sd.y
-            case 'x+y':       clr=sd.x+sd.y
-            case 'x-y':       clr=sd.x-sd.y
-            case 'h-waves':   clr=sin(sd.x)
-            case 't-waves':   clr=sin(sd.t/max(sd.t)*4*pi)
-            case 'l-waves':   clr=sin(linspace(0,4*pi,sd.n()))
-            case 'v-waves':   clr=sin(sd.y)
-            case 'r-waves':   clr=sin(r)
-            case 'ripples':   clr=sin(r**2)
-            case 's-ripples': clr=sin(sqrt(r))
-            case _:
-                clr=color_scheme
-                cmap=None
+
+        if hasattr(color_scheme,"__len__") and len(color_scheme)==sd.n():
+            clr=color_scheme
+        else:
+            match color_scheme:
+                case 'radial':    clr=r
+                case 'cycles':    clr=sin(sd.p)
+                case 'phase':     clr=sd.p
+                case 'polar':     clr=arctan2(sd.x,sd.y)
+                case 'x-direction': clr=cos(scipy.signal.medfilt(sd.directions()))
+                case 'y-direction': clr=sin(scipy.signal.medfilt(sd.directions()))
+                case 'direction': clr=scipy.signal.medfilt(sd.directions())
+                case 'spacing':   clr=scipy.signal.medfilt(sd.neighbor_distances())
+                case 'time':      clr=sd.t
+                case 'length':    clr=linspace(0,sd.x.shape[0],sd.x.shape[0])
+                case 'random':    clr=np.random.rand(len(sd.x)) 
+                case 'x':         clr=sd.x
+                case 'xrand':     clr=sd.x+np.random.normal(0,max(sd.x)/3,sd.n())
+                case 'y':         clr=sd.y
+                case 'yrand':     clr=sd.y+np.random.normal(0,max(sd.y)/3,sd.n())
+                case 'rrand':     clr=r+np.random.normal(0,max(r)/3,sd.n())
+                case 'xy':        clr=sd.x*sd.y
+                case 'x+y':       clr=sd.x+sd.y
+                case 'x-y':       clr=sd.x-sd.y
+                case 'h-waves':   clr=sin(sd.x)
+                case 't-waves':   clr=sin(sd.t/max(sd.t)*4*pi)
+                case 'l-waves':   clr=sin(linspace(0,4*pi,sd.n()))
+                case 'v-waves':   clr=sin(sd.y)
+                case 'r-waves':   clr=sin(r)
+                case 'ripples':   clr=sin(r**2)
+                case 's-ripples': clr=sin(sqrt(r))
+                case _:
+                    clr=color_scheme
+                    cmap=None
         
         if subsample:
             x = sd.x[::subsample]
