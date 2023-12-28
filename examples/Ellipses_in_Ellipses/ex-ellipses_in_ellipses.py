@@ -17,15 +17,6 @@ F.text_color='white'
 c = cmap_list()
 cs = cs_list()
 
-import matplotlib as mpl
-from matplotlib.colors import ListedColormap, LinearSegmentedColormap
-cmap1 = LinearSegmentedColormap.from_list("RedOrangePink",
-                                         ["Red","Orange","Pink"])
-cmap2 = LinearSegmentedColormap.from_list("Pinks",
-                                         ["rebeccapurple","darkmagenta","orchid","pink"])
-cmap3 = LinearSegmentedColormap.from_list("DarkGreen",
-                                         ["seagreen","teal","cornflowerblue","mediumblue","indigo"])
-
 fig_n = 0
 
 ###

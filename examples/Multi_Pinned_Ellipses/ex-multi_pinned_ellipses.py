@@ -52,7 +52,7 @@ if hd:
     S.save(f'figure-{data_set}.pickle')
     data_set+=1
     
-F.plot(S,color_scheme=cs,cmap=my_cmap,alpha=0.4,fig_dim=fd,save=save)
+F.plot(S,color_scheme=cs,cmap='pretty_blues',alpha=0.4,fig_dim=fd,save=save)
 
 ###
 

@@ -211,6 +211,18 @@ class SpiroData:
 
     def n(self):  return self.x.shape[0]
 
+    def select(self,condition):
+        sd = SpiroData()
+        j = condition
+        return sd.set_array(self.x[j],self.y[j],self.p[j],
+                            self.t[j],self.o[j],self.s[j])
+
+    def remove(self,condition):
+        sd = SpiroData()
+        j = np.in1d(range(self.n()),condition)
+        return sd.set_array(self.x[~j],self.y[~j],self.p[~j],
+                            self.t[~j],self.o[~j],self.s[~j])
+        
     def save(self,filename):
         with open(filename,'wb') as f:
             pickle.dump(self,f,pickle.HIGHEST_PROTOCOL)

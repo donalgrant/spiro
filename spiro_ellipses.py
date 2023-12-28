@@ -9,7 +9,7 @@ def ellipses_from_coord(sd,coord=array([0,0]),offset=100,npts=500,
                         scale_major=1.0,
                         orient_offset=0.0,
                         off_major=1.0,off_minor=0.0,
-                        eccen=0.8,nfigs=0,i2_start=-1):
+                        eccen=0.8,nfigs=0,i2_start=-1,object=0):
     
     S = SpiroData()
     if nfigs==0: nfigs = int(sd.n()/offset)
@@ -43,7 +43,7 @@ def ellipses_from_coord(sd,coord=array([0,0]),offset=100,npts=500,
 
         s = ecoords(e,n)*a
         st = SpiroData()
-        st.load(s,phase).move(oM*a,om*b).rotate(o-orient).move(x0,y0)
+        st.load(s,phase,object=array_val(object,i),segment=i).move(oM*a,om*b).rotate(o-orient).move(x0,y0)
             
         S.add(st)
         
@@ -60,11 +60,11 @@ def ellipses_from_pts(sd,n=3,offset=100,npts=500,scale_major=1.0,
 
         st.add(ellipses_from_coord(sd,array([ sd.x[j], sd.y[j] ]),offset,npts,
                                    scale_major,orient_offset,off_major,off_minor,
-                                   eccen,nfigs,i2_start))
+                                   eccen,nfigs,i2_start,object=i))
         
     return st
 
-def ellipses_on_frame(sd,major,eccen,orient,pts,first=0,n=None):
+def ellipses_on_frame(sd,major,eccen,orient,pts,first=0,n=None,object=0):
     '''Every argument except the first may be an array:
     sd = SpiroData frame on which to draw the ellipses
     major:  semi-major axis of ellipses
@@ -77,13 +77,14 @@ def ellipses_on_frame(sd,major,eccen,orient,pts,first=0,n=None):
     for i in range(first,last):
         s = ecoords(array_val(eccen,i),array_val(pts,i))*array_val(major,i)
         st = SpiroData()
-        st.load(s,array_val(sd.p,i)).rotate(array_val(orient,i)).disp(sd.xy(i))
+#        print(f'e_o_f load {i} with object={array_val(object,i)}, segment={i}')
+        st.load(s,array_val(sd.p,i),object=array_val(object,i),segment=i).rotate(array_val(orient,i)).disp(sd.xy(i))
         S.add(st)
     return S
 
 def ellipses_between_frames(s1,s2,step1,step2,
                             scale_major,orient_offset,off_major,off_minor,eccen,
-                            nfigs,pts,bias=0.5,istart1=0,istart2=0):
+                            nfigs,pts,bias=0.5,istart1=0,istart2=0,object=0):
     S=SpiroData()
 
     i1 = istart1
@@ -113,7 +114,7 @@ def ellipses_between_frames(s1,s2,step1,step2,
         
         s = ecoords(e,np)*a
         st = SpiroData()
-        st.load(s,ph).move(oM*a,om*b).rotate(oo-o).disp( (1-fb)*c1 + fb*c2 )
+        st.load(s,ph,object=array_val(object,k),segment=k).move(oM*a,om*b).rotate(oo-o).disp( (1-fb)*c1 + fb*c2 )
         S.add(st)
         
         i1 += array_val(step1,k)
