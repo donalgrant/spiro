@@ -129,7 +129,7 @@ pts=[200,200,200]
     
 for i in range(15):
     S.add(triangles_on_frame(T,skip=skip,scale=scale,oangle=oa,n=n,fh=0,fb=0,asym=asym,
-                             orient_follow=1,orient=ao,arc_angle=aa,pts=pts))
+                             orient_follow=1,orient=ao,arc_angle=aa,pts=pts*def_factor))
     S.p+=0.1
     scale *= 0.95
 
@@ -166,7 +166,7 @@ for i in range(nr):
     
     first=i*T.n()//nr
     S.add(triangles_on_frame(T,first=first,skip=skip,scale=scale[i],n=n,fh=0,fb=0,
-                             asym=asym,orient_follow=1,orient=0,arc_angle=pi/4,pts=200))
+                             asym=asym,orient_follow=1,orient=0,arc_angle=pi/4,pts=200*def_factor))
 
 cmap='turbo'
 cs=np.mod(linspace(0,S.n(),S.n()),200)
@@ -199,7 +199,7 @@ for i in range(nr):
     npts=int(30*scale[i])
     first=i*T.n()//nr
     S.add(pars_on_frame(T,first=first,skip=skip,scale=scale[i],n=n,fh=0,fb=0,
-                             asym=asym,orient_follow=1,orient=0,arc_angle=pi/4,pts=npts))
+                             asym=asym,orient_follow=1,orient=0,arc_angle=pi/4,pts=npts*def_factor))
 
     color_sequence=np.full((npts),0)
     for j in range(n):  
@@ -208,3 +208,121 @@ for i in range(nr):
             cs.extend(color_sequence*0+i+2*j/n+3)
 
 figure(S,cs,'turbo')
+
+###  (masking -- panels)
+
+e=0.0
+R=7
+ppl=1000
+
+a=circum(R,semi_minor(R,e))/(2*pi)
+T1 = cIe(Ellipse(R,e),wheel=Wheel(a/3,a/3),ppl=ppl,loops=1,inside=True)
+
+skip=2
+n=T1.n()//skip//18
+
+d = T1.neighbor_distances()
+dmax=max(d)
+dmin=min(d)
+scale=5
+ao=pi/2*(d-dmin)/(dmax-dmin)
+
+pts = [0,500,500]
+
+offset=1 # np.random.randint(T1.n())
+
+S = SpiroData()
+n_swoops=12
+for i in range(n_swoops):
+    first=T1.n()*i//n_swoops
+    S.add(triangles_on_frame(T1,skip=skip,scale=scale,oangle=pi/3,n=n-1,orient=ao,
+                             first=first,pts=pts*def_factor,orient_follow=1,arc_angle=pi/2,object=i))
+    
+U = SpiroData()
+npanels=3
+pwidth=4
+pspace=5
+pfirst=-(npanels*pspace)/2
+for i in range(npanels):
+    pstart=pfirst+i*pspace
+    U.add(S.select(np.where( (S.x > pstart) & (S.x < pstart+pwidth) )))
+
+figure(U,'cycles','Blues')
+
+###
+
+e=0.5
+R=7
+ppl=1000
+
+a=circum(R,semi_minor(R,e))/(2*pi)
+T = cIe(Ellipse(R,e),wheel=Wheel(a/4,a/6),ppl=ppl,loops=1,inside=True).rotate(pi/4)
+
+skip=10
+n=T.n()//skip
+
+scale=7
+oa=pi/3
+ao=0.0
+asym=0.3
+aa=pi/3
+of=1
+npts=300
+pts=[npts,npts,npts,0]
+    
+S=pars_on_frame(T,skip=skip,scale=scale,oangle=oa,n=n,asym=asym,orient_follow=1,orient=ao,arc_angle=aa,pts=pts)
+
+a=0.5
+my_cmap = plt.cm.turbo(np.arange(plt.cm.turbo.N))
+my_cmap[:,0:3] *= a 
+my_cmap = ListedColormap(my_cmap)
+
+# F.plot(T,color_scheme='pink',dot_size=5.0)
+F.plot(S,color_scheme='cycles',cmap='turbo',alpha=.4,fig_dim=fd,dot_size=0.1,new_fig=True,color_dither=0.0)
+F.plot(S.subsample(3).move(0.2,-0.2),color_scheme='cycles',
+       cmap=my_cmap,alpha=.1,fig_dim=fd,dot_size=15,new_fig=False,color_dither=0.0,save=True,filename='Feathers.png')
+
+### 5 Multi-colormapped Panels
+
+e=0.0
+R=7
+ppl=1000
+
+a=circum(R,semi_minor(R,e))/(2*pi)
+T1 = cIe(Ellipse(R,e),wheel=Wheel(a/3,a/3),ppl=ppl,loops=1,inside=True)
+
+skip=2
+n=T1.n()//skip//18
+
+d = T1.neighbor_distances()
+dmax=max(d)
+dmin=min(d)
+scale=5
+ao=pi/2*(d-dmin)/(dmax-dmin)
+
+pts = [0,500,500]
+
+offset=1 # np.random.randint(T1.n())
+
+S = SpiroData()
+n_swoops=12
+for i in range(n_swoops):
+    first=T1.n()*i//n_swoops
+    S.add(triangles_on_frame(T1,skip=skip,scale=scale,oangle=pi/3,n=n-1,orient=ao,
+                             first=first,pts=pts*def_factor,orient_follow=1,arc_angle=pi/2,object=i))
+    
+l=10
+U = SpiroData()
+npanels=5
+pwidth=2.8
+pspace=3
+pfirst=-(npanels*pspace)/2
+cmap=['Oranges','Blues','bone','Greens','Reds']
+for i in range(npanels):
+    pstart=pfirst+i*pspace
+    U=S.select(np.where( (S.x > pstart) & (S.x < pstart+pwidth) ))
+    
+    F.plot(U,cmap=cmap[i],color_scheme='phase',alpha=0.4,dot_size=.1,limits=[-l,l,-l,l],
+          new_fig=True if i==0 else False)
+
+F.save_fig(filename='multi-cmap-panels.png')

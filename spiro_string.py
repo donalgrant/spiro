@@ -67,13 +67,13 @@ def closed_paths(sd,offsets,skip=1,first=0,n=0,line_pts=500,object=0):
         i0=i1
         for o in offsets:
             st.load(line(array([ sd.xy(i1), sd.xy(i1+o) ]),line_pts),
-                    sd.p[i1%sd.n()], object=array_val(object,seg_count), segment=seg_count)
+                    sd.p[i1%sd.n()], object=array_val(object,j), segment=seg_count)
             seg_count+=1
             i1 += o
 
         # now close the loop
         st.load(line(array([ sd.xy(i1),sd.xy(i0) ]),line_pts),
-                sd.p[i1%sd.n()], object=array_val(object,seg_count), segment=seg_count)
+                sd.p[i1%sd.n()], object=array_val(object,j), segment=seg_count)
         seg_count+=1
         j+=1
         

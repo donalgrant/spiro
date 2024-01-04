@@ -88,7 +88,7 @@ class SpiroData:
         s = SpiroData()
         s.x=xy_array[:,0]
         s.y=xy_array[:,1]
-        s.t=linspace(time_offset,s.x.shape[0],s.x.shape[0])
+        s.t=linspace(time_offset,time_offset+s.x.shape[0],s.x.shape[0])
         s.p=s.t*0+phase
         s.o=np.full((s.n()),object)
         s.s=np.full((s.n()),segment)

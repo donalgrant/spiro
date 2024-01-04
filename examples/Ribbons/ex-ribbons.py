@@ -105,7 +105,7 @@ for i in range(20):
     S.add(T)
 
 cmap_b=cmap_from_list(['mediumblue','blue','cornflowerblue','deepskyblue'])
-F.plot(S,cmap_b),color_scheme='time',save=True)
+F.plot(S,cmap=cmap_b,color_scheme='time',save=True)
 
 ###
 

@@ -154,6 +154,8 @@ class SpiroFig:
         else:
             match color_scheme:
                 case 'radial':    clr=r
+                case 'object':    clr=sd.o
+                case 'segment':   clr=sd.s
                 case 'cycles':    clr=sin(sd.p)
                 case 'phase':     clr=sd.p
                 case 'polar':     clr=arctan2(sd.x,sd.y)
@@ -214,7 +216,7 @@ class SpiroFig:
                 ax.scatter(x,y,color=rgb,linestyle=linestyle,s=dot_size,alpha=alpha)
                 
 
-        if len(caption)>0:
+        if len(caption) > 0:
             ax.set_title(caption,color=self.text_color,y=-0.1,fontsize=fontsize)
 #            self._fig.text(1.0, 0.05, 'David A. Imel 2023', ha='right',
 #                           color=self.text_color)

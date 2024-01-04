@@ -14,9 +14,9 @@ print(T.n())
 nsubs=len(cmap_list())
 ncols=6
 nrows=nsubs//ncols
+if nsubs % ncols > 0:  nrows += 1
 G = SpiroFig(rows=nrows,cols=ncols)
 G.text_color='white'
-if nsubs % ncols > 0:  nrows += 1
 for cs in cs_list():
     first=True
     for color_map in cmap_list():

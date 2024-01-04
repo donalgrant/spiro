@@ -21,7 +21,7 @@ for i in range(36):
     S.rotate(pi/128*i)
     S.x+=1
     S.y-=1
-    F.plot(S,color_scheme='cycles',cmap='ocean',caption=True,
+    F.plot(S,color_scheme='cycles',cmap='ocean',caption='',
            new_fig=True if i==0 else False)
 
 F.save_fig()

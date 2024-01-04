@@ -100,45 +100,55 @@ def arc(end_pt,radius,invert=False,npts=20):
 
 def cot(radians): return 0 if radians==pi/2 else 1/tan(radians)
 
-def tcoords(oangle,asym,fb,fh):
-    '''unit-area triangle with origin angle oangle and asymmetry angle asym'''
+def rot_and_shift(coords,rot,xy_offset):
+    cc = rot_about([0,0], rot, coords)
+    for i in range(cc.shape[0]):  cc[i] -= xy_offset
+    return cc
+    
+def tcoords(oangle,asym=0,fb=0,fh=0,prot=0):
+    '''unit-area triangle with origin angle oangle and asymmetry angle asym; pre-rotate cw by prot rads'''
     a = (1+asym)/2 * (pi-oangle)
     d = cot(oangle)+cot(a)
     h = sqrt(2.0/d)
     b = sqrt(2*d)
-    bo = b*fb
-    ho = h*fh
-    cc = empty((3,2))
-    cc[0,0] = -bo
-    cc[0,1] = -ho
-    cc[1,0] = b-bo
-    cc[1,1] = -ho
-    cc[2,0] = h * cot(oangle) - bo
-    cc[2,1] = h - ho
-    return cc
+    coords = array([ [0,0], [b,0], [h*cot(oangle),h] ])
+    xy = array([b*fb,h*fh])
+    return rot_and_shift( coords, prot, xy )
 
-def pcoords(oangle,asym,fb,fh):
-    '''unit-area parallelogram with origin angle oangle and asymmetry asym;
+def pcoords(oangle,asym=0,fb=0,fh=0,prot=0):
+    '''unit-area parallelogram with origin angle oangle and asymmetry asym; pre-rotate by prot rads;
        fb, fh are base/height offsets'''
 
     c = (1+asym)/(1-asym)
     a = c
     h = 1 / a
     b = h / sin(oangle)
+    coords = array([ [0,0], [a,0], [a+b*cos(oangle),h], [b*cos(oangle),h] ])
+    xy = array([b*fb,h*fh])
+    return rot_and_shift( coords, prot, xy )
 
-    bo = b*fb
-    ho = h*fh
-    cc = empty((4,2))
-    cc[0,0] = -bo
-    cc[0,1] = -ho
-    cc[1,0] = a-bo
-    cc[1,1] = -ho
-    cc[2,0] = a+b*cos(oangle) - bo
-    cc[2,1] = h - ho
-    cc[3,0] = b*cos(oangle) - bo
-    cc[3,1] = h - ho
-    return cc
+def ngon_coords(n,asym=0,fb=0,fh=0,prot=0):  # vertices on the unit circle
+    coords = empty((n,2))
+    for i in range(n):
+        theta = -2*pi*i/n
+        coords[i,0]=cos(theta)
+        coords[i,1]=sin(theta)
+    xy = array([fb,fh])
+    return rot_and_shift( coords, prot, xy )
 
+def nstar_coords(n,asym=0.5,fb=0,fh=0,prot=0):  # vertices on the unit circle
+    coords = empty((2*n,2))
+    r2=asym
+    for i in range(0,n):
+        theta1 = -2*pi*i/n
+        theta2 = -(2*i+1)*pi/n
+        coords[2*i,0]=cos(theta1)
+        coords[2*i,1]=sin(theta1)
+        coords[2*i+1,0]=r2*cos(theta2)
+        coords[2*i+1,1]=r2*sin(theta2)
+    xy = array([fb,fh])
+    return rot_and_shift( coords, prot, xy )
+        
 def eccen_from_flat(f):  return sqrt(2*f-f*f)
 def eradius(eccen,phi):  return sqrt((1-eccen**2)/(1-(eccen*cos(phi))**2))
 

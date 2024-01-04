@@ -88,7 +88,7 @@ def arcs_from_multi(sd,offset,arc_radius=100,invert=False,
         jstring+=1
         i+=1
         i1=i2
-        if (max_strings<=0) and (i1+array_val(offset,i)) % n >= sd.n(): break
+        if (max_strings<=0) and (i1+array_val(offset,i) >= sd.n()): break
         i2 = (i2+array_val(offset,i)) % sd.n()  # wrap around if necessary
         if (max_strings>0) and (jstring>=max_strings): break
             

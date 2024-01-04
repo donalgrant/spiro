@@ -92,7 +92,8 @@ for theta in linspace(0,2*pi,96):
     z = xyz[:,2]
 
     U = SpiroData()
-    F.plot(U.set_array(x,y,S.p,S.t),color_scheme='cycles',cmap=my_cmap,alpha=.4,fig_dim=fd,dot_size=0.1,save=True,
+    F.plot(U.set_array(x,y,S.p,S.t,S.o,S.s),
+           color_scheme='cycles',cmap=my_cmap,alpha=.4,fig_dim=fd,dot_size=0.1,save=True,
            limits=[-15,15,-15,15],transparent=False,filename=filename)
 
     images.append(imageio.imread(filename))
@@ -105,7 +106,8 @@ for theta in linspace(0,2*pi,96):
     z = xyz[:,2]
 
     U = SpiroData()
-    F.plot(U.set_array(x,y,S.p,S.t),color_scheme='cycles',cmap=my_cmap,alpha=.4,fig_dim=fd,dot_size=0.1,save=True,
+    F.plot(U.set_array(x,y,S.p,S.t,S.o,S.s),
+           color_scheme='cycles',cmap=my_cmap,alpha=.4,fig_dim=fd,dot_size=0.1,save=True,
            limits=[-15,15,-15,15],transparent=False,filename=filename)
 
     images.append(imageio.imread(filename))
@@ -163,7 +165,7 @@ for i in range(nr):
     l=lmax[i]
     ds = 62.5/(l*l)
     
-    F.plot(U.set_array(x,y,S.p,S.t),color_scheme=cs,cmap=my_cmap,alpha=.4,fig_dim=fd,dot_size=ds,save=False,
+    F.plot(U.set_array(x,y,S.p,S.t,S.o,S.s),color_scheme=cs,cmap=my_cmap,alpha=.4,fig_dim=fd,dot_size=ds,save=False,
            limits=[-l,l,-l,l],transparent=False,filename=filename)
 
     images.append(imageio.imread(filename))
@@ -175,7 +177,8 @@ for i in range(nr):
 
     U = SpiroData()
 
-    F.plot(U.set_array(x,y,T.p,T.t),color_scheme=cs,cmap='pale_pink',alpha=.2,fig_dim=fd,dot_size=ds*10,save=True,
+    F.plot(U.set_array(x,y,T.p,T.t,S.o,S.s),
+           color_scheme=cs,cmap='pale_pink',alpha=.2,fig_dim=fd,dot_size=ds*10,save=True,
            limits=[-l,l,-l,l],transparent=False,new_fig=False,filename=filename)
 
     images.append(imageio.imread(filename))

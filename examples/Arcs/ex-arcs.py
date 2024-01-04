@@ -37,7 +37,7 @@ T = cIc(Ring(10),Wheel(4,3.5),loops=100,ppl=1283)
 cs='t-waves'
 
 offsets=[658]
-F.plot(arcs_from_multi(T,offsets),
+F.plot(arcs_from_multi(T,offsets,max_strings=200),
        cmap='Reds',color_scheme=cs,save=True)
 
 ##
@@ -103,6 +103,7 @@ for t in [True,False]:
     F.caption(f'arc_radius={arc_radius}; invert={t}')
     
     offsets=[658]
+    
     F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
            cmap='Reds',color_scheme=cs,caption=f'{offsets}',new_fig=False)
     
@@ -117,7 +118,7 @@ for t in [True,False]:
     offsets.append(174)
     F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
            cmap=cmap3,color_scheme=cs,caption=f'{offsets}',new_fig=False)
-    
+
     offsets=[657,852]
     F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
            cmap='summer',color_scheme=cs,caption=f'{offsets}',new_fig=False)
@@ -134,4 +135,4 @@ for t in [True,False]:
     F.plot(arcs_from_multi(T,offsets,arc_radius,invert=t),
            cmap='terrain',color_scheme=cs,caption=f'{offsets}',new_fig=False)
     
-    F.save_fig(f'arc-poster-{arc_radius}-{t}.png')
+    F.save_fig(f'arc-poster-{arc_radius}-{t}-revised.png')
