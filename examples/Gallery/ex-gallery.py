@@ -326,3 +326,17 @@ for i in range(npanels):
           new_fig=True if i==0 else False)
 
 F.save_fig(filename='multi-cmap-panels.png')
+
+###  Frame is Spiro on Spiro, with double arcs drawn on frame
+
+S=SpiroData()
+T = cIc(Ring(9),wheel=Wheel(3,3),ppl=540/9,loops=1,inside=True)
+for i in range(T.n()):
+    W = cIc(Ring(9),wheel=Wheel(3,6*i/T.n()),ppl=540/9,loops=1,inside=True)
+    S.add(W.disp(T.xy(i)).select(slice(i,None,1)))
+X=on_frame(S,scale=10,oangle=2,first=S.n()//2,fh=0,fb=0,n=S.n()//6,
+           asym=0,orient_follow=1,orient=0, polyfunc=ngon_coords,
+           arc_angle=[-pi/3,pi/4],pts=300)
+
+figure(X,'phase','turbo')
+
