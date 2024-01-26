@@ -4,8 +4,6 @@ from Ellipse import *
 import numpy as np
 from numpy import array,linspace,fmod,arange,sin,cos
 
-# add arc parameters and relpace line with arc call
-
 def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyfunc=None,  # tcoords or pcoords
                        pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0):
     '''polyfunc is a function providing vertex coordinates to draw on the frame.  It has five

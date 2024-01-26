@@ -39,6 +39,10 @@ pinks = cmap_from_list(clist,'pinks')
 clist = [ 'xkcd:'+i for i in ['lavender pink','pale mauve','pinky purple','purpleish','lavender pink'] ]
 pale_pink = cmap_from_list(clist,'pale_pink')
 
+clist = [ 'xkcd:'+i for i in ['red','crimson','fire engine red','dull red','carnation',
+                              'lipstick red','bright red','blood red','red'] ]
+pretty_reds = cmap_from_list(clist,'pretty_reds')
+
 def cmap_list():
     return ['pretty_blues','wreath','gold','emerald_woman','pinks','pale_pink',
             'cmap1','cmap2','cmap3',
