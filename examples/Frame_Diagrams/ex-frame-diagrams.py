@@ -333,6 +333,7 @@ S = SpiroData()
 n_positions=25
 T=cIc(Ring(9),W0,ppl=n_positions,loops=1,inside=True)
 T.add(cIc(Ring(6),W0,ppl=n_positions//2+1,loops=1,inside=True))
+T.add(cIc(Ring(3),W0,ppl=n_positions//4+1,loops=1,inside=True))
 
 def_factor=10
 scale=0.5
@@ -428,6 +429,26 @@ for j in linspace(0.2,0.8,4):
                    arc_angle=aa,pts=pts,object=4,prot=0))
     i += 1
 
+
+i += 1
+for j in linspace(-0.5,-0.8,2):
+    S.add(on_frame(T,scale=1,oangle=4,first=i,fh=0,fb=0,n=1,
+                   asym=j,orient_follow=of,orient=ao, polyfunc=nstar_coords,
+                   arc_angle=aa,pts=pts,object=4,prot=0))
+    i += 1
+    
+for j in linspace(-0.5,-0.8,2):
+    S.add(on_frame(T,scale=1,oangle=6,first=i,fh=0,fb=0,n=1,
+                   asym=j,orient_follow=of,orient=ao, polyfunc=nstar_coords,
+                   arc_angle=aa,pts=pts,object=4,prot=0))
+    i += 1
+    
+for j in [-pi/2,pi/2]:
+    S.add(on_frame(T,scale=1,oangle=4,first=i,fh=0,fb=0,n=1,
+                   asym=-0.5,orient_follow=of,orient=ao, polyfunc=nstar_coords,
+                   arc_angle=j,pts=pts,object=4,prot=0))
+    i += 1
+    
 F.plot(T,no_frame=False,dot_size=20,color_scheme='cyan',cmap='turbo')
 F.plot(S,color_scheme='orange',cmap='turbo',alpha=1,fig_dim=fd,dot_size=.1,new_fig=False)
 F.save_fig(filename='composite-diagram.png')

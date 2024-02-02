@@ -19,7 +19,7 @@ def read_SD(filename):
         U = pickle.load(f)
     return U
 
-def rotate(x0,y0,xr,yr,angle):
+def rotate(x0,y0,xr,yr,angle,object=0,segment=0):
     '''rotate the coordinate (xr,yr) about the
     origin (x0,y0) by angle
     '''
@@ -40,6 +40,8 @@ def rotate(x0,y0,xr,yr,angle):
     sd.y = y0+r*cos(p)
     sd.p = p
     sd.t = t
+    sd.o = t*0+object
+    sd.s = t*0+segment
         
     return sd
 

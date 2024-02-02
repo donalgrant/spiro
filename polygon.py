@@ -65,6 +65,8 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
     sd.y = ys + time_factor * t * sin(A) + b * cos(p) 
     sd.p = p
     sd.t = t
+    sd.s = sd.t*0
+    sd.o = sd.t*0
     
     return sd
 

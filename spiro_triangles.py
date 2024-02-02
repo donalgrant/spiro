@@ -5,7 +5,7 @@ import numpy as np
 from numpy import array,linspace,fmod,arange,sin,cos
 
 def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyfunc=None,  # tcoords or pcoords
-                       pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0):
+                       pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0,vertex_order=None):
     '''polyfunc is a function providing vertex coordinates to draw on the frame.  It has five
     parameters: two shape parameters (e.g., opening angle and asymmetry),
                 two offset parameters to specify the distance from the frame to draw the object, and
@@ -27,9 +27,13 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
         pr = array_val(prot,k)
         ph = array_val(sd.p,i)
         T.load(polyfunc(oa,ay,fb=fbk,fh=fhk,prot=pr),ph)
-        st = SpiroData() # for the triangle sides
+        st = SpiroData() # for the connections between vertices
         tt = 0
-        for j in range(T.n()):
+        nv=T.n()
+        if not vertex_order is None:
+            T=T.select(vertex_order)
+            nv=T.n()-1
+        for j in range(nv):
             npts=array_val(pts,k*T.n()+j)
             st.load(arc_between_pts(array([ T.xy(j),T.xy(j+1) ]),
                                     arc_subtended=array_val(arc_angle,k*T.n()+j),npts=npts),
