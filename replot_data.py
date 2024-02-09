@@ -52,7 +52,7 @@ cs   = []
 
 if args.new_cmap is not None:
     clist = [ 'xkcd:'+i for i in args.new_cmap.split(',') ]
-    cmap.extend(cmap_from_list(clist,cname='new_cmap').name)
+    cmap.extend([cmap_from_list(clist,cname='new_cmap').name])
 
 if args.all_cmaps:  cmap.extend(cmap_list())
 if args.all_cs:       cs.extend(cs_list())
@@ -82,7 +82,8 @@ for data_file in args.file:
     print(f'replotting {data_file}')
     S = SpiroData.read(data_file)
     for cmap_i in cmap:
-        cmap_name = cmap_name.name if hasattr(cmap_i,'name') else cmap_i
+        cmap_name = cmap_i.name if hasattr(cmap_i,'name') else cmap_i
+        print("cmap_name = ",cmap_name)
         for cs_i in cs:
             filename=f'{data_file}-{cmap_name}-{cs_i}-ss{ss}-fd{fd}-cd{dither}.png'
             print(f'Plotting and saving {filename} with dot_size={ds}, alpha={alpha}')
