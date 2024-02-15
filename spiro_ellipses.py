@@ -43,7 +43,8 @@ def ellipses_from_coord(sd,coord=array([0,0]),offset=100,npts=500,
 
         s = ecoords(e,n)*a
         st = SpiroData()
-        st.load(s,phase,object=array_val(object,i),segment=i).move(oM*a,om*b).rotate(o-orient).move(x0,y0)
+        st.load(s,phase,object=array_val(object,i),segment=i,
+                frame_x=coord[0],frame_y=coord[1]).move(oM*a,om*b).rotate(o-orient).move(x0,y0)
             
         S.add(st)
         
@@ -77,8 +78,8 @@ def ellipses_on_frame(sd,major,eccen,orient,pts,first=0,n=None,object=0):
     for i in range(first,last):
         s = ecoords(array_val(eccen,i),array_val(pts,i))*array_val(major,i)
         st = SpiroData()
-#        print(f'e_o_f load {i} with object={array_val(object,i)}, segment={i}')
-        st.load(s,array_val(sd.p,i),object=array_val(object,i),segment=i).rotate(array_val(orient,i)).disp(sd.xy(i))
+        st.load(s,array_val(sd.p,i),object=array_val(object,i),segment=i,
+                frame_x=sd.xy(i)[0],frame_y=sd.xy(i)[1]).rotate(array_val(orient,i)).disp(sd.xy(i))
         S.add(st)
     return S
 
@@ -114,7 +115,8 @@ def ellipses_between_frames(s1,s2,step1,step2,
         
         s = ecoords(e,np)*a
         st = SpiroData()
-        st.load(s,ph,object=array_val(object,k),segment=k).move(oM*a,om*b).rotate(oo-o).disp( (1-fb)*c1 + fb*c2 )
+        st.load(s,ph,object=array_val(object,k),segment=k,
+                frame_x=c1[0],frame_y=c1[1]).move(oM*a,om*b).rotate(oo-o).disp( (1-fb)*c1 + fb*c2 )
         S.add(st)
         
         i1 += array_val(step1,k)

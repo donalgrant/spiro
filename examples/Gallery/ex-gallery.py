@@ -340,3 +340,23 @@ X=on_frame(S,scale=10,oangle=2,first=S.n()//2,fh=0,fb=0,n=S.n()//6,
 
 figure(X,'phase','turbo')
 
+###
+
+n = 300
+a = 1.35
+b = 0.25
+x = np.zeros(n)
+y = np.zeros(n)
+
+for k in range(n-1):
+    x[k+1] = 1.0 - a*x[k]*x[k] + y[k]
+    y[k+1] = b*x[k]
+
+W = SpiroData()
+W.set_array(x,y,x*0,linspace(0,n,n),x*0+1,x*0+1)
+
+T = on_frame(W.subsample(1),scale=np.linspace(1.0,1.0,n),oangle=3,first=0,n=n-1,
+             asym=0.2,orient_follow=0,orient=2*W.neighbor_distances(),polyfunc=nstar_coords,
+             arc_angle=-pi/4,pts=np.linspace(150,150,3*n,dtype=int),object=0,prot=0)
+
+figure(T,'time','turbo')

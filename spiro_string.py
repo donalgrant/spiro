@@ -9,7 +9,8 @@ def string_offset_pairs(sd,offset=1000,step=50,line_pts=500,object=0):
     st = SpiroData()
     for i in range(0,sd.n()-offset,step):
         st.load(line(array([ [sd.x[i],sd.y[i]], [sd.x[i+offset],sd.y[i+offset]] ]),line_pts),
-                sd.p[i],object=array_val(object,i),segment=i)
+                sd.p[i],object=array_val(object,i),segment=i,
+                frame_x=sd.x[i],frame_y=sd.y[i])
         
     return st
 
@@ -19,7 +20,8 @@ def string_dispersing_pairs(sd,offset=1000,step=50,step2=100,line_pts=500,object
     i2=i1+offset
     while i2<sd.n():
         st.load(line(array([ [sd.x[i1],sd.y[i1]], [sd.x[i2],sd.y[i2]] ]),line_pts),
-                sd.p[i1],object=array_val(object,i1//step),segment=i1//step)
+                sd.p[i1],object=array_val(object,i1//step),segment=i1//step,
+                frame_x=sd.x[i1],frame_y=sd.y[i1])
         i1+=step
         i2+=step2
         
@@ -32,7 +34,8 @@ def string_dispersing_links(sd,offset=1000,step0=50,step=1,line_pts=500,object=0
     ip=step0
     while i2<sd.n():
         st.load(line(array([ [sd.x[i1],sd.y[i1]], [sd.x[i2],sd.y[i2]] ]),line_pts),
-                sd.p[i1],object=array_val(object,ip//step),segment=ip//step)
+                sd.p[i1],object=array_val(object,ip//step),segment=ip//step,
+                frame_x=sd.x[i1],frame_y=sd.y[i1])
         i1=i2
         ip+=step
         i2=i1+offset
@@ -53,7 +56,8 @@ def strings_from_coord(sd,coord=array([0,0]),offset=100,line_pts=500,nLines=0,i2
         i2=i*offset+initial_i2
         if i2>=sd.n():  break
         st.load(line(array([ [x0,y0], [sd.x[i2],sd.y[i2]] ]),line_pts),
-                sd.p[i2],object=array_val(object,i),segment=i)
+                sd.p[i2],object=array_val(object,i),segment=i,
+                frame_x=x0,frame_y=y0)
         
     return st
 
@@ -67,13 +71,15 @@ def closed_paths(sd,offsets,skip=1,first=0,n=0,line_pts=500,object=0):
         i0=i1
         for o in offsets:
             st.load(line(array([ sd.xy(i1), sd.xy(i1+o) ]),line_pts),
-                    sd.p[i1%sd.n()], object=array_val(object,j), segment=seg_count)
+                    sd.p[i1%sd.n()], object=array_val(object,j), segment=seg_count,
+                    frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
             seg_count+=1
             i1 += o
 
         # now close the loop
         st.load(line(array([ sd.xy(i1),sd.xy(i0) ]),line_pts),
-                sd.p[i1%sd.n()], object=array_val(object,j), segment=seg_count)
+                sd.p[i1%sd.n()], object=array_val(object,j), segment=seg_count,
+                frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
         seg_count+=1
         j+=1
         
@@ -102,7 +108,8 @@ def strings_from_multi(sd,offset_array,line_pts=500,max_strings=0,first=0,object
     jstring=0
     while True:
         st.load(line(array([ [sd.x[i1],sd.y[i1]], [sd.x[i2],sd.y[i2]] ]),line_pts),
-                sd.p[i1], object=array_val(object,jstring), segment=jstring)
+                sd.p[i1], object=array_val(object,jstring), segment=jstring,
+                frame_x=sd.x[i1],frame_y=sd.y[i1])
         jstring+=1
         i+=1
         i1=i2

@@ -329,6 +329,7 @@ F.plot(S,color_scheme='red',cmap='turbo',alpha=.4,fig_dim=fd,dot_size=1,save=Tru
 
 ###  Composite diagram
 
+'''
 S = SpiroData()
 n_positions=25
 T=cIc(Ring(9),W0,ppl=n_positions,loops=1,inside=True)
@@ -448,6 +449,141 @@ for j in [-pi/2,pi/2]:
                    asym=-0.5,orient_follow=of,orient=ao, polyfunc=nstar_coords,
                    arc_angle=j,pts=pts,object=4,prot=0))
     i += 1
+
+'''
+
+F = SpiroFig()
+S = SpiroData()
+n_positions=25
+T=cIc(Ring(9),W0,ppl=n_positions,loops=1,inside=True)
+T.add(cIc(Ring(6),W0,ppl=n_positions//2+1,loops=1,inside=True))
+T.add(cIc(Ring(3),W0,ppl=n_positions//4+1,loops=1,inside=True))
+
+hd=0
+fd = 10*(1+2*hd) # figure dimensions
+
+def_factor=10
+scale=0.5
+nr=10
+oa=pi/3 # 2*pi/nr
+ao=0 # linspace(0,2*pi,n_positions)
+asym=0.
+arc_angle=0
+of=1
+pts=[50,50,50,50]*def_factor
+fh=0.
+fb=0.
+i=1
+for nr in range(1,6):
+    for j in range(nr):
+        S.add(triangles_on_frame(T,scale=scale,oangle=oa,first=i,fh=fh,fb=fb,n=1,
+                                asym=asym,orient_follow=of,orient=ao,
+                                arc_angle=arc_angle,pts=pts,object=i,prot=-2*j*pi/nr))
+    i += 1
+    
+for nr in range(1,6):
+    for j in range(nr):
+        S.add(pars_on_frame(T,scale=scale,oangle=oa,first=i,fh=fh,fb=fb,n=1,
+                            asym=asym,orient_follow=of,orient=ao,
+                            arc_angle=arc_angle,pts=pts,object=i,prot=-2*j*pi/nr))
+    i += 1
+    
+for nr in range(3,6):
+    for j in range(nr):
+        S.add(pars_on_frame(T,scale=scale,oangle=oa,first=i,fh=fh,fb=fb,n=1,
+                            asym=asym,orient_follow=of,orient=ao,
+                            arc_angle=pi/nr,pts=pts,object=i,prot=-2*j*pi/nr))
+    i += 1
+    
+scale=1/2
+oa=pi/2
+asym=0
+of=1
+ao=0
+aa=0
+S.add(triangles_on_frame(T,scale=scale,oangle=oa,first=i,fh=0,fb=1/scale/sqrt(2),n=1,
+                    asym=asym,orient_follow=of,orient=ao,
+                    arc_angle=aa,pts=pts,object=4,prot=pi/4))
+S.add(triangles_on_frame(T,scale=scale,oangle=oa,first=i,fh=1/scale/sqrt(2),fb=0,n=1,
+                    asym=asym,orient_follow=of,orient=ao,
+                    arc_angle=aa,pts=pts,object=4,prot=-pi/4))
+S.add(triangles_on_frame(T,scale=scale,oangle=oa,first=i,fh=-1/scale/sqrt(2),fb=0,n=1,
+                    asym=asym,orient_follow=of,orient=ao,
+                    arc_angle=aa,pts=pts,object=4,prot=3*pi/4))
+S.add(triangles_on_frame(T,scale=scale,oangle=oa,first=i,fh=0,fb=-1/scale/sqrt(2),n=1,
+                    asym=asym,orient_follow=of,orient=ao,
+                    arc_angle=aa,pts=pts,object=4,prot=-3*pi/4))
+i += 1
+
+for j in range(5,9):
+    S.add(on_frame(T,scale=1,oangle=j,first=i,fh=0,fb=0,n=1,
+                   asym=0,orient_follow=of,orient=ao, polyfunc=ngon_coords,
+                   arc_angle=aa,pts=pts,object=4,prot=0))
+    i += 1
+
+for j in linspace(pi/6,pi/1.5,4):
+    S.add(on_frame(T,scale=1,oangle=6,first=i,fh=0,fb=0,n=1,
+                   asym=0,orient_follow=of,orient=ao, polyfunc=ngon_coords,
+                   arc_angle=-j,pts=pts,object=4,prot=0))
+    i += 1
+
+for j in range(3,6):
+    S.add(on_frame(T,scale=1,oangle=j,first=i,fh=0,fb=0,n=1,
+                   asym=0,orient_follow=of,orient=ao, polyfunc=ngon_coords,
+                   arc_angle=-pi/2,pts=pts,object=4,prot=0))
+    S.add(on_frame(T,scale=1,oangle=j,first=i,fh=0,fb=0,n=1,
+                   asym=0,orient_follow=of,orient=ao, polyfunc=ngon_coords,
+                   arc_angle=pi/2,pts=pts,object=4,prot=0))
+    i += 1
+    
+    S.add(on_frame(T,scale=1,oangle=j,first=i,fh=0,fb=0,n=1,
+                   asym=0,orient_follow=of,orient=ao, polyfunc=ngon_coords,
+                   arc_angle=-pi,pts=pts,object=4,prot=0))
+    S.add(on_frame(T,scale=1,oangle=j,first=i,fh=0,fb=0,n=1,
+                   asym=0,orient_follow=of,orient=ao, polyfunc=ngon_coords,
+                   arc_angle=pi,pts=pts,object=4,prot=0))
+    i += 1
+
+for j in range(3,7):
+    S.add(on_frame(T,scale=1,oangle=j,first=i,fh=0,fb=0,n=1,
+                   asym=0.5,orient_follow=of,orient=ao, polyfunc=nstar_coords,
+                   arc_angle=aa,pts=pts,object=4,prot=0))
+    i += 1
+
+for j in linspace(0.2,0.8,4):
+    S.add(on_frame(T,scale=1,oangle=4,first=i,fh=0,fb=0,n=1,
+                   asym=j,orient_follow=of,orient=ao, polyfunc=nstar_coords,
+                   arc_angle=aa,pts=pts,object=4,prot=0))
+    i += 1
+
+i += 1
+for j in linspace(-0.5,-0.8,2):
+    S.add(on_frame(T,scale=1,oangle=4,first=i,fh=0,fb=0,n=1,
+                   asym=j,orient_follow=of,orient=ao, polyfunc=nstar_coords,
+                   arc_angle=aa,pts=pts,object=4,prot=0))
+    i += 1
+    
+S.add(on_frame(T,scale=1,oangle=6,first=i,fh=0,fb=0,n=1,
+               asym=-0.8,orient_follow=of,orient=ao, polyfunc=nstar_coords,
+               arc_angle=aa,pts=pts,object=4,prot=0))
+i += 1
+    
+S.add(on_frame(T,scale=1,oangle=4,first=i,fh=0,fb=0,n=1,
+               asym=-0.5,orient_follow=of,orient=ao, polyfunc=nstar_coords,
+               arc_angle=-pi/2,pts=pts,object=4,prot=0))
+i += 1
+    
+S.add(on_frame(T,scale=1,oangle=7,first=i,fh=0,fb=0,n=1,
+               asym=0,orient_follow=of,orient=ao, polyfunc=ngon_coords,
+               vertex_order=[0,3,6,2,5,1,4,0],
+               arc_angle=0,pts=pts,object=4,prot=0))
+i += 1
+    
+S.add(on_frame(T,scale=1,oangle=7,first=i,fh=0,fb=0,n=1,
+               asym=0,orient_follow=of,orient=ao, polyfunc=ngon_coords,
+               vertex_order=[0,3,6,2,5,1,4,0,2,4,6,1,3,5,0,1,2,3,4,5,6,0],
+               arc_angle=-pi/6,pts=pts,object=4,prot=0))
+i += 1
     
 F.plot(T,no_frame=False,dot_size=20,color_scheme='cyan',cmap='turbo')
 F.plot(S,color_scheme='orange',cmap='turbo',alpha=1,fig_dim=fd,dot_size=.1,new_fig=False)

@@ -31,12 +31,15 @@ def arcs_from_coord(sd,coord=array([0,0]),offset=100,npts=500,arc_radius=30,inve
             segment = i+j*nLines
             
             if d <= 2*r:
-                st.load(arc(end_pt,r,invert=invert,npts=npts),phase,object=object,segment=segment)
+                st.load(arc(end_pt,r,invert=invert,npts=npts),phase,
+                        object=object,segment=segment,frame_x=sd.x[i2],frame_y=sd.y[i2])
             else:
                 if arc_always:
-                    st.load(arc(end_pt,d/2,invert=invert,npts=npts),phase,object=object,segment=segment)
+                    st.load(arc(end_pt,d/2,invert=invert,npts=npts),phase,
+                            object=object,segment=segment,frame_x=sd.x[i2],frame_y=sd.y[i2])
                 elif not arc_only:
-                    st.load(line(end_pt,pts),phase,object=object,segment=segment)
+                    st.load(line(end_pt,pts),phase,
+                            object=object,segment=segment,frame_x=sd.x[i2],frame_y=sd.y[i2])
                 else:
                     pass
         
@@ -74,14 +77,17 @@ def arcs_from_multi(sd,offset,arc_radius=100,invert=False,
         
         if d <= 2*arc_radius:
             st.load(arc(end_pt,arc_radius,invert=invert,npts=line_pts),
-                    phase,object=array_val(object,jstring),segment=jstring)
+                    phase,object=array_val(object,jstring),segment=jstring,
+                    frame_x=sd.x[i2],frame_y=sd.y[i2])
         else:
             if arc_always:
                 st.load(arc(end_pt,d/2,invert=invert,npts=line_pts),
-                        phase,object=array_val(object,jstring),segment=jstring)
+                        phase,object=array_val(object,jstring),segment=jstring,
+                    frame_x=sd.x[i2],frame_y=sd.y[i2])
             elif not arc_only:
                 st.load(line(end_pt,line_pts),
-                        phase,object=array_val(object,jstring),segment=jstring)
+                        phase,object=array_val(object,jstring),segment=jstring,
+                    frame_x=sd.x[i2],frame_y=sd.y[i2])
             else:
                 pass
 
@@ -109,7 +115,8 @@ def arcs_on_frame(sd,radius,subtended,offset,pts,centers,first=0,n=None,object=0
     for i in range(first,last):
         s = arc_on_center(sd.xy(i),array_val(radius,i),array_val(subtended,i),
                           array_val(offset,i),array_val(pts,i),array_val(centers,i))
-        st.load(s,sd.p[i],object=array_val(object,i-first),segment=i)
+        st.load(s,sd.p[i],object=array_val(object,i-first),segment=i,
+                frame_x=sd.xy(i)[0],frame_y=sd.xy(i)[1])
     return st
 
 def closed_arcs_orig(sd,offsets,radii,invert=True,skip=1,first=0,n=0,
@@ -122,12 +129,14 @@ def closed_arcs_orig(sd,offsets,radii,invert=True,skip=1,first=0,n=0,
         i0=i1
         for o in offsets:
             st.load(arc(array([ sd.xy(i1), sd.xy(i1+o) ]),array_val(radii,o),
-                        invert=array_val(invert,o),npts=line_pts), sd.p[i1%sd.n()])
+                        invert=array_val(invert,o),npts=line_pts), sd.p[i1%sd.n()],
+                    frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
             i1 += o
 
         # now close the loop
         st.load(arc(array([ sd.xy(i1),sd.xy(i0) ]),array_val(radii,o+1),
-                     invert=array_val(invert,o+1),npts=line_pts), sd.p[i1%sd.n()])
+                     invert=array_val(invert,o+1),npts=line_pts), sd.p[i1%sd.n()],
+                frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
         j+=1
         
         if (n<=0) and (i0+skip)>=sd.n(): break
@@ -149,13 +158,15 @@ def closed_arcs(sd,offsets,radii,invert=True,skip=1,first=0,n=0,
             o = array_val(offsets,k)
             st.load(arc(array([ sd.xy(i1), sd.xy(i1+o) ]),array_val(radii,k),
                         invert=array_val(invert,k),npts=line_pts),
-                    sd.p[i1%sd.n()], object=array_val(object,j), segment=j*(1+nk)+k)
+                    sd.p[i1%sd.n()], object=array_val(object,j), segment=j*(1+nk)+k,
+                    frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
             i1 += o
 
         # now close the loop
         st.load(arc(array([ sd.xy(i1),sd.xy(i0) ]),array_val(radii,k+1),
                      invert=array_val(invert,k+1),npts=line_pts),
-                sd.p[i1%sd.n()], object=array_val(object,j), segment=j*(1+nk)+k+1)
+                sd.p[i1%sd.n()], object=array_val(object,j), segment=j*(1+nk)+k+1,
+                 frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
         j+=1
         
         if (n<=0) and (i0+skip)>=sd.n(): break
@@ -178,7 +189,8 @@ def closed_subarcs(sd,offsets,sub_angle,invert=True,skip=1,first=0,n=0,line_pts=
             radius = dist(end_points)/ 2 / sin(array_val(sub_angle,k)/2)
             phase = linspace(sd.p[i1%sd.n()],sd.p[(i1+o)%sd.n()],line_pts) if interp_phase else sd.p[i1%sd.n()]
             st.load(arc(end_points,radius,invert=array_val(invert,k),npts=line_pts),phase,
-                    object=array_val(object,j),segment=j*(nk+1)+k)
+                    object=array_val(object,j),segment=j*(nk+1)+k,
+                    frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
 
             i1 += o
 
@@ -187,7 +199,8 @@ def closed_subarcs(sd,offsets,sub_angle,invert=True,skip=1,first=0,n=0,line_pts=
         radius = dist(end_points)/ 2 / sin(array_val(sub_angle,k+1)/2)
         phase = linspace(sd.p[i1%sd.n()],sd.p[i0%sd.n()],line_pts) if interp_phase else sd.p[i1%sd.n()]
         st.load(arc(end_points,radius,invert=array_val(invert,k+1),npts=line_pts),phase,
-                object=array_val(object,j),segment=j*(nk+1)+k+1)
+                object=array_val(object,j),segment=j*(nk+1)+k+1,
+                frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
 
         j+=1
         
@@ -207,13 +220,15 @@ def snake(nSnakes,end_pts,sub_angle,invert,line_pts,ph0,phf,object=0):
         ep = array([ W.xy(j), W.xy(j+1) ])
         ph = linspace(phase[j],phase[j+1],line_pts)
         radius = dist(ep)/ 2 / sin(sub_angle/2)
-        S.load(arc(ep,radius,invert=inv_snake,npts=line_pts),ph,object=array_val(object,j),segment=j)
+        S.load(arc(ep,radius,invert=inv_snake,npts=line_pts),ph,object=array_val(object,j),segment=j,
+                    frame_x=W.xy(j)[0],frame_y=W.xy(j)[1])
         inv_snake = not inv_snake
     # and final arc to connect to the end
     ep = array([ W.xy(W.n()-1), end_pts[1] ])
     ph = linspace(phase[W.n()-1],phf,line_pts)
     radius = dist(ep)/ 2 / sin(sub_angle/2)
-    S.load(arc(ep,radius,invert=inv_snake,npts=line_pts),ph,object=array_val(object,j+1),segment=j+1)
+    S.load(arc(ep,radius,invert=inv_snake,npts=line_pts),ph,object=array_val(object,j+1),segment=j+1,
+           frame_x=W.xy(W.n()-1)[0],frame_y=W.xy(W.n()-1)[1])
     return S
 
 def closed_snakes(sd,offsets,sub_angle_1,sub_angle_2,invert=True,skip=1,first=0,
@@ -238,7 +253,8 @@ def closed_snakes(sd,offsets,sub_angle_1,sub_angle_2,invert=True,skip=1,first=0,
             ph0 = sd.p[i1    %sd.n()]
             phf = sd.p[(i1+o)%sd.n()] if interp_phase else ph0 
             st.add(snake(nSnakes+1,end_points,subs[j],invert,line_pts,ph0,phf),
-                   object=array_val(object,j),segment=k+j*(1+nk))
+                   object=array_val(object,j),segment=k+j*(1+nk),
+                   frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
             i1 += o
 
         # now close the loop
@@ -246,7 +262,8 @@ def closed_snakes(sd,offsets,sub_angle_1,sub_angle_2,invert=True,skip=1,first=0,
         ph0 = sd.p[i1%sd.n()]
         phf = sd.p[i0%sd.n()] if interp_phase else ph0 
         st.add(snake(nSnakes+1,end_points,subs[j],invert,line_pts,ph0,phf),
-               object=array_val(object,j),segment=1+k+j*(1+nk))
+               object=array_val(object,j),segment=1+k+j*(1+nk),
+               frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
 
         j+=1
         
@@ -272,7 +289,8 @@ def rotating_arcs(sd,arc_radius=100,rotation_rate=1,arc_subtended=None,
     return arcs_on_frame(sd,arc_radius,arc_subtended,offset,line_pts,0,object=object)
 
 def connected_bubbles(sd,pts=300,object=0):
-    return arcs_on_frame(sd,sd.neighbor_distances()/2,2*pi,pi-sd.directions(),pts,0,n=sd.n()-1,object=object)
+    return arcs_on_frame(sd,sd.neighbor_distances()/2,2*pi,pi-sd.directions(),
+                         pts,0,n=sd.n()-1,object=object)
 
 def ribbon(sd,width,arc_subtended=pi/4,twists=0,twist_start=0,pts=300,trim=False,object=0):
     radius = width/arc_subtended
