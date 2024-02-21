@@ -70,4 +70,74 @@ def directed_pars(sd,skip=1,offset=None,scale=1.0,oangle=pi/3,
     return pars_on_frame(sd,skip,scale,oangle,asym=asym,pts=pts,first=first,n=n,
                          orient_follow=offset,orient=angle_offset,object=object)
 
+def crosses_on_frame(sd,asym=0,top_ratio=1.0,bottom_ratio=1.0,skip=1,scale=1,orient=0,
+                     pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0):
+    '''draw a set of four rectangles arranged in the shape of a cross:
+       asym gives the rectangular ratio for the cross-pieces (left and right are equal)
+       top_ratio is the size of top rectangle relative to cross-piece
+       bottom_ratio is the size of the bottom rectangle relative to cross-piece
+    '''
 
+    oa=pi/2
+
+    n = sd.n() if n is None else n
+
+    tbr = ((1+asym)/(1-asym))
+
+    # to calculate length of arrays, use n divided by the average of the skip array (if an array), rounding down
+
+    skip_n = skip if np.isscalar(skip) else np.average(skip)
+    range_n = int(n/skip_n)
+    
+    tt = array( [array_val(tbr,j)*array_val(top_ratio,   j) for j in range(range_n)] )
+    bb = array( [array_val(tbr,j)*array_val(bottom_ratio,j) for j in range(range_n)] )
+
+    st = array( [array_val(scale,j)*array_val(top_ratio,   j) for j in range(range_n)] )
+    sb = array( [array_val(scale,j)*array_val(bottom_ratio,j) for j in range(range_n)] )
+    
+    tta = (tt-1)/(tt+1)
+    bba = (bb-1)/(bb+1)
+
+    S=SpiroData()
+
+    p=np.zeros(0,dtype=int)
+    for j in range(range_n):
+        nj=array_val(pts,j)
+        ttj = array_val(tt,j)
+        p=np.append(p,array( [int(nj*ttj),int(nj/ttj),int(nj*ttj),0] ))
+    
+    S.add(on_frame(sd,scale=st,oangle=oa,first=first,n=n,skip=skip,fh=-1,fb=-1,
+                   asym=tta,orient_follow=orient_follow,orient=orient,polyfunc=pcoords,
+                   arc_angle=arc_angle,pts=p,object=object,prot=-pi/2))
+
+    p=np.zeros(0,dtype=int)
+    for j in range(range_n):
+        nj=array_val(pts,j)
+        tbj = array_val(tbr,j)
+        p=np.append(p,array( [int(nj*tbj),int(nj/tbj),int(nj*tbj),0] ))
+        
+    S.add(on_frame(sd,scale=scale,oangle=oa,first=first,n=n,skip=skip,fh=-1,fb=0,
+                   asym=asym,orient_follow=orient_follow,orient=orient,polyfunc=pcoords,
+                   arc_angle=arc_angle,pts=p,object=object,prot=pi))
+
+    p=np.zeros(0,dtype=int)
+    for j in range(range_n):
+        nj=array_val(pts,j)
+        bbj = array_val(bb,j)
+        p=np.append(p,array( [int(nj*bbj),int(nj/bbj),int(nj*bbj),0] ))
+
+    S.add(on_frame(sd,scale=sb,oangle=oa,first=first,n=n,skip=skip,fh=0,fb=0,
+                   asym=bba,orient_follow=orient_follow,orient=orient,polyfunc=pcoords,
+                   arc_angle=arc_angle,pts=p,object=object,prot=pi/2))
+
+    p=np.zeros(0,dtype=int)
+    for j in range(range_n):
+        nj=array_val(pts,j)
+        tbj = array_val(tbr,j)
+        p=np.append(p,array( [int(nj*tbj),int(nj/tbj),int(nj*tbj),0] ))
+
+    S.add(on_frame(sd,scale=scale,oangle=oa,first=first,n=n,skip=skip,fh=0,fb=-1,
+                   asym=asym,orient_follow=orient_follow,orient=orient,polyfunc=pcoords,
+                   arc_angle=arc_angle,pts=p,object=object,prot=0))
+
+    return S

@@ -67,6 +67,8 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
     sd.t = t
     sd.s = sd.t*0
     sd.o = sd.t*0
+    sd.fx = linspace(x1,x2,sd.x.shape[0]) # should really include guards, but usually subtle effect
+    sd.fy = linspace(y1,y2,sd.y.shape[0]) # ditto
     
     return sd
 

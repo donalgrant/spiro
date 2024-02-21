@@ -1,5 +1,6 @@
-from numpy import sin,cos,tan,empty,array,matmul,linspace,full,abs,pi,sqrt,arctan2,arccos,arcsin
+from numpy import sin,cos,tan,empty,array,matmul,linspace,full,abs,pi,sqrt,arctan2,arccos,arcsin,diff
 from scipy.spatial.transform import Rotation as R
+from scipy.interpolate import make_interp_spline
 
 def rot_2D(angle):
     '''Matrix will rotate a coordinate by angle_rads cw'''
@@ -31,6 +32,9 @@ def rotX(xyz,theta): return rot3D(xyz,rotmat3D(array([1,0,0]),theta))
 def rotY(xyz,theta): return rot3D(xyz,rotmat3D(array([0,1,0]),theta))
 def rotZ(xyz,theta): return rot3D(xyz,rotmat3D(array([0,0,1]),theta))
 
+def path_diffs(x,y): return sqrt(diff(x)**2+diff(y)**2)
+def path_length(x,y): return sqrt(diff(x)**2+diff(y)**2).cumsum()
+    
 def line(end_pt,npts=20):
 
     cc = empty((npts,2))

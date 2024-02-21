@@ -44,7 +44,7 @@ def rotate(x0,y0,xr,yr,angle,object=0,segment=0):
     sd.s = t*0+segment
     sd.fx = t*0+x0
     sd.fy = t*0+y0
-        
+
     return sd
 
 class SpiroData:
@@ -238,11 +238,15 @@ class SpiroData:
     def scale(self,factor):
         self.x*=factor
         self.y*=factor
+        self.fx*=factor
+        self.fy*=factor
         return self
 
     def move(self,x0,y0):
         self.x+=x0
         self.y+=y0
+        self.fx+=x0
+        self.fy+=y0
         return self
 
     def disp(self,coord): return self.move(coord[0],coord[1])
@@ -290,6 +294,51 @@ class SpiroData:
         return sd.set_array(self.x[~j],self.y[~j],self.p[~j],
                             self.t[~j],self.o[~j],self.s[~j],
                             self.fx[~j],self.fy[~j])
+
+    def non_zero_intervals(self):
+        dr = path_diffs(self.x,self.y)
+        return np.where(dr>1.0e-6)
+        
+    def max_path(self):
+        j = self.non_zero_intervals()
+        x = self.x[j]
+        y = self.y[j]
+        dist = path_length(x,y)
+        return dist[-1]
+    
+    def resample(self,interp_dists):
+        j = self.non_zero_intervals()
+        dist=np.append([0],path_length(self.x[j],self.y[j]))
+        bx= make_interp_spline(dist,self.x[j])
+        by= make_interp_spline(dist,self.y[j])
+        bp= make_interp_spline(dist,self.p[j])
+        bt= make_interp_spline(dist,self.t[j])
+        bo= make_interp_spline(dist,self.o[j])
+        bs= make_interp_spline(dist,self.s[j])
+        bfx=make_interp_spline(dist,self.fx[j])
+        bfy=make_interp_spline(dist,self.fy[j])
+        sd = SpiroData()
+        sd.x=bx(interp_dists)
+        sd.y=by(interp_dists)
+        sd.p=bp(interp_dists)
+        sd.t=bt(interp_dists)
+        sd.o=bo(interp_dists)
+        sd.s=bs(interp_dists)
+        sd.fx=bfx(interp_dists)
+        sd.fy=bfy(interp_dists)
+        return sd
+    
+    def copy(self):
+        sd = SpiroData()
+        sd.x= np.copy(self.x)
+        sd.y= np.copy(self.y)
+        sd.p= np.copy(self.p)
+        sd.t= np.copy(self.t)
+        sd.o= np.copy(self.o)
+        sd.s= np.copy(self.s)
+        sd.fx=np.copy(self.fx)
+        sd.fy=np.copy(self.fy)
+        return sd
         
     def save(self,filename):
         with open(filename,'wb') as f:

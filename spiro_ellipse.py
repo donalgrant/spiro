@@ -147,6 +147,9 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
     sd.x = pp[:,0]
     sd.y = pp[:,1]
 
+    sd.fx = sd.t*0
+    sd.fy = sd.t*0
+
     return sd.move(x0,y0)
 
 def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False,ppl=1000,object=0,segment=0):
@@ -190,7 +193,8 @@ def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False,ppl=
     sd.t = t
     sd.o = full((ppl),object)
     sd.o = full((ppl),segment)
-    
+    sd.fx = linspace(x1,x2,sd.x.shape[0]) # should really include guards, but usually subtle effect
+    sd.fy = linspace(y1,y2,sd.y.shape[0]) # ditto
     
     return sd
 

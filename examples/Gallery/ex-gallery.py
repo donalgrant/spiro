@@ -353,10 +353,50 @@ for k in range(n-1):
     y[k+1] = b*x[k]
 
 W = SpiroData()
-W.set_array(x,y,x*0,linspace(0,n,n),x*0+1,x*0+1)
+W.set_array(x,y,x*0,linspace(0,n,n),x*0+1,x*0+1,x*0,y*0)
 
 T = on_frame(W.subsample(1),scale=np.linspace(1.0,1.0,n),oangle=3,first=0,n=n-1,
              asym=0.2,orient_follow=0,orient=2*W.neighbor_distances(),polyfunc=nstar_coords,
              arc_angle=-pi/4,pts=np.linspace(150,150,3*n,dtype=int),object=0,prot=0)
 
 figure(T,'time','turbo')
+
+###  Resample heart figure with huge dots
+
+T = heart(wheel=Wheel(1,0),inside=False) 
+
+ppl=500
+id = linspace(0,T.max_path(),ppl)
+W = T.resample(id)
+
+S = SpiroData()
+
+nk=1
+gs=0
+n = W.n()//(nk+gs)
+ns = W.n()//nk 
+
+npts=150*def_factor
+pts_fade = array([ npts//5+npts-int(npts*sin(2*pi*j/n)) for j in range(n) ]) 
+
+for k in range(nk):
+    
+    first = k*ns
+    
+    scale = 5 
+    asym=0 
+    tr = 1.
+    br = 1.
+
+    ao = pi/4
+    
+    nn = n-1
+    of = W.n()//3
+    aa = pi/3 
+
+    
+    S.add(crosses_on_frame(W,asym=asym,top_ratio=tr,bottom_ratio=br,scale=scale,arc_angle=aa,
+                           first=first,orient_follow=of,orient=ao,pts=pts_fade,n=nn))
+
+SS=S.resample(linspace(0,S.max_path(),ppl*3))
+figure(SS,SS.fradii(),cmap='jet',alpha=0.3,dot_size=500)
