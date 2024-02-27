@@ -5,11 +5,16 @@ import numpy as np
 from numpy import array,linspace,fmod,arange,sin,cos
 
 def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyfunc=None,  # tcoords or pcoords
-                       pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0,vertex_order=None):
-    '''polyfunc is a function providing vertex coordinates to draw on the frame.  It has five
+             pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0,vertex_order=None,
+             pin_coord=None,pin_to_frame=False,autoscale=True):
+    '''
+    polyfunc is a function providing vertex coordinates to draw on the frame.  It has five
     parameters: two shape parameters (e.g., opening angle and asymmetry),
                 two offset parameters to specify the distance from the frame to draw the object, and
-                a "pre-rotation" angle, the angle about which to rotate the figure before applying the offset'''
+                a "pre-rotation" angle, the angle about which to rotate the figure before applying the offset
+    if pin_coord is specified, then the origin of each object is that coordinate, with scale and orientation
+    corresponding to the points on the frame.  (orient_follow is ignored in this case.)
+    '''
     
     S = SpiroData()
     n = sd.n() if n is None else n
@@ -26,7 +31,18 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
         fhk = array_val(fh, k)
         pr = array_val(prot,k)
         ph = array_val(sd.p,i)
-        T.load(polyfunc(oa,ay,fb=fbk,fh=fhk,prot=pr),ph,frame_x=sd.xy(i)[0],frame_y=sd.xy(i)[1])
+        sc = array_val(scale,k)
+        fx = sd.xy(i)[0]
+        fy = sd.xy(i)[1]
+        if not pin_coord is None:
+            if pin_to_frame:
+                orient_angle = -sd.direction_to_coord(i,pin_coord)
+            else:
+                orient_angle = pi-sd.direction_to_coord(i,pin_coord)
+            orient_angle -= array_val(orient,k)
+            if autoscale:
+                sc *= sd.dist_to_coord(i,pin_coord)
+        T.load(polyfunc(oa,ay,fb=fbk,fh=fhk,prot=pr),ph,frame_x=fx,frame_y=fy)
         st = SpiroData() # for the connections between vertices
         tt = 0
         nv=T.n()
@@ -38,9 +54,15 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
             st.load(arc_between_pts(array([ T.xy(j),T.xy(j+1) ]),
                                     arc_subtended=array_val(arc_angle,k*T.n()+j),npts=npts),
                     T.p[j], time_offset=tt,object=array_val(object,k),segment=j,
-                    frame_x=sd.xy(i)[0],frame_y=sd.xy(i)[1])
+                    frame_x=fx,frame_y=fy)
             tt += npts
-        S.add(st.scale(array_val(scale,k)).rotate(array_val(orient_angle,k)).disp(sd.xy(i)))
+
+        if (pin_coord is None) or pin_to_frame:
+            loc_coord = sd.xy(i)
+        else:
+            loc_coord = pin_coord
+
+        S.add(st.scale(sc).rotate(array_val(orient_angle,k)).disp(loc_coord))
         i+=array_val(skip,k)
     return S
 

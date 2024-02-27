@@ -168,6 +168,14 @@ class SpiroData:
         i2w = self.wrap(i2)
         return arctan2(self.y[i2w]-self.y[i1w],self.x[i2w]-self.x[i1w])
 
+    def direction_to_coord(self,i,coord):
+        iw = self.wrap(i)
+        return arctan2(coord[1]-self.y[iw],coord[0]-self.x[iw])
+
+    def dist_to_coord(self,i,coord):
+        iw = self.wrap(i)
+        return dist(array([ self.xy(i), coord ]))
+
     def fchord_direction(self,i1,i2):
         i1w = self.wrap(i1)
         i2w = self.wrap(i2)
@@ -228,6 +236,12 @@ class SpiroData:
 
     def fneighbor_distances(self):
         return array([ self.fneighbor_dist(i) for i in range(self.n()) ])
+
+    def lengths(self):
+        return append([0],path_length(self.x,self.y))
+    
+    def flengths(self):
+        return append([0],path_length(self.fx,self.fy))
     
     def rotate(self,angle):
         coords = rot_coords(angle,column_stack((self.x,self.y)))

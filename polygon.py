@@ -75,7 +75,7 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
 def corner_guard(wheel_size=0,corner_angle=pi/2,):
     return wheel_size/tan(corner_angle/2)
 
-def spiro_line_orig(R=60,wheel=Wheel(12,7.2),orient=0,loops=60,n=1,fold=False, invert=False):
+def spiro_line_orig(R=60,wheel=Wheel(12,7.2),orient=0,loops=60,fold=False, invert=False):
 
     cc = rot_coords(orient,array([ [-R/2,0], [R/2,0] ]))
 
@@ -99,11 +99,11 @@ def spiro_line_orig(R=60,wheel=Wheel(12,7.2),orient=0,loops=60,n=1,fold=False, i
         
     return sd
 
-def spiro_line(R=60,wheel=Wheel(12,7.2,0),orient=0,loops=60,n=1,fold=False, invert=False):
+def spiro_line(R=60,wheel=Wheel(12,7.2,0),orient=0,loops=60,fold=False, invert=False):
     coords=array([ [-R/2,0], [R/2,0] ])
     return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=False)  # invert doesn't work
 
-def spiro_eq_triangle(R=60,wheel=Wheel(12,7.2,0),orient=0,loops=60,n=1,fold=False,inside=False):
+def spiro_eq_triangle(R=60,wheel=Wheel(12,7.2,0),orient=0,loops=60,fold=False,inside=False):
     ytop = R*sin(pi/3.0)
     coords = array([ [-R/2,-ytop/3], [0,2*ytop/3], [R/2,-ytop/3] ])
     return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=inside)

@@ -77,6 +77,9 @@ def eIe(ring=Ellipse(20,0.5,0,0),
     sd.x = pp[:,0]
     sd.y = pp[:,1]
 
+    sd.fx = cx
+    sd.fy = cy
+    
     sd.rotate(ring.o).move(ring.O[0],ring.O[1])
     
     return sd
@@ -147,8 +150,8 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
     sd.x = pp[:,0]
     sd.y = pp[:,1]
 
-    sd.fx = sd.t*0
-    sd.fy = sd.t*0
+    sd.fx = cx
+    sd.fy = cy
 
     return sd.move(x0,y0)
 
@@ -206,6 +209,8 @@ def integral_ellipticals(n,e_ring,e_wheel,ring_angle=pi/4,
     ring=Ellipse(major=20,eccen=e_ring,offset=ring_angle)
     nwr = rounds / circuits
     a = major_from_circum(ring.c/nwr,e_wheel)
+    if n==1:
+        return eIe(ring,Ellipse(a,e_wheel,min_pen*a,0,pen_offset=min_po),inside=inside,loops=circuits)
     for i in range(n):
         m  = min_pen + (max_pen-min_pen)*i/(n-1)
         po = min_po  + (max_po -min_po) *i/(n-1)

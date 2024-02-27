@@ -555,3 +555,91 @@ for k in range(nk):
                            first=first,orient_follow=of,orient=ao,pts=pts_fade,n=nn))
 
 figure(S,S.fradii(),'jet')
+
+###
+
+T = roll(0,0,100,0,wheel=Wheel(2,0)) 
+
+ppl=200
+id = linspace(0,ppl,ppl)
+id *= T.max_path() / id[-1]
+W = T.resample(id)
+
+S = SpiroData()
+
+nk=1
+gs=0
+n = W.n()//(nk+gs)
+ns = W.n()//nk 
+
+npts=150*def_factor
+pts_fade = npts
+
+for k in range(nk):
+    
+    first = k*ns 
+    
+    scale = 10
+
+    asym=0.0 
+    tr = 1.0 
+    br = 1.0 
+
+    gs = 0.3
+    gf = 2.
+    ao = np.geomspace(gs,gf*pi,n//2)-gs
+    ao = np.append(np.flip(ao),ao)
+    
+    nn = n-1
+    of = 0 
+    aa = 0 
+
+    S.add(crosses_on_frame(W,asym=asym,top_ratio=tr,bottom_ratio=br,scale=scale,arc_angle=aa,
+                           first=first,orient_follow=of,orient=ao,pts=pts_fade,n=nn,object=k))
+
+figure(S,'time','turbo')
+
+###
+
+T = spiro_ngon(3,wheel=Wheel(2,0)).rotate(pi/6)
+
+ppl=600
+id = linspace(0,ppl,ppl) 
+id *= T.max_path() / id[-1]
+W = T.resample(id)
+
+S = SpiroData()
+
+nk=1
+gs=0
+n = W.n()//(nk+gs)
+ns = W.n()//nk 
+
+npts=150*def_factor
+pts_fade = npts
+
+for k in range(nk):
+    
+    first = k*ns 
+    
+    scale = 10 
+
+    asym=0.0 
+    tr = 1.0 
+    br = 1.0 
+
+    gs = 0.3
+    gf = 2.
+    aoa = np.geomspace(gs,gf*pi,n//6)-gs
+    aoa = np.append(aoa,np.flip(aoa))
+    ao = array( [] )
+    for j in range(3):  ao = np.append(ao,aoa)
+    
+    nn = n-1
+    of = 0 
+    aa = 0 
+
+    S.add(crosses_on_frame(W,asym=asym,top_ratio=tr,bottom_ratio=br,scale=scale,arc_angle=aa,
+                           first=first,orient_follow=of,orient=ao,pts=pts_fade,n=nn,object=k))
+
+figure(S,'time','tab20b')

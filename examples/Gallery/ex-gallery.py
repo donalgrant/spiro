@@ -400,3 +400,44 @@ for k in range(nk):
 
 SS=S.resample(linspace(0,S.max_path(),ppl*3))
 figure(SS,SS.fradii(),cmap='jet',alpha=0.3,dot_size=500)
+
+###
+
+T = cIc(Ring(24),wheel=Wheel(4,8),loops=1,inside=False,ppl=2000)
+W = T.copy()
+rr = 1.0
+dr = np.random.standard_normal(W.n())
+dt = np.random.uniform(0,2*pi,W.n())
+W.x += rr*dr*cos(dt)
+W.y += rr*dr*sin(dt)
+
+S = SpiroData()
+
+nk=1
+gs=0
+n = W.n()//(nk+gs)
+ns = W.n()//nk 
+
+npts=150*def_factor
+
+pts_fade = array([],dtype=int)
+for j in range(n):
+    p = npts//30 + npts - int(npts*cos(12*pi*j)/n)
+    pts_fade = np.append(pts_fade,[0,0,p,p])
+
+for k in range(nk): 
+    
+    first = k*ns + ns//2
+    
+    ao = 0
+    
+    s = 1 
+    asym = 0.4 
+    nn = n
+    aa = -pi/9 
+
+    S.add(on_frame(W,skip=[1,1,1,1,1,1,1,1,1,1,10],asym=asym,oangle=2,arc_angle=aa,
+                   fb=0.5,fh=-0.5,first=first,orient=ao,pts=pts_fade,scale=s,
+                   n=nn,object=k,polyfunc=nstar_coords,prot=0,pin_coord=array([0,0]),pin_to_frame=False))
+    
+figure(S,'time','gist_heat')
