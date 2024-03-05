@@ -66,6 +66,11 @@ def cmap_list():
 def cs_list():
     return ['radial','cycles','phase','spacing','direction','x-direction','y-direction',
             'polar','time','length','random',
+            'width','fwidth','lengths','flengths','fradii','fpolars',
+            'fcdist3','fcdist4','fcdist5','fcdist6','fcdist7',
+            'cdist3','cdist4','cdist5','cdist6','cdist7',
+            'fcdirs3','fcdirs4','fcdirs5','fcdirs6','fcdirs7',
+            'cdirs3','cdirs4','cdirs5','cdirs6','cdirs7',
             'x','xrand','y','yrand','rrand', # 'prand','crand','drand','srand',  # add these?
             'xy','x+y','x-y','h-waves','t-waves','l-waves','v-waves',
             'r-waves','ripples','s-ripples'
@@ -185,6 +190,33 @@ class SpiroFig:
                 case 'r-waves':   clr=sin(r)
                 case 'ripples':   clr=sin(r**2)
                 case 's-ripples': clr=sin(sqrt(r))
+                case 'fpolars':   clr=sd.fpolars()
+                case 'fradii':    clr=sd.fradii()
+                case 'width':     clr=sd.chord_dists(sd.n()//2)
+                case 'fwidth':    clr=sd.fchord_dists(sd.n()//2)
+                case 'lengths':   clr=sd.lengths()
+                case 'flengths':  clr=sd.flengths()
+                case 'fcdist3':   clr=sd.fchord_dists(sd.n()//3)  # would love to parse for the digit
+                case 'fcdist4':   clr=sd.fchord_dists(sd.n()//4)
+                case 'fcdist5':   clr=sd.fchord_dists(sd.n()//5)
+                case 'fcdist6':   clr=sd.fchord_dists(sd.n()//6)
+                case 'fcdist7':   clr=sd.fchord_dists(sd.n()//7)
+                case 'fcdirs3':   clr=sd.fchord_dirs(sd.n()//3)  # would love to parse for the digit
+                case 'fcdirs4':   clr=sd.fchord_dirs(sd.n()//4)
+                case 'fcdirs5':   clr=sd.fchord_dirs(sd.n()//5)
+                case 'fcdirs6':   clr=sd.fchord_dirs(sd.n()//6)
+                case 'fcdirs7':   clr=sd.fchord_dirs(sd.n()//7)
+                case 'cdist3':    clr=sd.chord_dists(sd.n()//3)  # would love to parse for the digit
+                case 'cdist4':    clr=sd.chord_dists(sd.n()//4)
+                case 'cdist5':    clr=sd.chord_dists(sd.n()//5)
+                case 'cdist6':    clr=sd.chord_dists(sd.n()//6)
+                case 'cdist7':    clr=sd.chord_dists(sd.n()//7)
+                case 'cdirs3':    clr=sd.chord_dirs(sd.n()//3)  # would love to parse for the digit
+                case 'cdirs4':    clr=sd.chord_dirs(sd.n()//4)
+                case 'cdirs5':    clr=sd.chord_dirs(sd.n()//5)
+                case 'cdirs6':    clr=sd.chord_dirs(sd.n()//6)
+                case 'cdirs7':    clr=sd.chord_dirs(sd.n()//7)
+                
                 case _:
                     clr=color_scheme
                     cmap=None

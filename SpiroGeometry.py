@@ -104,6 +104,10 @@ def arc(end_pt,radius,invert=False,npts=20):
 
 def cot(radians): return 0 if radians==pi/2 else 1/tan(radians)
 
+def par_diag(oangle,asym):
+    c = (1+asym)/(1-asym)
+    return arctan2(1.0,c*c+cot(oangle))
+
 def rot_and_shift(coords,rot,xy_offset):
     cc = rot_about([0,0], rot, coords)
     for i in range(cc.shape[0]):  cc[i] -= xy_offset

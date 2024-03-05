@@ -6,7 +6,7 @@ from numpy import array,linspace,fmod,arange,sin,cos
 
 def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyfunc=None,  # tcoords or pcoords
              pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0,vertex_order=None,
-             pin_coord=None,pin_to_frame=False,autoscale=True):
+             pin_coord=None,pin_to_frame=False,autoscale=True,pinned_vertex=0):
     '''
     polyfunc is a function providing vertex coordinates to draw on the frame.  It has five
     parameters: two shape parameters (e.g., opening angle and asymmetry),
@@ -14,6 +14,8 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
                 a "pre-rotation" angle, the angle about which to rotate the figure before applying the offset
     if pin_coord is specified, then the origin of each object is that coordinate, with scale and orientation
     corresponding to the points on the frame.  (orient_follow is ignored in this case.)
+    If pinned_vertex is set to an index other than zero, then the size of the segment between
+    vertex 0 and the pinned_vertex will be used for the scaling of the figure.
     '''
     
     S = SpiroData()
@@ -34,15 +36,21 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
         sc = array_val(scale,k)
         fx = sd.xy(i)[0]
         fy = sd.xy(i)[1]
+        T.load(polyfunc(oa,ay,fb=fbk,fh=fhk,prot=pr),ph,frame_x=fx,frame_y=fy)
+        
         if not pin_coord is None:
-            if pin_to_frame:
-                orient_angle = -sd.direction_to_coord(i,pin_coord)
-            else:
-                orient_angle = pi-sd.direction_to_coord(i,pin_coord)
+            
+            seg_length = dist(array( [ T.xy(0), T.xy(pinned_vertex) ] ))
+            seg_dir = dir(array( [ T.xy(0), T.xy(pinned_vertex) ] )) if seg_length > 0 else 0
+            pc_dir = sd.direction_to_coord(i,pin_coord)
+            orient_angle = -pc_dir if pin_to_frame else pi-pc_dir
+            orient_angle += seg_dir
             orient_angle -= array_val(orient,k)
             if autoscale:
                 sc *= sd.dist_to_coord(i,pin_coord)
-        T.load(polyfunc(oa,ay,fb=fbk,fh=fhk,prot=pr),ph,frame_x=fx,frame_y=fy)
+                if seg_length > 0:
+                    sc /= seg_length
+                
         st = SpiroData() # for the connections between vertices
         tt = 0
         nv=T.n()
