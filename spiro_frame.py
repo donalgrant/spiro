@@ -39,9 +39,10 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
         T.load(polyfunc(oa,ay,fb=fbk,fh=fhk,prot=pr),ph,frame_x=fx,frame_y=fy)
         
         if not pin_coord is None:
-            
-            seg_length = dist(array( [ T.xy(0), T.xy(pinned_vertex) ] ))
-            seg_dir = dir(array( [ T.xy(0), T.xy(pinned_vertex) ] )) if seg_length > 0 else 0
+
+            pv = array_val(pinned_vertex,k)
+            seg_length = dist(array( [ T.xy(0), T.xy(pv) ] ))
+            seg_dir = dir(array( [ T.xy(0), T.xy(pv) ] )) if seg_length > 0 else 0
             pc_dir = sd.direction_to_coord(i,pin_coord)
             orient_angle = -pc_dir if pin_to_frame else pi-pc_dir
             orient_angle += seg_dir

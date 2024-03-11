@@ -1,4 +1,7 @@
-from numpy import sin,cos,tan,empty,array,matmul,linspace,full,abs,pi,sqrt,arctan2,arccos,arcsin,diff
+import sys
+import numpy as np
+from numpy import sin,cos,tan,empty,array,matmul,linspace,geomspace,full
+from numpy import abs,pi,sqrt,arctan2,arccos,arcsin,diff,zeros,flip
 from scipy.spatial.transform import Rotation as R
 from scipy.interpolate import make_interp_spline
 
@@ -190,3 +193,39 @@ def ellipse_between_pts(end_pt,eccen,npts=50):
 
 def cos_angle(a,b,c):
     return arccos( (a**2+b**2-c**2) / (2*a*b) )
+
+'''
+parameters: factor=1 (uniform), reverse=False, flip=True, option='linear','geometric','fibonacci','sinusoid', repeat=1, scale=max-path (1 if not given)
+'''
+
+def fibonacci(n):
+    if n<3:  return 1
+    x1 = 1
+    x2 = 1
+    for j in range(n-2):
+        (x1,x2) = (x2,x1+x2)
+    return x2
+        
+    
+def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat=1):
+
+    dn = 2*repeat if deramp else repeat
+    
+    match spacing:
+        case 'linear':     x = linspace(1,1+parm,n//dn)
+        case 'geometric':  x = geomspace(1,1+parm,n//dn)
+        case 'sinusoid':   x = array([ 1.0 + parm*sin(pi*j/(2*n//dn)) for j in range(0,n//dn) ])
+        case 'fibonacci':  x = array([ fibonacci(j+1) for j in range(n//dn) ])  # parm is ignored
+        case _:
+            print("***Error -- not a valid spacing")
+            sys.exit()
+
+    if reverse:  x = np.flip(x)
+    if deramp:  x = np.append(x,flip(x))
+
+    s = array([])
+    for j in range(repeat):
+        s = np.append(s,x)
+        
+    c = s.cumsum()
+    return c/c[-1]
