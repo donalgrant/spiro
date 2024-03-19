@@ -76,7 +76,7 @@ for k in range(nk):
     aa = pi/6
 
     S.add(on_frame(W,asym=0,oangle=pi/3,arc_angle=aa,fb=0.5,fh=0.5,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=tcoords,prot=-pi/12,pin_coord=array([-3,0]),pin_to_frame=True))
+                   n=nn,object=k,polyfunc=tcoords,prot=-pi/12,pin_coord=array([-3,0]),pin_to_frame=1.0))
 
 figure(S,'time','hot')
 
@@ -114,7 +114,7 @@ for k in range(nk):
     aa = pi/6
 
     S.add(on_frame(W,asym=0.5,oangle=pi/3,arc_angle=aa,fb=0.4,fh=0,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=tcoords,prot=0,pin_coord=array([-60,60]),pin_to_frame=False))
+                   n=nn,object=k,polyfunc=tcoords,prot=0,pin_coord=array([-60,60]),pin_to_frame=0.0))
     
 figure(S,S.chord_dists(S.n()//4),'cmap2')
 
@@ -144,7 +144,7 @@ for k in range(1):
     aa = -pi/4 
 
     S.add(on_frame(W,asym=0,oangle=4,arc_angle=aa,fb=-0.,fh=-0.5,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=ngon_coords,prot=0,pin_coord=array([0,0]),pin_to_frame=False))
+                   n=nn,object=k,polyfunc=ngon_coords,prot=0,pin_coord=array([0,0]),pin_to_frame=0.0))
     
 figure(S,S.fpolars(),'turbo')
 
@@ -177,8 +177,9 @@ for k in range(nk):
     nn = n
     aa = -pi/6 
 
-    S.add(on_frame(W,asym=asym,oangle=3,arc_angle=aa,fb=-0.5,fh=-0.5,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=nstar_coords,prot=0,pin_coord=array([-1,0]),pin_to_frame=True))
+    S.add(on_frame(W,asym=asym,oangle=3,arc_angle=aa,fb=-0.5,fh=-0.5,first=first,orient=ao,
+                   pts=pts_fade,scale=s,n=nn,object=k,polyfunc=nstar_coords,prot=0,
+                   pin_coord=array([-1,0]),pin_to_frame=1.0))
     
 figure(S,S.fchord_dists(S.n()//7),'autumn')
 
@@ -214,7 +215,7 @@ for k in range(nk):
 
     S.add(on_frame(W,skip=[1,1,1,1,1,1,1,1,1,1,10],asym=asym,oangle=2,arc_angle=aa,
                    fb=0.5,fh=-0.5,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=nstar_coords,prot=0,pin_coord=array([0,0]),pin_to_frame=False))
+                   n=nn,object=k,polyfunc=nstar_coords,prot=0,pin_coord=array([0,0]),pin_to_frame=0.0))
     
 figure(S,'time','gist_heat')
 
@@ -250,7 +251,7 @@ for k in range(nk):
 
     S.add(on_frame(W,skip=1,asym=asym,oangle=pi/4,arc_angle=aa,fb=0,fh=0.0,
                    first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=pcoords,prot=0,pin_coord=array([5,0]),pin_to_frame=False))
+                   n=nn,object=k,polyfunc=pcoords,prot=0,pin_coord=array([5,0]),pin_to_frame=0.0))
 
 figure(S,'time','OrRd')
 
@@ -290,7 +291,7 @@ for k in range(nk):
     aa = pi/9 
 
     S.add(on_frame(W,asym=asym,oangle=5,arc_angle=aa,fb=0,fh=0.0,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=ngon_coords,prot=0,pin_coord=array([-70,-75]),pin_to_frame=True))
+                   n=nn,object=k,polyfunc=ngon_coords,prot=0,pin_coord=array([-70,-75]),pin_to_frame=1.0))
     
 figure(S,'length','emerald_woman')
 
@@ -326,7 +327,7 @@ for k in range(nk):
     aa = 0 
 
     S.add(on_frame(W,asym=asym,oangle=pi/3,arc_angle=aa,fb=0,fh=0.0,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=tcoords,prot=0,pin_coord=array([0,0]),pin_to_frame=True))
+                   n=nn,object=k,polyfunc=tcoords,prot=0,pin_coord=array([0,0]),pin_to_frame=1.0))
     
 figure(S,'time','turbo')
 
@@ -365,8 +366,9 @@ for k in range(nk):
     nn = n
     aa = pi/9 
 
-    S.add(on_frame(W,asym=asym,oangle=pi/5,arc_angle=aa,fb=0.5,fh=0.5,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=tcoords,prot=0,pin_coord=array([0,7]),pin_to_frame=True))
+    S.add(on_frame(W,asym=asym,oangle=pi/5,arc_angle=aa,fb=0.5,fh=0.5,first=first,orient=ao,
+                   pts=pts_fade,scale=s,n=nn,object=k,polyfunc=tcoords,prot=0,
+                   pin_coord=array([0,7]),pin_to_frame=1.0))
 
 figure(S,S.lengths(),'inferno')
 
@@ -400,8 +402,9 @@ for k in range(nk):
     nn = n
     aa = pi/9 
 
-    S.add(on_frame(W,asym=asym,oangle=pi/5,arc_angle=aa,fb=0.5,fh=0.5,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=tcoords,prot=0,pin_coord=array([0,7]),pin_to_frame=False,autoscale=False))
+    S.add(on_frame(W,asym=asym,oangle=pi/5,arc_angle=aa,fb=0.5,fh=0.5,first=first,orient=ao,
+                   pts=pts_fade,scale=s,n=nn,object=k,polyfunc=tcoords,prot=0,
+                   pin_coord=array([0,7]),pin_to_frame=0.0,autoscale=False))
     
 figure(S,S.lengths(),'pretty_reds')
 
@@ -435,8 +438,9 @@ for k in range(nk):
     nn = n
     aa = pi/3 
 
-    S.add(on_frame(W,asym=asym,oangle=pi/3,arc_angle=aa,fb=-0.5,fh=-0.5,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=tcoords,prot=0,pin_coord=array([3,0]),pin_to_frame=False,autoscale=True))
+    S.add(on_frame(W,asym=asym,oangle=pi/3,arc_angle=aa,fb=-0.5,fh=-0.5,first=first,orient=ao,
+                   pts=pts_fade,scale=s,n=nn,object=k,polyfunc=tcoords,prot=0,
+                   pin_coord=array([3,0]),pin_to_frame=0.0,autoscale=True))
 
 figure(S,'time','pretty_blues')
 
@@ -472,8 +476,9 @@ for k in range(nk):
     nn = n-1
     aa = pi/4 
 
-    S.add(on_frame(W,asym=asym,oangle=pi/2,arc_angle=aa,fb=-0.5,fh=-0.5,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=pcoords,prot=0,pin_coord=array([-10,-10]),pin_to_frame=False,autoscale=True))
+    S.add(on_frame(W,asym=asym,oangle=pi/2,arc_angle=aa,fb=-0.5,fh=-0.5,first=first,orient=ao,
+                   pts=pts_fade,scale=s,n=nn,object=k,polyfunc=pcoords,prot=0,
+                   pin_coord=array([-10,-10]),pin_to_frame=0.0,autoscale=True))
     
 figure(S,'cycles','Oranges')
 
@@ -505,10 +510,12 @@ for k in range(nk//3):
 
     pc = array([0,0,])
     
-    S.add(on_frame(W,asym=asym,oangle=pi/3,arc_angle=aa,fb=-0.5,fh=-0.5,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=tcoords,prot=0,pin_coord=pc,pin_to_frame=True,autoscale=True))
+    S.add(on_frame(W,asym=asym,oangle=pi/3,arc_angle=aa,fb=-0.5,fh=-0.5,first=first,orient=ao,
+                   pts=pts_fade,scale=s,n=nn,object=k,polyfunc=tcoords,prot=0,
+                   pin_coord=pc,pin_to_frame=1.0,autoscale=True))
 
-    S.add(on_frame(W,asym=asym,oangle=pi/3,arc_angle=-aa,fb=-0.5,fh=-0.5,first=first,orient=ao,pts=pts_fade,scale=s,
-                   n=nn,object=k,polyfunc=tcoords,prot=0,pin_coord=pc,pin_to_frame=True,autoscale=True))
+    S.add(on_frame(W,asym=asym,oangle=pi/3,arc_angle=-aa,fb=-0.5,fh=-0.5,first=first,orient=ao,
+                   pts=pts_fade,scale=s,n=nn,object=k,polyfunc=tcoords,prot=0,
+                   pin_coord=pc,pin_to_frame=1.0,autoscale=True))
     
 figure(S,'direction','turbo')

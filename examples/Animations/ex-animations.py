@@ -123,3 +123,46 @@ for i in range(m):
 
 images.extend(np.flip(images,axis=0))
 imageio.mimsave("animate_green_polygons.gif", images, duration=0.2, loop=0)
+
+###
+
+def_factor=1
+
+ppl=1000
+
+maj=24
+ecc=0.0
+a = circum(maj,semi_minor(maj,ecc))/(2*pi)/3
+T1 = cIe(Ellipse(maj,ecc),wheel=Wheel(a,a),loops=1.0,inside=True,ppl=ppl)
+T2 = cIe(Ellipse(maj,ecc),wheel=Wheel(a/2,a),loops=1.0,inside=True,ppl=ppl)
+
+S = SpiroData()
+
+npts=200*def_factor
+
+nk=1
+gs=0
+n  = T2.n()//(nk+gs)
+ns = T2.n()//nk 
+
+pts = npts
+
+images=[]
+
+for offset in range(0,2*ns,2):
+    k=1
+    first1 = k*ns
+    first2 = k*ns+offset
+    if offset % 20 == 0:
+        print(offset,first1,first2,n)
+    S=frame_pair(T1,T2,skip1=1,skip2=1,first1=first1,first2=first2,
+                 scale=0.5,oangle=pi/2,fb=0.0,fh=0.0,asym=0,orient=pi/2,polyfunc=tcoords,
+                 pts=pts,arc_angle=0,object=k,prot=0,vertex_order=None,
+                 pin_to_frame1=True,autoscale=True,pinned_vertex=1)
+
+    filename='animate-frame-pair.png'
+    F.plot(S,color_scheme='width',cmap='hot_r',alpha=0.4,dot_size=.1,save=True,filename=filename,
+          limits=[-35,35,-35,35],transparent=False)
+    images.append(imageio.imread(filename))
+
+imageio.mimsave('animate-frame-pair.gif',images,duration=0.06,loop=0)
