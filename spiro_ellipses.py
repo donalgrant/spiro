@@ -1,3 +1,6 @@
+from spiro_frame import *
+
+'''
 from SpiroData import *
 from SpiroGeometry import *
 from Ellipse import *
@@ -66,13 +69,15 @@ def ellipses_from_pts(sd,n=3,offset=100,npts=500,scale_major=1.0,
     return st
 
 def ellipses_on_frame(sd,major,eccen,orient,pts,first=0,n=None,object=0):
-    '''Every argument except the first may be an array:
+'''
+'''Every argument except the first may be an array:
     sd = SpiroData frame on which to draw the ellipses
     major:  semi-major axis of ellipses
     eccen:  eccentricity for each ellipse
     orient: orientation for each ellipse
     pts:    number of points to draw in the arc
-    '''
+'''
+'''
     S = SpiroData()
     last = first+sd.n() if n is None else first+n
     for i in range(first,last):
@@ -123,3 +128,4 @@ def ellipses_between_frames(s1,s2,step1,step2,
         i2 += array_val(step2,k)
         
     return S
+'''
