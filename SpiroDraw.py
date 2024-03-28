@@ -245,11 +245,11 @@ class SpiroFig:
             ax.plot(x,y,color=clr)
         else:
             if rgb is None:
-                ax.scatter(x,y,c=apply_dither(clr,color_dither),linestyle=linestyle,s=dot_size,
-                           cmap=cmap,alpha=alpha)
+                self.scat = ax.scatter(x,y,c=apply_dither(clr,color_dither),linestyle=linestyle,s=dot_size,
+                                       cmap=cmap,alpha=alpha)
             else:
                 print('color is: ',rgb)
-                ax.scatter(x,y,color=rgb,linestyle=linestyle,s=dot_size,alpha=alpha)
+                self.scat = ax.scatter(x,y,color=rgb,linestyle=linestyle,s=dot_size,alpha=alpha)
                 
 
         if len(caption) > 0:

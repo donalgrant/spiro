@@ -57,7 +57,56 @@ def dist(end_pt):
 def dir(end_pt):
     return arctan2(end_pt[1,1]-end_pt[0,1],end_pt[1,0]-end_pt[0,0])
 
-    
+def intersect(p1,p2,d1,d2,tol=1.0e-3):
+    '''
+    find the coordinate of the intersection of two lines through
+    coordinates p1 and p2, respectively, and with angles ccw wrt
+    horizontal of d1 and d2, respectively.  tol sets the minimum
+    angle difference between d1 and d2 to find an intersection.
+    '''
+    if abs((d1 % pi) - (d2 % pi)) < tol:    # near-identical slopes
+#        print('near-identical slopes:  ',d1,d2)
+        pc = None
+        '''
+        if d1 % pi == pi/2:
+            if p2[1]==p1[1]:
+                pc = (p1+p2)/2.0
+            else:
+                print('    no intersection')
+                pc = None
+        else:
+            m1 = tan(d1)
+            print('   slope is ',m1)
+            if (p2[1]-p1[1]) == m1*(p2[0]-p1[0]):
+                print('    avg coord')
+                pc = (p1+p2)/2.0
+            else:
+                print('    no intersection')
+                pc = None
+        '''
+    else:  # non-identical slopes
+#        print('-->slopes are different')
+        if   d1 % pi == pi/2:  # vertical n1 slope
+#            print('    d1 is vertical:  ',d1)
+            m2 = tan(d2)
+#            print('    m2: ',m2)
+            pc = array([ p1[0], m2*(p1[0]-p2[0])+p2[1] ])
+        elif d2 % pi == pi/2:  # vertical n2 slope
+#            print('    d2 is vertical:  ',d2)
+            m1 = tan(d1)
+#            print('    m1: ',m1)
+            pc = array([ p2[0], m1*(p2[0]-p1[0])+p1[1] ])
+        else:
+            m1 = tan(d1)
+            m2 = tan(d2)
+#            print('    m1, m2: ',m1,m2)
+            xc = (p2[1]-p1[1] + m1*p1[0] + m2*p2[0]) / (m1-m2)
+            yc = m1*xc - m1*p1[0] + p1[1]
+            pc = array([ xc, yc ])
+            
+    return pc
+
+
 def arc_on_center(center,radius,arc_subtended,angle_offset=0,npts=20,to_origin=0):
     cc = empty((npts,2))
     for i in range(npts):
@@ -137,6 +186,10 @@ def pcoords(oangle,asym=0,fb=0,fh=0,prot=0):
     coords = array([ [0,0], [a,0], [a+b*cos(oangle),h], [b*cos(oangle),h] ])
     xy = array([b*fb,h*fh])
     return rot_and_shift( coords, prot, xy )
+    
+def dcoords(oangle,asym=0,fb=0,fh=0,prot=0):  
+    '''just a dot -- stand in for frame_only calls'''
+    return array([ [0,0] ])
 
 def ngon_coords(n,asym=0,fb=0,fh=0,prot=0):  # vertices on the unit circle
     coords = empty((n,2))

@@ -186,7 +186,7 @@ def frame_pair(F1,F2,skip1=1,skip2=1,first1=0,first2=0,
                scale=1.0,oangle=pi/3,fb=0.0,fh=0.0,asym=0,orient=0,polyfunc=None,  # tcoords or pcoords
                pts=100,n1=1,n2=None,arc_angle=0,object=0,prot=0,vertex_order=None,
                pin_to_frame1=0.0,autoscale=True,pinned_vertex=0,show_side=None,
-               normal_intersect=False,norm_off1=0.0,norm_off2=0.0):
+               normal_intersect=False,norm_off1=0.0,norm_off2=0.0,frame_only=False,intersect_tol=1.0e-3):
 
     S = SpiroData()
     max_n = F2.n() if n2 is None else n2
@@ -199,53 +199,8 @@ def frame_pair(F1,F2,skip1=1,skip2=1,first1=0,first2=0,
         j1 = array_val(first1,i)+i*sk1
         
         if normal_intersect:
-            
-            p1 = F1.xy(j1)
-            d1 = F1.direction(j1)+pi/2
-            d2 = F2.direction(j2)+pi/2
-#            print(i,j1,j2,p1,p2,d1*180/pi,d2*180/pi)
-            if d1 % pi == d2 % pi:    # identical slopes
-#                print('-->identical slopes')
-                if d1 % pi == pi/2:
-#                    print('   slopes are vertical')
-                    if p2[1]==p1[1]:
-#                        print('    avg coord')
-                        pc = (p1+p2)/2.0
-                    else:
-#                        print('    no intersection')
-                        pc = None
-                else:
-                    m1 = tan(d1)
-#                    print('   slope is ',m1)
-                    if (p2[1]-p1[1]) == m1*(p2[0]-p1[0]):
-#                        print('    avg coord')
-                        pc = (p1+p2)/2.0
-                    else:
-#                        print('    no intersection')
-                        pc = None
-            else:  # non-identical slopes
-#                print('-->slopes are different')
-                if   d1 % pi == pi/2:  # vertical n1 slope
-#                    print('    d1 is vertical:  ',d1)
-                    m2 = tan(d2)
-#                    print('    m2: ',m2)
-                    pc = array([ p1[0], m2*(p1[0]-p2[0])+p2[1] ])
-                elif d2 % pi == pi/2:  # vertical n2 slope
-#                    print('    d2 is vertical:  ',d2)
-                    m1 = tan(d1)
-#                    print('    m1: ',m1)
-                    pc = array([ p2[0], m1*(p2[0]-p1[0])+p1[1] ])
-                else:
-                    m1 = tan(d1)
-                    m2 = tan(d2)
-#                    print('    m1, m2: ',m1,m2)
-                    xc = (p2[1]-p1[1] + m1*p1[0] + m2*p2[0]) / (m1-m2)
-                    yc = m1*xc - m1*p1[0] + p1[1]
-                    pc = array([ xc, yc ])
-
-#            if not pc is None:
-#                print('==>intersect coord:  ',pc)
-                    
+            pc = intersect(F1.xy(j1),p2,F1.direction(j1)+pi/2+array_val(norm_off1,i),
+                           F2.direction(j2)+pi/2+array_val(norm_off2,i),tol=intersect_tol)
         else:
             pc=p2
 
@@ -255,13 +210,20 @@ def frame_pair(F1,F2,skip1=1,skip2=1,first1=0,first2=0,
             npts = show_side * array_val(pts,i)
         
         if pc is not None:
-            S.add(on_frame(F1,skip=sk1,first=j1,n=array_val(n1,i),
-                           scale=array_val(scale,i),oangle=array_val(oangle,i),
-                           fb=array_val(fb,i),fh=array_val(fh,i),asym=array_val(asym,i),
-                           orient=array_val(orient,i),polyfunc=polyfunc,
-                           pts=npts,arc_angle=array_val(arc_angle,i),
-                           object=array_val(object,i),prot=array_val(prot,i),vertex_order=vertex_order,
-                           pin_coord=pc,pin_to_frame=array_val(pin_to_frame1,i),
-                           autoscale=array_val(autoscale,i),pinned_vertex=array_val(pinned_vertex,i)))
+            if frame_only:
+                S.add(on_frame(F1,skip=sk1,first=j1,n=array_val(n1,i),
+                               scale=0,oangle=0,fb=0,fh=0,asym=0,orient=0,polyfunc=dcoords,
+                               pts=1,arc_angle=0,object=array_val(object,i),prot=0,
+                               pin_coord=pc,pin_to_frame=array_val(pin_to_frame1,i),
+                               autoscale=False,pinned_vertex=0))
+            else:
+                S.add(on_frame(F1,skip=sk1,first=j1,n=array_val(n1,i),
+                               scale=array_val(scale,i),oangle=array_val(oangle,i),
+                               fb=array_val(fb,i),fh=array_val(fh,i),asym=array_val(asym,i),
+                               orient=array_val(orient,i),polyfunc=polyfunc,
+                               pts=npts,arc_angle=array_val(arc_angle,i),
+                               object=array_val(object,i),prot=array_val(prot,i),vertex_order=vertex_order,
+                               pin_coord=pc,pin_to_frame=array_val(pin_to_frame1,i),
+                               autoscale=array_val(autoscale,i),pinned_vertex=array_val(pinned_vertex,i)))
     return S
 
