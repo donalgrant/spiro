@@ -216,14 +216,16 @@ def nstar_coords(n,asym=0.5,fb=0,fh=0,prot=0):  # vertices on the unit circle
 def eccen_from_flat(f):  return sqrt(2*f-f*f)
 def eradius(eccen,phi):  return sqrt((1-eccen**2)/(1-(eccen*cos(phi))**2))
 
-def ecoords(eccen,npts=50):
+# reverse the original order to make consistent with other Xcoords functions
+# added offsets to use with on_frame function
+def ecoords(npts=50,eccen=0.0,fb=0,fh=0,prot=0):
     '''unit-semi-major ellipse.  Can scale coords by semi-major axis'''
     cc = empty((npts,2))
     phi = linspace(0,2*pi,npts)
     ur = eradius(eccen,phi)
     cc[:,0]=ur*cos(phi)
     cc[:,1]=ur*sin(phi)
-    return cc
+    return rot_and_shift( cc, prot, array([fb,fh]) )
 
 def ellipse_between_pts(end_pt,eccen,npts=50):
 

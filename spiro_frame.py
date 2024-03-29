@@ -4,7 +4,7 @@ from Ellipse import *
 import numpy as np
 from numpy import array,linspace,fmod,arange,sin,cos
 
-def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyfunc=None,  # tcoords or pcoords
+def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyfunc=None,  # Xcoords; X=[tped]
              pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0,vertex_order=None,
              pin_coord=None,pin_to_frame=0.0,autoscale=True,pinned_vertex=0,
              frame_intersect=False):
@@ -263,7 +263,7 @@ def ellipses_from_coord(sd,coord=array([0,0]),offset=100,npts=500,
         
         phase = sd.p[i2]
 
-        s = ecoords(e,n)*a
+        s = ecoords(n,e)*a
         st = SpiroData()
         st.load(s,phase,object=array_val(object,i),segment=i,
                 frame_x=coord[0],frame_y=coord[1]).move(oM*a,om*b).rotate(o-orient).move(x0,y0)
@@ -298,7 +298,7 @@ def ellipses_on_frame(sd,major,eccen,orient,pts,first=0,n=None,object=0):
     S = SpiroData()
     last = first+sd.n() if n is None else first+n
     for i in range(first,last):
-        s = ecoords(array_val(eccen,i),array_val(pts,i))*array_val(major,i)
+        s = ecoords(array_val(pts,i),array_val(eccen,i))*array_val(major,i)
         st = SpiroData()
         st.load(s,array_val(sd.p,i),object=array_val(object,i),segment=i,
                 frame_x=sd.xy(i)[0],frame_y=sd.xy(i)[1]).rotate(array_val(orient,i)).disp(sd.xy(i))
@@ -335,7 +335,7 @@ def ellipses_between_frames(s1,s2,step1,step2,
             a = sm * dist(ep) / 2
         b = semi_minor(a,e)
         
-        s = ecoords(e,np)*a
+        s = ecoords(np,e)*a
         st = SpiroData()
         st.load(s,ph,object=array_val(object,k),segment=k,
                 frame_x=c1[0],frame_y=c1[1]).move(oM*a,om*b).rotate(oo-o).disp( (1-fb)*c1 + fb*c2 )
