@@ -8,7 +8,8 @@ from Ring import *
 def eIe(ring=Ellipse(20,0.5,0,0),
                        wheel=Ellipse(3,0.5,2,0),
                        loops=1,
-                       slide = lambda t: 1,
+#                       slide = lambda t: 1,   # original code
+                       slide=None,
                        start_guard=0,end_guard=0,
                        start_guard_angle=0,end_guard_angle=0,
                        ppl=4000,inside=True,reverse=False,object=0):  
@@ -33,16 +34,21 @@ def eIe(ring=Ellipse(20,0.5,0,0),
 
     p   = t * ring.c / wheel.c * 2 * pi + wheel.o 
     rp  = array([ wheel.r(phi) for phi in p ])
-
+    
+    '''  # original code
     arc = array([ wheel.arc(p[0],phi) for phi in p ])
     ring_phi = array([ ring.phi_at_arc(iv * arc_i * slide(arc_i), ring.po)
                        for arc_i in arc])
+    '''
+    
+    arc = slide_arc(array([ wheel.arc(p[0],phi) for phi in p ]),slide)
+    ring_phi = array([ ring.phi_at_arc(iv * arc_i, ring.po) for arc_i in arc])
     ring_r   = array([ ring.r(phi) for phi in ring_phi ])
     ring_n   = array([ ring.normal_at_phi(phi) for phi in ring_phi ])
 
     # coordinate of contact
     
-    cx = ring_r * sin(ring_phi)   # does this work in python?
+    cx = ring_r * sin(ring_phi)  
     cy = ring_r * cos(ring_phi)
 
     # normal at point of contact
@@ -85,13 +91,13 @@ def eIe(ring=Ellipse(20,0.5,0,0),
     return sd
 
 def eIc(ring=Ring(10),wheel=Ellipse(3,0.5,2,0,0),
-                      loops=1,ppl=1000,inside=True,object=0):
+                      loops=1,ppl=1000,inside=True,object=0,slide=None):
     return elliptical_arc(ring.O[0],ring.O[1],ring.o,ring.r,wheel=wheel,
                           loops=loops,spacing=1/ppl,inside=inside,
-                          pen_offset=wheel.po,object=object)
+                          pen_offset=wheel.po,object=object,slide=slide)
 
 def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
-                   loops=1,spacing=pi/4000,inside=True,pen_offset=0,object=0):  
+                   loops=1,spacing=pi/4000,inside=True,pen_offset=0,object=0,slide=None):  
     '''roll on the outside (inside if invert=True) of an arc
     centered on x0, y0, with radius, starting at orientation of
     orient radians cw from the vertical.  Arc has length loops * 2pi
@@ -102,7 +108,8 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
 
     RC = circum(R)
 
-    t=linspace(0.0,wheel.phi_at_arc(RC*loops),int(loops/spacing))
+    N = int(loops/spacing)
+    t=linspace(0.0,wheel.phi_at_arc(RC*loops),N)
 
     iv = -1 if inside else 1
     
@@ -111,7 +118,14 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
     p   = t + wheel.o
     rp  = array([ wheel.r(phi) for phi in p ])
 
-    arc = array([ wheel.arc(p[0],phi) for phi in p ])
+    arc = slide_arc( array([ wheel.arc(p[0],phi) for phi in p ]), slide  )
+    '''
+    arc_orig = array([ wheel.arc(p[0],phi) for phi in p ])
+    darc = arc_orig[1:N]-arc_orig[0:N-1]
+    for j in range(darc.shape[0]):
+        darc[j] *= array_val(slide,j)
+    arc = arc_orig[0]+np.append(0,darc.cumsum())
+    '''
     theta = iv * arc / R + orient
 
     # coordinate of contact

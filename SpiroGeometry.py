@@ -5,6 +5,17 @@ from numpy import abs,pi,sqrt,arctan2,arccos,arcsin,diff,zeros,flip
 from scipy.spatial.transform import Rotation as R
 from scipy.interpolate import make_interp_spline
 
+
+def array_val(a,i):
+    '''Generic function to extract an element of an array, with
+    wrapping on the element number.  If what is passed is a scalar,
+    then the scalar itself is returned.'''
+    
+    return a[i%len(a)] if hasattr(a,"__len__") else a
+
+def array_or_scalar_len(a):
+    return len(a) if hasattr(a,"__len__") else 1
+
 def rot_2D(angle):
     '''Matrix will rotate a coordinate by angle_rads cw'''
     return array([ [ cos(angle), sin(angle) ],
@@ -284,3 +295,13 @@ def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat
         
     c = s.cumsum()
     return c/c[-1]
+
+
+def slide_arc(arc_orig,slide=None):
+    if slide is None:
+        return arc_orig
+    N = arc_orig.shape[0]
+    darc = arc_orig[1:N]-arc_orig[0:N-1]
+    for j in range(N-1):
+        darc[j] *= array_val(slide,j)
+    return arc_orig[0]+np.append(0,darc.cumsum())

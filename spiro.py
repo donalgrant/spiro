@@ -7,13 +7,13 @@ from Ring import *
 from SpiroGeometry import *
 
 def spiro(ring=Ring(10),wheel=Wheel(4,3.5,0.0),loops=5,
-          slide = lambda t: 1,
+          slide = None,
           ppl=1000,inside=True,object=0):
     return cIc(ring,wheel,loops=loops,
                slide=slide,ppl=ppl,inside=inside,object=object)
 
 def cIe(ring,wheel,loops=1,ppl=4000,inside=False,reverse=False,
-        quadrants=0, qfuzz=50, slide = lambda t: 1,
+        quadrants=0, qfuzz=50, slide = None,
         start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,object=0):
     return wheel_in_ellipse(ring.O[0],ring.O[1],wheel,ring, loops=loops, ppl=ppl,
                             slide=slide,
@@ -24,7 +24,7 @@ def cIe(ring,wheel,loops=1,ppl=4000,inside=False,reverse=False,
         
 def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
                      loops=1,ppl=4000,
-                     slide = lambda t: 1,
+                     slide = None,
                      start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
                      orient=0,invert=False,reverse=False,object=0):  
     '''roll on the outside (inside if invert=True) of an elliptical arc
@@ -44,10 +44,9 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     
     p = t * ellipse.c / wheel.c * 2 * pi + wheel.o
 
-    theta = np.array([ iv * ellipse.phi_at_arc(wheel.arc(phi)) + ellipse.po for phi in p ])
-
+    arc = slide_arc(array([ wheel.arc(phi) for phi in p ]),slide)
+    theta = np.array([ iv * ellipse.phi_at_arc(arc[j]) + ellipse.po for j in range(arc.shape[0]) ])
     normal = np.array([ ellipse.normal_at_phi(th) for th in theta ])
-
     xnc = np.array([ ellipse.r(th)*sin(th) for th in theta ])
     ync = np.array([ ellipse.r(th)*cos(th) for th in theta ])
 
@@ -69,7 +68,7 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
 
 
 def cIc(ring,wheel, loops=1,ppl=1000, inside=False,reverse=False,
-        quadrants=0, qfuzz=50, slide = lambda t: 1,
+        quadrants=0, qfuzz=50, slide = None,
         start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,object=0):
     return spiro_arc(ring.O[0],ring.O[1],ring.o,ring.r,wheel,
                      loops=loops,ppl=ppl,
@@ -82,7 +81,7 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
 #                    loops=1,spacing=pi/4000,
                     loops=1,ppl=1000,
                     quadrants=0, qfuzz=50,
-                    slide = lambda t: 1,
+                    slide = None,
                     start_guard=0,end_guard=0,start_guard_angle=0,end_guard_angle=0,
                     invert=False,reverse=False,object=0):  
     '''roll on the outside (inside if invert=True) of an arc
@@ -109,8 +108,9 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
     
 #    guard_offset_angle=end_guard_angle if False else start_guard_angle  # work this out later
 
-    theta_factor = iv * a/R * slide(t)
+#    theta_factor = array([ iv * a/R * array_val(slide,j) for j in range(t.shape[0]) ])  # not correct sliding 
     phi_factor   = 1
+    theta_factor = iv
     
     # work out start_guard and end_guard effects in invert and reverse situations
 
@@ -126,7 +126,10 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
 #    guard_offset_angle=end_guard_angle if False else start_guard_angle  # work this out later
 
     p     = phi_factor   * t + offset
-    theta = theta_factor * t + orient + guard_offset_angle
+#    theta = theta_factor * t + orient + guard_offset_angle  # original
+    arc = slide_arc(array([ wheel.arc(phi) for phi in p ]),slide)
+    theta = iv * theta_factor * arc / R + orient + guard_offset_angle
+
     r     = R + iv * a
 
     normal = theta # what matters for pen loc is normal to ring; just theta for circle

@@ -4,16 +4,6 @@ from numpy import array, append, column_stack, abs, sqrt, arctan2, linspace
 from SpiroGeometry import *
 import pickle
 
-def array_val(a,i):
-    '''Generic function to extract an element of an array, with
-    wrapping on the element number.  If what is passed is a scalar,
-    then the scalar itself is returned.'''
-    
-    return a[i%len(a)] if hasattr(a,"__len__") else a
-
-def array_or_scalar_len(a):
-    return len(a) if hasattr(a,"__len__") else 1
-
 def read_SD(filename):
     with open(filename,'rb') as f:
         U = pickle.load(f)
