@@ -273,7 +273,7 @@ def fibonacci(n):
     return x2
         
     
-def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat=1):
+def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat=1,nocum=False):
 
     dn = 2*repeat if deramp else repeat
     
@@ -292,10 +292,12 @@ def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat
     s = array([])
     for j in range(repeat):
         s = np.append(s,x)
-        
-    c = s.cumsum()
-    return c/c[-1]
 
+    if not nocum:
+        c = s.cumsum()
+        return c/c[-1]
+    
+    return s
 
 def slide_arc(arc_orig,slide=None):
     if slide is None:

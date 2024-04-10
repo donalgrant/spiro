@@ -51,7 +51,7 @@ a=9.0
 bv=[0.9*a-0.03*a*i for i in range(10)]
 for i in range(10):
     S.add(spiro(Ring(2.0),Wheel(a,bv[i]),9,slide=1.5))
-F.plot(S,cmap=c,color_scheme=cs,save=True)
+figure(S,cs,c)
 
 ###
 
@@ -88,8 +88,7 @@ w=Ellipse(8,0.9,11,0,pi/4)
 l=20
 S.add(eIe(wheel=w,slide=-0.5,inside=True,loops=l/0.5,ppl=10000))
 S.rotate(pi/3)
-F.plot(S,color_scheme='cycles',cmap='autumn')
-F.save_fig()
+figure(S,'cycles','autumn')
 
 ###
 
@@ -98,7 +97,7 @@ w=Ellipse(10,0.9,11,0,pi/4)
 l=20
 S.add(eIe(wheel=w,slide=-0.5,inside=True,loops=l/0.5,ppl=10000))
 S.rotate(pi/3)
-F.plot(S,color_scheme='l-waves',cmap='autumn',save=True)
+figure(S,'l-waves','autumn')
 
 ###
 
@@ -107,7 +106,7 @@ w=Ellipse(9,0.9,11,0,pi/4)
 l=20
 S.add(eIe(wheel=w,slide=-0.5,inside=True,loops=l/0.5,ppl=10000))
 S.rotate(pi/3)
-F.plot(S,color_scheme='t-waves',cmap='autumn',save=True)
+figure(S,'t-waves','autumn')
 
 ###
 
@@ -116,7 +115,7 @@ w=Ellipse(9,0.9,17,0,pi/5)
 l=20
 S.add(eIe(wheel=w,slide=0.1,inside=True,loops=l/0.5,ppl=10000))
 S.rotate(pi/3)
-F.plot(S,color_scheme='l-waves',cmap='ocean',save=True)
+figure(S,'l-waves','ocean')
 
 ###
 
@@ -125,7 +124,7 @@ w=Ellipse(9,0.9,17,0,pi/5)
 l=20
 S.add(eIe(wheel=w,slide=2.0,inside=True,loops=l/0.5,ppl=10000))
 S.rotate(pi/3)
-F.plot(S,color_scheme='s-ripples',cmap='ocean',save=True)
+figure(S,'s-ripples','ocean')
 
 ###
 
@@ -134,7 +133,7 @@ w=Ellipse(9,0.3,17,0,pi/5)
 l=20
 S.add(eIe(wheel=w,slide=2.0,inside=True,loops=l/0.5,ppl=10000))
 S.rotate(pi/3)
-F.plot(S,color_scheme='cycles',cmap='turbo',save=True)
+figure(S,'cycles','turbo')
 
 ###
 
@@ -143,7 +142,7 @@ w=Ellipse(9,0.6,17,0,pi/5)
 l=20
 S.add(eIe(wheel=w,slide=2.0,inside=True,loops=l/0.5,ppl=10000))
 S.rotate(pi/3)
-F.plot(S,color_scheme='cycles',cmap='jet',save=True)
+figure(S,'cycles','jet')
 
 ###
 
@@ -152,7 +151,7 @@ w=Ellipse(9,0.6,17,0,pi/5)
 l=40
 S.add(eIe(wheel=w,slide=1.7,inside=True,loops=l/0.5,ppl=10000))
 S.rotate(pi/3)
-F.plot(S,color_scheme='cycles',cmap='inferno',save=True)
+figure(S,'cycles','inferno')
 
 ###
 
@@ -166,5 +165,4 @@ for sl in linspace(1.5,2.0,1):
     for i in range(nc):
         S.add(spiro(Ring(17),Wheel(a,bv[i]),18,slide=sl))
     for cs in ['length','l-waves','radial','time','t-waves','cycles']:
-        F.plot(S,color_scheme=cs,save=True)
-
+        figure(S,cs,'viridis')
