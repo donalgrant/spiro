@@ -278,6 +278,7 @@ def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat
     dn = 2*repeat if deramp else repeat
     
     match spacing:
+        case 'constant':   x = np.full(n//dn,parm)
         case 'linear':     x = linspace(1,1+parm,n//dn)
         case 'geometric':  x = geomspace(1,1+parm,n//dn)
         case 'sinusoid':   x = array([ 1.0 + parm*sin(pi*j/(2*n//dn)) for j in range(0,n//dn) ])

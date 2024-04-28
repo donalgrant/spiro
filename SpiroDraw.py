@@ -65,7 +65,7 @@ def cmap_list():
 
 def cs_list():
     return ['radial','cycles','phase','spacing','direction','x-direction','y-direction',
-            'polar','time','length','random',
+            'polar','time','length','length_r','random',
             'width','fwidth','lengths','flengths','fradii','fpolars',
             'fcdist3','fcdist4','fcdist5','fcdist6','fcdist7',
             'cdist3','cdist4','cdist5','cdist6','cdist7',
@@ -174,6 +174,7 @@ class SpiroFig:
                 case 'spacing':   clr=scipy.signal.medfilt(sd.neighbor_distances())
                 case 'time':      clr=sd.t
                 case 'length':    clr=linspace(0,sd.x.shape[0],sd.x.shape[0])
+                case 'length_r':  clr=linspace(sd.x.shape[0],0,sd.x.shape[0])
                 case 'random':    clr=np.random.rand(len(sd.x)) 
                 case 'x':         clr=sd.x
                 case 'xrand':     clr=sd.x+np.random.normal(0,max(sd.x)/3,sd.n())
