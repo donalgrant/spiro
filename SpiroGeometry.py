@@ -62,6 +62,13 @@ def line(end_pt,npts=20):
 
     return cc
 
+def line_toward(start_coord,dir,dist,npts=20):
+    end_coord = array([ 0.0,0.0 ])  # initialize 
+    end_coord[0] = start_coord[0]+cos(dir)*dist
+    end_coord[1] = start_coord[1]+sin(dir)*dist
+    return line(array([ start_coord, end_coord ]),npts=npts)
+    
+
 def dist(end_pt):
     return sqrt((end_pt[1,0]-end_pt[0,0])**2+(end_pt[1,1]-end_pt[0,1])**2)
 
@@ -111,7 +118,7 @@ def intersect(p1,p2,d1,d2,tol=1.0e-3):
             m1 = tan(d1)
             m2 = tan(d2)
 #            print('    m1, m2: ',m1,m2)
-            xc = (p2[1]-p1[1] + m1*p1[0] + m2*p2[0]) / (m1-m2)
+            xc = (p2[1]-p1[1] + m1*p1[0] - m2*p2[0]) / (m1-m2)
             yc = m1*xc - m1*p1[0] + p1[1]
             pc = array([ xc, yc ])
             

@@ -176,7 +176,7 @@ for k in range(nk):
     S.add(frame_pair(S1,S2,first1=f,frame_only=True,pin_to_frame1=ptf,
                      normal_intersect=False,object=k))
 
-figure(S,'length','emerald_woman')
+figure(S.rotate(pi),'length','emerald_woman')
 
 ###
 
@@ -204,7 +204,7 @@ for k in range(nk):
     S.add(frame_pair(S1,S2,first1=f,frame_only=True,pin_to_frame1=ptf, # n2=S2.n()//10,
                      normal_intersect=False,object=k))
 
-figure(S,'spacing','pretty_reds')
+figure(S.rotate(pi),'spacing','pretty_reds')
 
 ###
 
@@ -276,8 +276,8 @@ a=2
 S1 = spiro_cross(width=R,height=R,wheel=Wheel(a,2*a),inside=False,loops=l//ppl1).rotate(pi/4)
 S2 = spiro_nstar(4,r1=1.3*R/2,r2=0.3, wheel=Wheel(a,0.8*a),inside=True,loops=l//ppl2)
 
-S1 = S1.resample(S1.max_path()*frame_sampling(ppl1))
-S2 = S2.resample(S2.max_path()*frame_sampling(ppl2))
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl1,spacing='constant'))
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl2,spacing='constant'))
 
 ptfN = 1*S2.n()
 ptf = array([ 0.5 + 0.0 * sin(2*pi*j/ptfN) for j in range(ptfN) ])
@@ -311,8 +311,8 @@ a=2
 S1 = spiro_cross(width=R,height=R,wheel=Wheel(a,2*a),inside=False,loops=l//ppl1).rotate(pi/4)
 S2 = spiro_nstar(4,r1=1.3*R/2,r2=0.3, wheel=Wheel(a,0.8*a),inside=True,loops=l//ppl2)
 
-S1 = S1.resample(S1.max_path()*frame_sampling(ppl1))
-S2 = S2.resample(S2.max_path()*frame_sampling(ppl2))
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl1,spacing='constant'))
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl2,spacing='constant'))
 
 ptfN = 1*S2.n()
 ptf = array([ 0.5 + 0.3 * sin(2*pi*j/ptfN) for j in range(ptfN) ])
@@ -355,8 +355,8 @@ S2 = cIc(ring=Ring(r2),wheel=Wheel(a2,a2),loops=l//ppl2,ppl=1000,inside=True)
 
 a=6
 
-S1 = S1.resample(S1.max_path()*frame_sampling(ppl1))
-S2 = S2.resample(S2.max_path()*frame_sampling(ppl2))
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl1,spacing='constant'))
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl2,spacing='constant'))
 
 ptfN = 5*S2.n()
 ptf = array([ 0.5 + 0.0 * sin(7*pi*j/ptfN) for j in range(ptfN) ])
@@ -402,8 +402,8 @@ S1 = eIe(ring=Ellipse(r1,er1),wheel=Ellipse(a1,ew1,1.2*a1),
 S2 = eIe(ring=Ellipse(r2,er2),wheel=Ellipse(a2,ew2,1.2*a2),
          loops=l//ppl2,ppl=1000,inside=True).rotate(pi/3).move(10,0)
 
-S1 = S1.resample(S1.max_path()*frame_sampling(ppl1))
-S2 = S2.resample(S2.max_path()*frame_sampling(ppl2))
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl1,spacing='constant'))
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl2,spacing='constant'))
 
 ptfN = S2.n()
 ptf = array([ 0.5 + 0.0 * sin(1*pi*j/ptfN) for j in range(ptfN) ])
@@ -450,8 +450,8 @@ S2 = eIe(ring=Ellipse(r2,er2),wheel=Ellipse(a2,ew2,1.2*a2),
 
 S = SpiroData()
 
-S1 = S1.resample(S1.max_path()*frame_sampling(ppl1))
-S2 = S2.resample(S2.max_path()*frame_sampling(ppl2))
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl1,spacing='constant'))
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl2,spacing='constant'))
 
 ptfN = 3*S2.n()
 ptf = array([ -0.5 + 0.0 * sin(1*pi*j/ptfN) for j in range(ptfN) ])
@@ -498,8 +498,8 @@ S2 = eIe(ring=Ellipse(r2,er2),wheel=Ellipse(a2,ew2,1.2*a2),
 
 S = SpiroData()
 
-S1 = S1.resample(S1.max_path()*frame_sampling(ppl1))
-S2 = S2.resample(S2.max_path()*frame_sampling(ppl2))
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl1,spacing='constant'))
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl2,spacing='constant'))
 
 ptfN = S2.n()
 ptf = array([ 0.5 + 0.0 * sin(1*pi*j/ptfN) for j in range(ptfN) ])
@@ -512,7 +512,6 @@ o = linspace(0.3,1.0-1/nf,1)
 for oj in range(o.shape[0]):
     for k in range(nk):
         f = int( o[oj]*ppl1 + ppl1/nf * k/nk)
-        print(oj,k,f)
         S.add(frame_pair(S1,S2,first1=f,frame_only=True,pin_to_frame1=ptf, n2=ptfN,
                          normal_intersect=False,object=k))
 
@@ -547,8 +546,8 @@ S2 = eIe(ring=Ellipse(r2,er2),wheel=Ellipse(a2,ew2,1.5*a2),
 
 S = SpiroData()
 
-S1 = S1.resample(S1.max_path()*frame_sampling(ppl1))
-S2 = S2.resample(S2.max_path()*frame_sampling(ppl2))
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl1,spacing='constant'))
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl2,spacing='constant'))
 
 ptfN = S2.n()//2
 ptf = array([ 0.5 + 0.4 * sin(7*pi*j/ptfN) for j in range(ptfN) ])
@@ -561,7 +560,6 @@ o = linspace(0.3,1.0-1/nf,1)
 for oj in range(o.shape[0]):
     for k in range(nk):
         f = int( o[oj]*ppl1 + ppl1/nf * k/nk)
-        print(oj,k,f)
         S.add(frame_pair(S1,S2,first1=f,frame_only=True,pin_to_frame1=ptf, n2=ptfN,
                          normal_intersect=False,object=k))
 
@@ -596,8 +594,8 @@ S2 = eIe(ring=Ellipse(r2,er2),wheel=Ellipse(a2,ew2,0.5*a2),
 
 S = SpiroData()
 
-S1 = S1.resample(S1.max_path()*frame_sampling(ppl1))
-S2 = S2.resample(S2.max_path()*frame_sampling(ppl2))
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl1,spacing='constant'))
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl2,spacing='constant'))
 
 ptfN = S2.n()//2
 ptf = array([ 0.5 + 0.3 * sin(3*pi*j/ptfN) for j in range(ptfN) ])
@@ -610,7 +608,6 @@ o = linspace(0.2,1.0-1/nf,1)
 for oj in range(o.shape[0]):
     for k in range(nk):
         f = int( o[oj]*ppl1 + ppl1/nf * k/nk)
-        print(oj,k,f)
         S.add(frame_pair(S1,S2,first1=f,frame_only=True,pin_to_frame1=ptf, n2=ptfN,
                          normal_intersect=False,object=k))
 

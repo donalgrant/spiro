@@ -51,6 +51,7 @@ class SpiroData:
         self.s = array([])  # segment number
         self.fx = array([])  # frame x-coord
         self.fy = array([])  # frame y-coord
+        self.v = array([])   # flag:  1 if valid, 0 if invalid
         return self
 
     def add(self, sd):
@@ -62,9 +63,23 @@ class SpiroData:
         self.s = append(self.s,sd.s)
         self.fx = append(self.fx,sd.fx)
         self.fy = append(self.fy,sd.fy)
+        self.v = append(self.v,sd.v)
         return self
 
-    def set(self,x=0,y=0,p=0,t=0,o=0,s=0,fx=0,fy=0):
+    # use add_invalid to maintain correspondence of points to a source, even if some points are undefined/invalid
+    def add_invalid(self, sd):
+        self.x = append(self.x,sd.x)
+        self.y = append(self.y,sd.y)
+        self.p = append(self.p,sd.p)
+        self.t = append(self.t,sd.t)
+        self.o = append(self.o,sd.o)
+        self.s = append(self.s,sd.s)
+        self.fx = append(self.fx,sd.fx)
+        self.fy = append(self.fy,sd.fy)
+        self.v = append(self.v,sd.v*0)   # mark all points as invalid
+        return self
+
+    def set(self,x=0,y=0,p=0,t=0,o=0,s=0,fx=0,fy=0,v=1):
         self.x = array([x])
         self.y = array([y])
         self.p = array([p])
@@ -73,20 +88,22 @@ class SpiroData:
         self.s = array([s])
         self.fx = array([fx])
         self.fy = array([fy])
+        self.v = array([v])
         return self
 
-    def set_array(self,x,y,p,t,o,s,fx,fy):
+    def set_array(self,x,y,p=None,t=None,o=None,s=None,fx=None,fy=None,v=None):
         self.x = x
         self.y = y
-        self.p = p
-        self.t = t
-        self.o = o
-        self.s = s
-        self.fx = fx
-        self.fy = fy
+        self.p = self.x*0                 if p  is None else p
+        self.t = linspace(0,1,x.shape[0]) if t  is None else t
+        self.o = self.x*0                 if o  is None else o
+        self.s = self.x*0                 if s  is None else s
+        self.fx = self.x                  if fx is None else fx
+        self.fy = self.y                  if fy is None else fy
+        self.v = self.x*0+1               if v  is None else v
         return self
 
-    def load(self,xy_array,phase,time_offset=0,object=0,segment=0,frame_x=0,frame_y=0):
+    def load(self,xy_array,phase=0.0,time_offset=0,object=0,segment=0,frame_x=0,frame_y=0):
         s = SpiroData()
         s.x=xy_array[:,0]
         s.y=xy_array[:,1]
@@ -96,6 +113,7 @@ class SpiroData:
         s.s=np.full((s.n()),segment)
         s.fx=np.full((s.n()),frame_x)
         s.fy=np.full((s.n()),frame_y)
+        s.v= np.full((s.n()),1)
         return self.add(s);
         
     def xc(self):  return self.x[-1] 
@@ -138,12 +156,12 @@ class SpiroData:
     def wrap(self,i):  return i % self.n()
     
     def direction(self,i1):
-        i1 = i1 % self.n()
+        i1 = (i1-1+self.n()) % self.n()
         i2 = (i1+1) % self.n()
         return arctan2(self.y[i2]-self.y[i1],self.x[i2]-self.x[i1])
 
     def fdirection(self,i1):
-        i1 = i1 % self.n()
+        i1 = (i1-1+self.n()) % self.n()
         i2 = (i1+1) % self.n()
         return arctan2(self.fy[i2]-self.fy[i1],self.fx[i2]-self.fx[i1])
 
@@ -162,9 +180,27 @@ class SpiroData:
         iw = self.wrap(i)
         return arctan2(coord[1]-self.y[iw],coord[0]-self.x[iw])
 
+    def direction_to_frame(self,i):
+        return self.direction_to_coord(i,self.fxy(i))
+
+    def directions_to_frame(self):
+        return array([ self.direction_to_frame(i) for i in range(self.n()) ])
+    
+    def frame_offset_dir(self,i):
+        return self.direction_to_frame(i)-self.fdirection(i)
+
+    def dirs_off_frame(self):
+        return array([ self.frame_offset_dir(i) for i in range(self.n()) ])
+    
     def dist_to_coord(self,i,coord):
         iw = self.wrap(i)
         return dist(array([ self.xy(i), coord ]))
+
+    def dist_to_frame(self,i):
+        return self.dist_to_coord(i,self.fxy(i))
+
+    def dists_to_frame(self):
+        return array([ self.dist_to_frame(i) for i in range(self.n()) ])
 
     def fchord_direction(self,i1,i2):
         i1w = self.wrap(i1)
@@ -232,6 +268,9 @@ class SpiroData:
     
     def flengths(self):
         return append([0],path_length(self.fx,self.fy))
+
+    def frac_paths(self):
+        return self.lengths()/self.max_path()
     
     def rotate(self,angle):
         coords = rot_coords(angle,column_stack((self.x,self.y)))
@@ -268,6 +307,7 @@ class SpiroData:
         sd.y = inv_r * sin(pp)
         sd.fx = self.fx
         sd.fy = self.fy
+        sd.v = self.v
         return sd
     
     def subsample(self,n,first=0):
@@ -281,6 +321,7 @@ class SpiroData:
         sd.s=self.s[first::n]
         sd.fx=self.fx[first::n]
         sd.fy=self.fy[first::n]
+        sd.v =self.v[first::n]
         return sd
 
     def n(self):  return self.x.shape[0]
@@ -290,14 +331,14 @@ class SpiroData:
         j = condition
         return sd.set_array(self.x[j],self.y[j],self.p[j],
                             self.t[j],self.o[j],self.s[j],
-                            self.fx[j],self.fy[j])
+                            self.fx[j],self.fy[j],self.v[j])
 
     def remove(self,condition):
         sd = SpiroData()
         j = np.in1d(range(self.n()),condition)
         return sd.set_array(self.x[~j],self.y[~j],self.p[~j],
                             self.t[~j],self.o[~j],self.s[~j],
-                            self.fx[~j],self.fy[~j])
+                            self.fx[~j],self.fy[~j],self.v[~j])
 
     def non_zero_intervals(self):
         dr = path_diffs(self.x,self.y)
@@ -330,7 +371,11 @@ class SpiroData:
         sd.s=bs(interp_dists)
         sd.fx=bfx(interp_dists)
         sd.fy=bfy(interp_dists)
+        sd.v=sd.x*0+1
         return sd
+
+    def oversample(self,factor):
+        return self.resample(self.max_path()*frame_sampling(int(factor*self.n()),1.0,'constant'))
     
     def copy(self):
         sd = SpiroData()
@@ -342,8 +387,15 @@ class SpiroData:
         sd.s= np.copy(self.s)
         sd.fx=np.copy(self.fx)
         sd.fy=np.copy(self.fy)
+        sd.v =np.copy(self.v)
         return sd
-        
+
+    def copy_n(self,n_copies):
+        sd = SpiroData()
+        for j in range(n_copies):
+            sd.add(self)
+        return sd
+    
     def save(self,filename):
         with open(filename,'wb') as f:
             pickle.dump(self,f,pickle.HIGHEST_PROTOCOL)

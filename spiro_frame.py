@@ -7,7 +7,7 @@ from numpy import array,linspace,fmod,arange,sin,cos
 def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyfunc=None,  # Xcoords; X=[tped]
              pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0,vertex_order=None,
              pin_coord=None,pin_to_frame=0.0,autoscale=True,pinned_vertex=0,
-             frame_intersect=False):
+             frame_intersect=False,show_line=False):
     '''
     polyfunc is a function providing vertex coordinates to draw on the frame.  It has five
     parameters: two shape parameters (e.g., opening angle and asymmetry),
@@ -22,6 +22,7 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
     S = SpiroData()
     n = sd.n() if n is None else n
     i = first
+
     for k in range(n):
         if not orient_follow is None:
             orient_angle = -sd.chord_direction(i,i+array_val(orient_follow,k))-array_val(orient,k)
@@ -40,7 +41,7 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
             fcoord = sd.xy(i)
         else:
             fcoord = pin_to_frame*sd.xy(i) + (1.0-pin_to_frame)*pin_coord
-            
+
         T.load(polyfunc(oa,ay,fb=fbk,fh=fhk,prot=pr),ph,frame_x=fcoord[0],frame_y=fcoord[1])
         
         if not pin_coord is None:
@@ -58,6 +59,11 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
                     sc /= seg_length
                 
         st = SpiroData() # for the connections between vertices
+
+        if show_line:
+            S.load(line(array([ [pin_coord[0],pin_coord[1]] , [sd.xy(i)[0],sd.xy(i)[1]] ]), npts=300),
+                   0,0,array_val(object,k),segment=i)
+            
         tt = 0
         nv=T.n()
         if not vertex_order is None:
@@ -186,21 +192,28 @@ def frame_pair(F1,F2,skip1=1,skip2=1,first1=0,first2=0,
                scale=1.0,oangle=pi/3,fb=0.0,fh=0.0,asym=0,orient=0,polyfunc=None,  # tcoords or pcoords
                pts=100,n1=1,n2=None,arc_angle=0,object=0,prot=0,vertex_order=None,
                pin_to_frame1=0.0,autoscale=True,pinned_vertex=0,show_side=None,
-               normal_intersect=False,norm_off1=0.0,norm_off2=0.0,frame_only=False,intersect_tol=1.0e-3):
+               normal_intersect=False,norm_off1=0.0,norm_off2=0.0,frame_only=False,intersect_tol=1.0e-3,
+               show_line=False,show_intersect=False):
 
     S = SpiroData()
     max_n = F2.n() if n2 is None else n2
     
     for i in range(max_n):
 
-        j2 = first2+i*array_val(skip2,i)
-        p2 = F2.xy(j2)
         sk1 = array_val(skip1,i)
         j1 = array_val(first1,i)+i*sk1
+        p1 = F1.xy(j1)
+        
+        j2 = first2+i*array_val(skip2,i)
+        p2 = F2.xy(j2)
+
         
         if normal_intersect:
-            pc = intersect(F1.xy(j1),p2,F1.direction(j1)+pi/2+array_val(norm_off1,i),
+            pc = intersect(p1,p2,F1.direction(j1)+pi/2+array_val(norm_off1,i),
                            F2.direction(j2)+pi/2+array_val(norm_off2,i),tol=intersect_tol)
+            if show_intersect and not pc is None:
+                S.load(line(array([ pc , p1 ]), npts=100),0,0,array_val(object,i),segment=-i-1)
+                S.load(line(array([ pc , p2 ]), npts=100),0,0,array_val(object,i),segment=-i-1)
         else:
             pc=p2
 
@@ -209,22 +222,28 @@ def frame_pair(F1,F2,skip1=1,skip2=1,first1=0,first2=0,
         else:
             npts = show_side * array_val(pts,i)
         
+        if frame_only:
+            T=on_frame(F1,skip=sk1,first=j1,n=array_val(n1,i),
+                       scale=0,oangle=0,fb=0,fh=0,asym=0,orient=0,polyfunc=dcoords,
+                       pts=1,arc_angle=0,object=array_val(object,i),prot=0,
+                       pin_coord=pc,pin_to_frame=array_val(pin_to_frame1,i),
+                       autoscale=False,pinned_vertex=0,show_line=show_line)
+        else:
+            T=on_frame(F1,skip=sk1,first=j1,n=array_val(n1,i),
+                       scale=array_val(scale,i),oangle=array_val(oangle,i),
+                       fb=array_val(fb,i),fh=array_val(fh,i),asym=array_val(asym,i),
+                       orient=array_val(orient,i),polyfunc=polyfunc,
+                       pts=npts,arc_angle=array_val(arc_angle,i),
+                       object=array_val(object,i),prot=array_val(prot,i),vertex_order=vertex_order,
+                       pin_coord=pc,pin_to_frame=array_val(pin_to_frame1,i),
+                       autoscale=array_val(autoscale,i),pinned_vertex=array_val(pinned_vertex,i),
+                       show_line=show_line)
+
         if pc is not None:
-            if frame_only:
-                S.add(on_frame(F1,skip=sk1,first=j1,n=array_val(n1,i),
-                               scale=0,oangle=0,fb=0,fh=0,asym=0,orient=0,polyfunc=dcoords,
-                               pts=1,arc_angle=0,object=array_val(object,i),prot=0,
-                               pin_coord=pc,pin_to_frame=array_val(pin_to_frame1,i),
-                               autoscale=False,pinned_vertex=0))
-            else:
-                S.add(on_frame(F1,skip=sk1,first=j1,n=array_val(n1,i),
-                               scale=array_val(scale,i),oangle=array_val(oangle,i),
-                               fb=array_val(fb,i),fh=array_val(fh,i),asym=array_val(asym,i),
-                               orient=array_val(orient,i),polyfunc=polyfunc,
-                               pts=npts,arc_angle=array_val(arc_angle,i),
-                               object=array_val(object,i),prot=array_val(prot,i),vertex_order=vertex_order,
-                               pin_coord=pc,pin_to_frame=array_val(pin_to_frame1,i),
-                               autoscale=array_val(autoscale,i),pinned_vertex=array_val(pinned_vertex,i)))
+            S.add(T)
+        else:
+            S.add_invalid(T)
+            
     return S
 
 def ellipses_from_coord(sd,coord=array([0,0]),offset=100,npts=500,
@@ -345,3 +364,45 @@ def ellipses_between_frames(s1,s2,step1,step2,
         i2 += array_val(step2,k)
         
     return S
+
+def biframe(s1,s2,l1,l2,ppl=1000,ng=1,fn=0.05,nk=1,base=0.5,amp=0.0,rate=1,
+            g0=0.0,gf=1.0,n2f=1.0,show_line=False,gfg=None,pplf=1):
+
+    S = SpiroData()
+
+    l = np.lcm(l1,l2)
+
+    pplf = ppl//max(l1,l2)
+    ppl1 = l2*pplf
+    ppl2 = l1*pplf
+
+    S1 = s1.copy_n(l1)
+    S2 = s2.copy_n(l2)
+
+    S1a = S1.resample(S1.max_path()*frame_sampling(l1*ppl1,spacing='constant'))
+    S2a = S2.resample(S2.max_path()*frame_sampling(l2*ppl2,spacing='constant'))
+
+    S2n = S2a.n()
+    ptfN = int(n2f*S2n)
+    ptf = array([ base + amp * sin(rate*pi*j/S2n) for j in range(ptfN) ])
+
+    if gfg is None:  gfg = fn
+    
+    o = linspace(g0,gf-gfg,ng)
+
+    for oj in range(o.shape[0]):
+        for k in range(nk):
+            f = int(round( o[oj]*ppl1 + ppl1*fn * k/nk ))
+            S.add(frame_pair(S1a,S2a,first1=f,frame_only=True,
+                             pin_to_frame1=ptf,n2=ptfN,object=oj,show_line=show_line))
+    
+    return S
+
+def auto_inorm_frame(s1,first=0,n=None,norm_off1=0,norm_off2=0,
+                     base=0.0,amp=0.0,rate=2.0,
+                     intersect_tol=0.1,show_intersect=False,object=0):
+    if n is None:  n = s1.n()
+    ptf = array([ base + amp * sin(rate*pi*j/s1.n()) for j in range(n) ])
+    return frame_pair(s1,s1,first1=first,n2=n,pin_to_frame1=ptf,
+                      normal_intersect=True,norm_off1=norm_off1,norm_off2=norm_off2,
+                      frame_only=True,intersect_tol=intersect_tol,show_intersect=show_intersect,object=object)

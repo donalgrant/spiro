@@ -67,6 +67,7 @@ def cs_list():
     return ['radial','cycles','phase','spacing','direction','x-direction','y-direction',
             'polar','time','length','length_r','random',
             'width','fwidth','lengths','flengths','fradii','fpolars',
+            'dir_to_frm','dist_to_frm','dir_off_frm',
             'fcdist3','fcdist4','fcdist5','fcdist6','fcdist7',
             'cdist3','cdist4','cdist5','cdist6','cdist7',
             'fcdirs3','fcdirs4','fcdirs5','fcdirs6','fcdirs7',
@@ -197,6 +198,9 @@ class SpiroFig:
                 case 'fwidth':    clr=sd.fchord_dists(sd.n()//2)
                 case 'lengths':   clr=sd.lengths()
                 case 'flengths':  clr=sd.flengths()
+                case 'dir_to_frm':  clr=sd.directions_to_frame()
+                case 'dist_to_frm': clr=sd.dists_to_frame()
+                case 'dir_off_frm': clr=sd.dirs_off_frame()
                 case 'fcdist3':   clr=sd.fchord_dists(sd.n()//3)  # would love to parse for the digit
                 case 'fcdist4':   clr=sd.fchord_dists(sd.n()//4)
                 case 'fcdist5':   clr=sd.fchord_dists(sd.n()//5)
