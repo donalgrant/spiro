@@ -97,8 +97,8 @@ figure(S0,'orange','Reds',new_fig=False,dot_size=1.0,alpha=1.0)
 npp = max(l1,l2) * 100
 
 S  = biframe(S1,S2,l1,l2,ppl=npp,ng=ng,fn=fn,nk=nk,base=base,amp=amp,rate=rate,g0=g0,gf=gf,n2f=n2f)
-Sa = biframe(S1,S2,l1,l2,ppl=npp, ng=ng,fn=fn,nk=nk,base=1.0, amp=0,  rate=rate,g0=g0,gf=gf,n2f=n2f)
-Sb = biframe(S1,S2,l1,l2,ppl=npp, ng=ng,fn=fn,nk=nk,base=0.0, amp=0,  rate=rate,g0=g0,gf=gf,n2f=n2f)
+Sa = biframe(S1,S2,l1,l2,ppl=npp,ng=ng,fn=fn,nk=nk,base=1.0, amp=0,  rate=rate,g0=g0,gf=gf,n2f=n2f)
+Sb = biframe(S1,S2,l1,l2,ppl=npp,ng=ng,fn=fn,nk=nk,base=0.0, amp=0,  rate=rate,g0=g0,gf=gf,n2f=n2f)
 S0 = biframe(S1,S2,l1,l2,ppl=npp,ng=ng,fn=fn,nk=nk,base=base,amp=amp,rate=rate,g0=g0,gf=gf,n2f=n2f,
             show_line=True)
 
@@ -138,7 +138,7 @@ S  = biframe(S1,S2,l1,l2,ppl=npp,ng=ng,fn=fn,nk=nk,base=base,amp=amp,rate=rate,g
 
 Sa = biframe(S1,S2,l1,l2,ppl=npp, ng=ng,fn=fn,nk=nk,base=1.0, amp=0,  rate=rate,g0=g0,gf=gf,n2f=n2f)
 Sb = biframe(S1,S2,l1,l2,ppl=npp, ng=ng,fn=fn,nk=nk,base=0.0, amp=0,  rate=rate,g0=g0,gf=gf,n2f=n2f)
-S0 = biframe(S1,S2,l1,l2,ppl=npp,ng=ng,fn=fn,nk=nk,base=base,amp=amp,rate=rate,g0=g0,gf=gf,n2f=n2f,
+S0 = biframe(S1,S2,l1,l2,ppl=npp, ng=ng,fn=fn,nk=nk,base=base,amp=amp,rate=rate,g0=g0,gf=gf,n2f=n2f,
             show_line=True)
 
 small_offsets = linspace(0,0.5,Sa.n())
@@ -146,7 +146,7 @@ alpha = linspace(1.0,0.5,npp)
 
 F.plot(S, color_scheme='red',cmap='Reds',dot_size=20,alpha=alpha,new_fig=True)
 
-F.plot(Sa.move(small_offsets,small_offsets), color_scheme='cyan',dot_size=20,alpha=alpha,new_fig=False)
+F.plot(Sa.move(small_offsets,small_offsets), color_scheme='cyan', dot_size=20,alpha=alpha,new_fig=False)
 F.plot(Sb.move(small_offsets,small_offsets), color_scheme='green',dot_size=20,alpha=alpha,new_fig=False)
 F.plot(S1,color_scheme='cyan', dot_size=.2, new_fig=False)
 F.plot(S2,color_scheme='green',dot_size=.2, new_fig=False)
@@ -473,3 +473,53 @@ F.plot(S,color_scheme='orange',dot_size=0.5,new_fig=False)
 F.plot(H,color_scheme='cyan',cmap='Greens',dot_size=100,alpha=1.0-H.frac_paths()/2,new_fig=False)
 
 F.save_fig()
+
+###
+
+R = 50
+ppl = 1000
+a = R*5/6
+
+S1 = cIc(ring=Ring(R),wheel=Wheel(a,0.2*a),loops=5,ppl=ppl,inside=False,reverse=False).rotate(pi/6)
+
+f=S1.n()//3
+
+S=SpiroData()
+
+ns = 50
+lbox = 12*R
+for i in range(ns):
+    T = auto_inorm_frame(S1,first=f,norm_off1=pi/12*i/ns,norm_off2=0,
+                         base=0.0,amp=0.5,rate=8,object=i)
+    for j in range(T.n()):
+        T.fx[j]=S1.x[j]
+        T.fy[j]=S1.y[j]
+
+    S.add(T.valid_in_box(lbox))
+
+figure(S,'dist_to_frm','turbo')
+
+###
+
+R = 50
+ppl = 2000
+a = R*5/6
+
+S1 = cIc(ring=Ring(R),wheel=Wheel(a,0.2*a),loops=5,ppl=ppl,inside=False,reverse=False).rotate(pi/6)
+
+f=S1.n()//9
+
+S=SpiroData()
+
+ns = 25
+lbox = 2*R
+for i in range(ns):
+    T = auto_inorm_frame(S1,first=f,norm_off1=pi/20*i/ns,norm_off2=0,
+                         base=0.0,amp=0.5,rate=8,object=i)
+    for j in range(T.n()):
+        T.fx[j]=S1.x[j]
+        T.fy[j]=S1.y[j]
+
+    S.add(T.valid_in_box(lbox))
+
+figure(S,'dist_to_frm','hot')

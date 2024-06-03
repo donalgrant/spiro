@@ -64,7 +64,7 @@ def cmap_list():
 # place, rather than both here and in the match statement.
 
 def cs_list():
-    return ['radial','cycles','phase','spacing','direction','x-direction','y-direction',
+    return ['radial','cycles','phase','spacing','fspacing','direction','x-direction','y-direction',
             'polar','time','length','length_r','random',
             'width','fwidth','lengths','flengths','fradii','fpolars',
             'dir_to_frm','dist_to_frm','dir_off_frm',
@@ -173,6 +173,7 @@ class SpiroFig:
                 case 'y-direction': clr=sin(scipy.signal.medfilt(sd.directions()))
                 case 'direction': clr=scipy.signal.medfilt(sd.directions())
                 case 'spacing':   clr=scipy.signal.medfilt(sd.neighbor_distances())
+                case 'fspacing':  clr=scipy.signal.medfilt(sd.fneighbor_distances())
                 case 'time':      clr=sd.t
                 case 'length':    clr=linspace(0,sd.x.shape[0],sd.x.shape[0])
                 case 'length_r':  clr=linspace(sd.x.shape[0],0,sd.x.shape[0])

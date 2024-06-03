@@ -340,6 +340,24 @@ class SpiroData:
                             self.t[~j],self.o[~j],self.s[~j],
                             self.fx[~j],self.fy[~j],self.v[~j])
 
+    def valid(self):
+        sd = self.copy()
+        sd = sd.select(sd.v==1)
+        return sd
+    
+    def valid_in_box(self,lbox):
+        sd = self.valid()
+        sd = sd.select(-lbox<=sd.x)
+        sd = sd.select(sd.x<=lbox)
+        sd = sd.select(-lbox<=sd.y)
+        sd = sd.select(sd.y<=lbox)
+        return sd
+
+    def valid_in_radius(self,r):
+        sd = self.valid()
+        sd = sd.select(sqrt(sd.x**2+sd.y**2)<=r)
+        return sd
+
     def non_zero_intervals(self):
         dr = path_diffs(self.x,self.y)
         return np.where(dr>1.0e-6)
