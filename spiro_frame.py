@@ -7,7 +7,7 @@ from numpy import array,linspace,fmod,arange,sin,cos
 def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyfunc=None,  # Xcoords; X=[tped]
              pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0,vertex_order=None,
              pin_coord=None,pin_to_frame=0.0,autoscale=True,pinned_vertex=0,
-             frame_intersect=False,show_line=False):
+             frame_intersect=False,show_line=False,rp_opts=None):
     '''
     polyfunc is a function providing vertex coordinates to draw on the frame.  It has five
     parameters: two shape parameters (e.g., opening angle and asymmetry),
@@ -17,6 +17,7 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
     corresponding to the points on the frame.  (orient_follow is ignored in this case.)
     If pinned_vertex is set to an index other than zero, then the size of the segment between
     vertex 0 and the pinned_vertex will be used for the scaling of the figure.
+    rp_opts are the resample options to be used on each figure drawn on the frame
     '''
     
     S = SpiroData()
@@ -77,7 +78,11 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
                     frame_x=fcoord[0],frame_y=fcoord[1])
             tt += npts
 
-        S.add(st.scale(sc).rotate(array_val(orient_angle,k)).disp(fcoord))
+        sst = st.scale(sc).rotate(array_val(orient_angle,k)).disp(fcoord)
+
+        if (rp_opts is not None):  sst=sst.resample(sst.max_path()*frame_sampling(1,fs_opts=rp_opts))
+
+        S.add(sst)
         i+=array_val(skip,k)
     return S
 

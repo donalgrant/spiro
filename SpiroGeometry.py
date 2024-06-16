@@ -280,8 +280,18 @@ def fibonacci(n):
     return x2
         
     
-def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat=1,nocum=False):
+def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat=1,nocum=False,
+                   fs_opts=None):
 
+    if fs_opts is not None:
+        if 'n'       in fs_opts:  n       = fs_opts['n']
+        if 'parm'    in fs_opts:  parm    = fs_opts['parm']
+        if 'spacing' in fs_opts:  spacing = fs_opts['spacing']
+        if 'reverse' in fs_opts:  reverse = fs_opts['reverse']
+        if 'deramp'  in fs_opts:  deramp  = fs_opts['deramp']
+        if 'repeat'  in fs_opts:  repeat  = fs_opts['repeat']
+        if 'nocum'   in fs_opts:  nocum   = fs_opts['nocum']
+        
     dn = 2*repeat if deramp else repeat
     
     match spacing:
