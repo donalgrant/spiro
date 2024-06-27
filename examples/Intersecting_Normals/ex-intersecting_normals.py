@@ -241,3 +241,274 @@ for k in range(nk):
                      normal_intersect=True))
 
 figure(S,'spacing','gist_heat_r')
+
+###
+
+S1 = cIc(Ring(30),Wheel(6,6),loops=1,ppl=400,inside=True)
+S2 = cIc(Ring(25),Wheel(5,5),loops=1,ppl=400,inside=True)
+
+S2 = S2.resample(S2.max_path()*frame_sampling(400,parm=10,spacing='linear',
+                                              deramp=False,repeat=50))
+
+nv = 2
+v = linspace(0,nv-1,nv,dtype=int)
+
+pts = 200
+
+nn = 400
+rp_opts = { 'n': nn, 'parm': 1.0, 'spacing':  ['constant'], 'repeat': 10, 'deramp': True }
+
+S=SpiroData()
+
+nf0=1
+for i in range(nf0):
+    f0=n//nf0*i 
+
+    S.add(frame_pair(S1,S2,skip1=1,skip2=1,first1=0,first2=S2.n()//6,
+               scale=1.0,oangle=pi/3,fb=0.0,fh=0.0,asym=0,orient=0,polyfunc=tcoords, 
+               pts=100,n1=1,n2=None,arc_angle=0,object=i,prot=0,vertex_order=None,
+               pin_to_frame1=0.0,autoscale=True,pinned_vertex=0,show_side=None,
+               normal_intersect=True,norm_off1=0.0,norm_off2=0.0,frame_only=False,intersect_tol=1.0e-1,
+               show_line=False,show_intersect=False))
+
+l = [-45,45,-45,45]
+
+figure(S,'time','cmap1',limits=l)
+
+###
+
+ppl=800
+
+S1 = cIc(Ring(30),Wheel(6,6),loops=1,ppl=ppl,inside=True)
+S2 = cIc(Ring(25),Wheel(5,5),loops=1,ppl=ppl,inside=True)
+
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl,parm=10,spacing='linear',
+                                              deramp=False,repeat=50))
+
+n = S2.n()
+
+nf=n//11
+
+nv = 2
+v = linspace(0,nv-1,nv,dtype=int)
+nb = S2.n()//11
+o = S2.chord_dirs(nb)
+
+pts = 500
+
+aa = pi/3 
+
+offset = 0
+S=SpiroData()
+
+nf0=3
+for i in range(nf0):
+    f0=n//nf0*i 
+
+    S.add(frame_pair(S1,S2,skip1=1,skip2=1,first1=f0,first2=S2.n()//9,
+               scale=1.0,oangle=pi/3,fb=0.0,fh=0.0,asym=0,orient=0,polyfunc=tcoords, 
+               pts=100,n1=1,n2=nf,arc_angle=aa,object=i,prot=0,vertex_order=None,
+               pin_to_frame1=0.0,autoscale=True,pinned_vertex=0,show_side=None,
+               normal_intersect=True,norm_off1=0.0,norm_off2=0.0,frame_only=False,intersect_tol=1.0e-1,
+               show_line=False,show_intersect=False))
+
+l = [-45,45,-45,45]
+figure(S,'time','emerald_woman',limits=l)
+
+###
+
+ppl=800
+
+S1 = cIc(Ring(30),Wheel(6,6),loops=1,ppl=ppl,inside=True)
+S2 = cIc(Ring(25),Wheel(5,5),loops=1,ppl=ppl,inside=True)
+
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl,parm=10,spacing='linear',
+                                              deramp=False,repeat=50))
+
+n = S2.n()
+
+nf=n
+
+nv = 2
+v = linspace(0,nv-1,nv,dtype=int)
+nb = S2.n()//11
+o = S2.chord_dirs(nb) 
+
+pts = 500
+
+nn = 400
+rp_opts = { 'n': nn, 'parm': 10.0, 'spacing':  ['linear'], 'repeat': 10, 'deramp': False }
+
+aa = pi/3 
+
+offset = 0
+S=SpiroData()
+
+nf0=1
+for i in range(nf0):
+    f0=n//nf0*i 
+
+    S.add(frame_pair(S1,S2,skip1=1,skip2=1,first1=f0,first2=S2.n()//9,
+               scale=2.0,oangle=pi/3,fb=0.0,fh=0.0,asym=0,orient=0,polyfunc=tcoords, 
+               pts=100,n1=1,n2=nf,arc_angle=aa,object=i,prot=0,vertex_order=None,
+               pin_to_frame1=0.0,autoscale=True,pinned_vertex=0,show_side=None,
+               normal_intersect=True,norm_off1=0.0,norm_off2=0.0,frame_only=False,intersect_tol=1.0e-1,
+               show_line=False,show_intersect=False,rp_opts=rp_opts))
+
+ll=60
+l = [-ll,ll,-ll,ll]
+figure(S,'dist_to_frm','Oranges',limits=l)  # try any color-scheme for this one!
+
+###
+
+ppl=800
+
+S1 = cIc(Ring(30),Wheel(5,6),loops=1,ppl=ppl,inside=True)
+S2 = cIc(Ring(24),Wheel(4,5),loops=1,ppl=ppl,inside=True)
+
+
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl,parm=10,spacing='sinusoid',
+                                              deramp=True,repeat=40)).rotate(pi/5)
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl,parm=10,spacing='sinusoid',
+                                              deramp=False,repeat=40))
+
+n = S2.n()
+
+nf=n//9
+
+nv = 2
+v = linspace(0,nv-1,nv,dtype=int)
+nb = S2.n()//11
+o = S2.chord_dirs(nb)
+
+pts = 500
+
+nn = 600
+rp_opts = { 'n': nn, 'parm': 10.0, 'spacing':  ['sinusoid'], 'repeat': 3, 'deramp': True }
+
+aa = pi 
+
+offset = 0
+S=SpiroData()
+
+f2 = S2.n()//6
+nf0=7
+for i in range(nf0):
+    f0=0
+
+    T=frame_pair(S1,S2,skip1=1,skip2=1,first1=f0,first2=f2,
+               scale=2.0,oangle=pi/4,fb=0.0,fh=0.0,asym=0,orient=0,polyfunc=tcoords, 
+               pts=100,n1=1,n2=nf,arc_angle=aa,object=i,prot=0,vertex_order=None,
+               pin_to_frame1=0.0,autoscale=True,pinned_vertex=0,show_side=None,
+               normal_intersect=True,norm_off1=0.0,norm_off2=0.0,frame_only=False,intersect_tol=1.0e-1,
+               show_line=False,show_intersect=False,rp_opts=rp_opts)
+    S.add(T.rotate(2*pi/nf0*i))
+
+ll=80
+l = [-ll,ll,-ll,ll]
+
+figure(S,'cycles','hot',limits=l)
+
+###
+
+ppl=1200
+
+S1 = cIc(Ring(30),Wheel(5,6),loops=1,ppl=ppl,inside=True)
+S2 = cIc(Ring(24),Wheel(4,5),loops=1,ppl=ppl,inside=True)
+
+
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl,parm=10,spacing='sinusoid',
+                                              deramp=True,repeat=40)).rotate(pi/5)
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl,parm=10,spacing='sinusoid',
+                                              deramp=False,repeat=40))
+
+n = S2.n()
+
+nf=n//9
+
+nv = 2
+v = linspace(0,nv-1,nv,dtype=int)
+nb = S2.n()//11
+o = S2.chord_dirs(nb) 
+
+pts = 400
+
+nn = 600
+rp_opts = { 'n': nn, 'parm': 1.0, 'spacing':  ['sinusoid'], 'repeat': 10, 'deramp': True }
+
+aa = pi 
+
+offset = 0
+S=SpiroData()
+
+f2 = S2.n()//6
+f0=0
+
+T=frame_pair(S1,S2,first1=f0,first2=f2,n1=1,n2=nf,pin_to_frame1=0.5,
+             normal_intersect=True,norm_off1=0.0,norm_off2=0.0,
+             frame_only=True,intersect_tol=1.0e-1)
+
+fpts=500
+T0=T.resample(T.max_path()*
+              frame_sampling(fpts,parm=10,spacing='sinusoid',deramp=False,repeat=30))
+
+T1=on_frame(T0,skip=1,scale=20.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyfunc=tcoords, 
+           pts=pts,first=0,n=T0.n()//5,orient_follow=T0.n()//20,
+           arc_angle=0,object=0,prot=0,vertex_order=None,
+           pin_coord=None,pin_to_frame=1.0,autoscale=False,pinned_vertex=0,rp_opts=rp_opts)
+
+ni=11
+for i in range(ni//3):  S.add(T1.rotate(2*pi/ni))
+
+S.rotate(-pi/2)
+ll=50
+l = None
+
+figure(S,'time','turbo')
+
+###
+
+ppl=800
+
+S1 = cIc(Ring(30),Wheel(5,6),loops=1,ppl=ppl,inside=True)
+S2 = cIc(Ring(24),Wheel(4,5),loops=1,ppl=ppl,inside=True).move(15,0)
+
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl,parm=10,spacing='sinusoid',
+                                              deramp=True,repeat=40)).rotate(pi/5)
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl,parm=10,spacing='sinusoid',
+                                              deramp=False,repeat=40))
+n = S2.n()
+
+nf=n//23+10
+
+nv = 2
+v = linspace(0,nv-1,nv,dtype=int)
+
+pts = 400
+
+nn = 600
+rp_opts = { 'n': nn, 'parm': 10.0, 'spacing':  ['sinusoid'], 'repeat': 10, 'deramp': True }
+
+aa = [pi/40,pi/5,pi/40,pi/5]
+
+offset = 0
+S=SpiroData()
+
+f2 = S2.n()//17
+f0=0
+
+sc = linspace(1,3,nf)
+T=frame_pair(S1,S2,skip1=1,skip2=1,first1=f0,first2=f2,
+             scale=sc,oangle=pi/4,fb=offset,fh=offset,asym=0.2,orient=0,polyfunc=pcoords, 
+             pts=pts,n1=1,n2=nf,arc_angle=aa,object=0,prot=0,vertex_order=None,
+             pin_to_frame1=0.0,autoscale=True,pinned_vertex=0,show_side=None,
+             normal_intersect=True,norm_off1=0.0,norm_off2=0,frame_only=False,
+             intersect_tol=1.0e-1,rp_opts=rp_opts)
+
+ni=7
+dn=2*pi/11
+for i in range(ni):  S.add(T.rotate(dn))
+
+S.rotate(-pi/5)
+
+figure(S,'fradii','twilight')

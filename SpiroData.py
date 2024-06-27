@@ -368,7 +368,8 @@ class SpiroData:
         y = self.y[j]
         dist = path_length(x,y)
         return dist[-1]
-    
+
+    # need to find a way to add a "closed curve" mod here
     def resample(self,interp_dists):
         j = self.non_zero_intervals()
         dist=np.append([0],path_length(self.x[j],self.y[j]))
@@ -393,7 +394,8 @@ class SpiroData:
         return sd
 
     def oversample(self,factor):
-        return self.resample(self.max_path()*frame_sampling(int(factor*self.n()),1.0,'constant'))
+        sd = self.resample(self.max_path()*frame_sampling(int(factor*self.n()),1.0,'constant'))
+        return sd # .add(self.select(slice(0,1)))
     
     def copy(self):
         sd = SpiroData()

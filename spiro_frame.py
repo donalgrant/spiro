@@ -80,7 +80,10 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
 
         sst = st.scale(sc).rotate(array_val(orient_angle,k)).disp(fcoord)
 
-        if (rp_opts is not None):  sst=sst.resample(sst.max_path()*frame_sampling(1,fs_opts=rp_opts))
+        if (rp_opts is not None):
+            fs_opts={}
+            for key in rp_opts:  fs_opts[key]=array_val(rp_opts[key],k)
+            sst=sst.resample(sst.max_path()*frame_sampling(1,fs_opts=fs_opts))
 
         S.add(sst)
         i+=array_val(skip,k)
@@ -198,7 +201,7 @@ def frame_pair(F1,F2,skip1=1,skip2=1,first1=0,first2=0,
                pts=100,n1=1,n2=None,arc_angle=0,object=0,prot=0,vertex_order=None,
                pin_to_frame1=0.0,autoscale=True,pinned_vertex=0,show_side=None,
                normal_intersect=False,norm_off1=0.0,norm_off2=0.0,frame_only=False,intersect_tol=1.0e-3,
-               show_line=False,show_intersect=False):
+               show_line=False,show_intersect=False,rp_opts=None):
 
     S = SpiroData()
     max_n = F2.n() if n2 is None else n2
@@ -232,7 +235,7 @@ def frame_pair(F1,F2,skip1=1,skip2=1,first1=0,first2=0,
                        scale=0,oangle=0,fb=0,fh=0,asym=0,orient=0,polyfunc=dcoords,
                        pts=1,arc_angle=0,object=array_val(object,i),prot=0,
                        pin_coord=pc,pin_to_frame=array_val(pin_to_frame1,i),
-                       autoscale=False,pinned_vertex=0,show_line=show_line)
+                       autoscale=False,pinned_vertex=0,show_line=show_line,rp_opts=rp_opts)
         else:
             T=on_frame(F1,skip=sk1,first=j1,n=array_val(n1,i),
                        scale=array_val(scale,i),oangle=array_val(oangle,i),
@@ -242,7 +245,7 @@ def frame_pair(F1,F2,skip1=1,skip2=1,first1=0,first2=0,
                        object=array_val(object,i),prot=array_val(prot,i),vertex_order=vertex_order,
                        pin_coord=pc,pin_to_frame=array_val(pin_to_frame1,i),
                        autoscale=array_val(autoscale,i),pinned_vertex=array_val(pinned_vertex,i),
-                       show_line=show_line)
+                       show_line=show_line,rp_opts=rp_opts)
 
         if pc is not None:
             S.add(T)

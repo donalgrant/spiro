@@ -206,14 +206,14 @@ o = 0
 
 pts = 1
 
-rp_opts = { 'n': 1000, 'parm':  4, 'spacing':  'fibonacci', 'repeat': 10,
+rp_opts = { 'n': 1000, 'parm':  4, 'spacing':  ['fibonacci'], 'repeat': 10,
             'reverse': False, 'nocum': False, 'deramp': True }
 
 S = SpiroData()
 
 nf0 = 1
 for f0 in linspace(0,S2.n(),nf0,dtype=int):
-    print(f0)
+
     S.add(on_frame(S2,scale=15,oangle=nv,fb=0.5,fh=0.5,asym=0.9,orient=o,
                    polyfunc=ecoords,pts=pts,first=f0,n=n,orient_follow=S2.n()//3,
                    arc_angle=0,object=0,vertex_order=v,
@@ -221,3 +221,186 @@ for f0 in linspace(0,S2.n(),nf0,dtype=int):
                    rp_opts=rp_opts))
 
 figure(S,'time','hot_r')
+
+###
+
+S1 = integral_ellipticals(1,0.6,0.4,min_pen=0.6,rounds=7,circuits=2,ppl=500)
+S2 = S1.resample(S1.max_path()*frame_sampling(2000,parm=2,spacing='sinusoid',deramp=True,repeat=40))
+
+n = S2.n()
+
+nv = 60
+v = linspace(0,nv-1,nv,dtype=int)
+o = pi/3
+
+pts = 1
+
+rp_opts = { 'n': 500, 'parm':  2, 'spacing':  ['sinusoid'], 'repeat': 10,
+            'reverse': False, 'nocum': False, 'deramp': True }
+
+S = SpiroData()
+
+nf0 = 1
+for f0 in linspace(0,S2.n(),nf0,dtype=int):
+    
+    S.add(on_frame(S2,scale=7,oangle=nv,fb=0.5,fh=0.5,asym=0.9,orient=o,
+                   polyfunc=ecoords,pts=pts,first=f0,n=n,orient_follow=S2.n()//3,
+                   arc_angle=0,object=0,vertex_order=v,
+                   pin_coord=None,pin_to_frame=0.0,autoscale=False,pinned_vertex=0,
+                   rp_opts=rp_opts))
+
+figure(S,'fwidth','turbo')
+
+###
+
+S1 = integral_ellipticals(1,0.7,0.5,min_pen=1.3,rounds=3,circuits=1,ppl=500)
+S2 = S1.resample(S1.max_path()*frame_sampling(2000,parm=2,spacing='fibonacci',
+                                              deramp=True,repeat=100))
+
+n = S2.n()
+
+nv = 60
+v = linspace(0,nv-1,nv,dtype=int)
+o = 0 
+
+pts = 500//nv
+
+rp_opts = { 'n': 500, 'parm':  2, 'spacing':  ['fibonacci'], 'repeat': 25,
+            'reverse': False, 'nocum': False, 'deramp': True, 'zero':  True }
+
+S = SpiroData()
+
+nf0 = 1
+for f0 in linspace(0,S2.n(),nf0,dtype=int):
+
+    S.add(on_frame(S2,scale=8,oangle=nv,fb=0.5,fh=0.5,asym=0.9,orient=o,
+                   polyfunc=ecoords,pts=pts,first=f0,n=n,orient_follow=10, # S2.n()//3,
+                   arc_angle=0,object=0,vertex_order=v,
+                   pin_coord=None,pin_to_frame=0.0,autoscale=False,pinned_vertex=0,
+                   rp_opts=rp_opts))
+
+figure(S,'dist_to_frm','inferno_r')
+
+###
+
+S1 = integral_ellipticals(1,0.7,0.5,min_pen=1.3,rounds=5,circuits=1,ppl=1000)
+S2 = S1.copy()
+
+n = S2.n()
+
+nv = 60
+v = linspace(0,nv-1,nv,dtype=int)
+o = 0
+
+pts = 600//nv
+
+S = SpiroData()
+
+nf0 = 1
+for f0 in linspace(0,S2.n(),nf0,dtype=int):
+
+    S.add(on_frame(S2,scale=8,oangle=nv,fb=0.5,fh=0.5,asym=0.9,orient=o,
+                   polyfunc=ecoords,pts=pts,first=f0,n=n,orient_follow=10,
+                   arc_angle=0,object=0,vertex_order=v,
+                   pin_coord=None,pin_to_frame=0.0,autoscale=False,pinned_vertex=0)) 
+
+figure(S,'segment','pale_pink')
+
+###
+
+S1 = integral_ellipticals(1,0.7,0.5,min_pen=1.3,rounds=5,circuits=1,ppl=3000)
+S2 = S1.copy()
+n = S2.n()
+
+nv = 100
+v = linspace(0,nv-1,nv,dtype=int)
+o = linspace(0,19*pi,n)
+
+pts = 1000//nv
+
+rp_opts = { 'n': 1000, 'parm':  1, 'spacing':  ['linear'], 'repeat': 25, 'deramp': True }
+
+f0=S2.n()//10
+S=on_frame(S2,scale=8,oangle=nv,fb=0.5,fh=0.5,asym=0.9,orient=o,
+           polyfunc=ecoords,pts=pts,first=f0,n=n//4,orient_follow=1000,
+           arc_angle=0,object=0,vertex_order=v,
+           pin_coord=None,pin_to_frame=0.0,autoscale=False,pinned_vertex=0,
+           rp_opts=rp_opts)
+
+figure(S,'fradii','gist_heat')
+
+###
+
+S1 = integral_ellipticals(1,0.7,0.5,min_pen=1.3,rounds=8,circuits=1,ppl=1000)
+S2 = S1.copy()
+
+n = S2.n()
+
+nv = 10
+v = linspace(0,nv-1,nv,dtype=int)
+o = 0 
+
+pts = 10 
+
+nn = 200
+rp_opts = { 'n': nn, 'parm':  linspace(1,50,n), 'spacing':  ['sinusoid'], 'repeat': 4, 'deramp': True }
+
+f0=0 
+
+S=on_frame(S2,scale=8,oangle=nv,fb=0.5,fh=0.5,asym=0.9,orient=o,
+           polyfunc=ecoords,pts=pts,first=f0,n=n,orient_follow=n//4,
+           arc_angle=-pi/4,object=0,vertex_order=v,
+           pin_coord=None,pin_to_frame=0.0,autoscale=False,pinned_vertex=0,
+           rp_opts=rp_opts)
+
+figure(S,'fradii','cmap1')
+
+###
+
+S1 = integral_ellipticals(1,0.7,0.5,min_pen=1.3,rounds=2,circuits=1,ppl=1500)
+S2 = S1.copy()
+
+n = S2.n()
+
+nv = 4
+v = linspace(0,nv-1,nv,dtype=int)
+o = 0 
+
+pts = 100
+
+nn = 40 
+
+aa = linspace(-pi/2,pi/2,nv*n)
+f0=0 
+
+S=on_frame(S2,scale=30,oangle=nv,fb=0.5,fh=0.5,asym=0.9,orient=o, 
+           polyfunc=ecoords,pts=pts,first=f0,n=n,orient_follow=1,
+           arc_angle=aa,object=0,vertex_order=v,
+           pin_coord=None,pin_to_frame=0.0,autoscale=False,pinned_vertex=0) 
+
+figure(S,'fradii','turbo')
+
+###
+
+S1 = integral_ellipticals(1,0.7,0.5,min_pen=1.3,rounds=2,circuits=1,ppl=2000)
+S2 = S1.copy()
+
+n = S2.n()
+
+nv = 4
+v = linspace(0,nv-1,nv,dtype=int)
+o = linspace(0,4*pi,n)
+
+pts = 100
+
+nn = 40 
+
+aa = linspace(-pi/2,pi/2,nv*n)
+f0=0 
+
+S=on_frame(S2,scale=30,oangle=nv,fb=0.5,fh=0.5,asym=0.9,orient=o, 
+           polyfunc=ecoords,pts=pts,first=f0,n=n,orient_follow=1,
+           arc_angle=aa,object=0,vertex_order=v,
+           pin_coord=None,pin_to_frame=0.0,autoscale=False,pinned_vertex=0) 
+
+figure(S,'fradii','twilight')

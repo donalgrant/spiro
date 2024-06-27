@@ -281,7 +281,7 @@ def fibonacci(n):
         
     
 def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat=1,nocum=False,
-                   fs_opts=None):
+                   zero=True,fs_opts=None):
 
     if fs_opts is not None:
         if 'n'       in fs_opts:  n       = fs_opts['n']
@@ -291,6 +291,7 @@ def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat
         if 'deramp'  in fs_opts:  deramp  = fs_opts['deramp']
         if 'repeat'  in fs_opts:  repeat  = fs_opts['repeat']
         if 'nocum'   in fs_opts:  nocum   = fs_opts['nocum']
+        if 'zero'    in fs_opts:  zero    = fs_opts['zero']
         
     dn = 2*repeat if deramp else repeat
     
@@ -310,9 +311,10 @@ def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat
     s = array([])
     for j in range(repeat):
         s = np.append(s,x)
-
+    
     if not nocum:
         c = s.cumsum()
+        if zero:  c -= c[0]
         return c/c[-1]
     
     return s

@@ -166,3 +166,43 @@ for offset in range(0,2*ns,2):
     images.append(imageio.imread(filename))
 
 imageio.mimsave('animate-frame-pair.gif',images,duration=0.06,loop=0)
+
+###
+
+S1 = integral_ellipticals(1,0.7,0.5,min_pen=1.3,rounds=5,circuits=1,ppl=1000)
+S2 = S1.copy()
+
+n = S2.n()
+print(n)
+nv = 60
+v = linspace(0,nv-1,nv,dtype=int)
+o = 0
+
+pts = 600//nv
+
+S = SpiroData()
+
+
+fps = 10  # frames per second
+
+images=[]
+
+f0=0
+for div in linspace(1,S2.n()-1,n//8,dtype=int):
+    print(div)
+    S=on_frame(S2,scale=8,oangle=nv,fb=0.5,fh=0.5,asym=0.9,orient=o,
+                   polyfunc=ecoords,pts=pts,first=f0,n=n,orient_follow=div,
+                   arc_angle=0,object=0,vertex_order=v,
+                   pin_coord=None,pin_to_frame=0.0,autoscale=False,pinned_vertex=0)
+    
+    filename='animate-ie-ellipse-01.png'
+    
+    F.plot(S,color_scheme='segment',cmap='pretty_reds',alpha=0.4,dot_size=.1,
+           save=True,filename=filename,
+           limits=[-35,35,-35,35],transparent=False)
+    
+    images.append(imageio.imread(filename))
+
+images.extend(np.flip(images,axis=0))
+imageio.mimsave('animate-ie-ellipse-01.gif',images,duration=1.0/fps,loop=0)
+    
