@@ -512,3 +512,98 @@ for i in range(ni):  S.add(T.rotate(dn))
 S.rotate(-pi/5)
 
 figure(S,'fradii','twilight')
+
+###
+
+ppl=1000
+
+S1 = cIc(Ring(30),Wheel(5,6),loops=1,ppl=ppl,inside=True)
+S2 = cIc(Ring(24),Wheel(4,5),loops=1,ppl=ppl,inside=True).move(15,0)
+
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl,parm=10,spacing='constant',
+                                              deramp=True,repeat=40)).rotate(pi/5)
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl,parm=10,spacing='constant',
+                                              deramp=False,repeat=40))
+
+n = S2.n()
+
+nf=n//3+20
+
+nv = 2
+v = linspace(0,nv-1,nv,dtype=int)
+
+pts = 400
+
+nn = 600
+rp_opts = { 'n': nn, 'parm': 10.0, 'spacing':  ['sinusoid'], 'repeat': 10, 'deramp': True }
+
+aa = [pi/40,pi/3,pi/40,pi/3]
+
+offset = -0.5
+S=SpiroData()
+
+f2 = S2.n()//15
+f0=0
+
+sc = linspace(0.5,1,nf)
+T=frame_pair(S1,S2,skip1=1,skip2=1,first1=f0,first2=f2,
+             scale=sc,oangle=pi/6,fb=offset,fh=offset,asym=0.4,orient=pi/4,polyfunc=pcoords, 
+             pts=pts,n1=1,n2=nf,arc_angle=aa,object=0,prot=0,vertex_order=None,
+             pin_to_frame1=0,autoscale=True,pinned_vertex=0,show_side=array([1,1,1,0]),
+             normal_intersect=True,norm_off1=0.0,norm_off2=0,frame_only=False,
+             intersect_tol=1.0,rp_opts=rp_opts)
+
+ni=1
+dn=2*pi/4
+for i in range(ni):  S.add(T.rotate(dn))
+
+S.rotate(-pi/5)
+
+figure(S,'time','Wistia')
+
+###
+
+ppl=6000
+
+n1 = 1
+n2 = 1
+S1 = cIc(Ring(30),Wheel(10,6),loops=n1,ppl=ppl,inside=True)
+S2 = cIc(Ring(42),Wheel(14,6),loops=n2,ppl=ppl,inside=True)
+
+S1 = S1.resample(S1.max_path()*frame_sampling(ppl,parm=10,spacing='sinusoid',
+                                              deramp=True,repeat=40))
+S2 = S2.resample(S2.max_path()*frame_sampling(ppl,parm=10,spacing='sinusoid',
+                                              deramp=False,repeat=40))
+
+n = S2.n()
+
+nf=n//3
+
+nv = 2
+v = linspace(0,nv-1,nv,dtype=int)
+
+pts = 400
+
+f2 = S2.n()//6
+f0=S2.n()//6
+
+T=frame_pair(S1,S2,first1=f0,first2=f2,polyfunc=dcoords,pts=pts,n1=1,n2=nf,
+             pin_to_frame1=0,normal_intersect=True,norm_off1=0,norm_off2=pi/2,
+             frame_only=True,intersect_tol=1.0e-2)
+
+nn = 240
+rp_opts = { 'n': nn, 'parm': 3.0, 'spacing':  ['linear'], 
+           'repeat': linspace(2,24,nf,dtype=int), 'deramp': True }
+
+aa = linspace(pi/3,pi,nf) # [pi/40,pi/3,pi/40,pi/3]
+o  = linspace(0,-pi/9,nf)
+sc = linspace(20,5,nf)
+
+offset = -0.3
+S=SpiroData()
+
+S = on_frame(T,scale=sc,oangle=2,fb=0.5,fh=0.5,orient=o,polyfunc=ngon_coords,
+             pts=100,first=0,n=T.n()-T.n()//12,orient_follow=10,arc_angle=aa,object=0,prot=0,vertex_order=v,
+             pin_coord=None,pin_to_frame=0.0,autoscale=False,pinned_vertex=0,rp_opts=rp_opts)
+
+figure(S,'time','hot_r')
