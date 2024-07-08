@@ -6,7 +6,6 @@ from SpiroData import *
 from SpiroDraw import *
 from spiro import *
 from spiro_ellipse import *
-from spiro_ellipses import *
 from spiro_arcs import *
 from spiro_string import *
 from spiro_frame import *

@@ -81,9 +81,13 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
         sst = st.scale(sc).rotate(array_val(orient_angle,k)).disp(fcoord)
 
         if (rp_opts is not None):
-            fs_opts={}
-            for key in rp_opts:  fs_opts[key]=array_val(rp_opts[key],k)
-            sst=sst.resample(sst.max_path()*frame_sampling(1,fs_opts=fs_opts))
+            if isinstance(rp_opts,dict):
+                fs_opts={}
+                for key in rp_opts:  fs_opts[key]=array_val(rp_opts[key],k)
+                sst=sst.resample(sst.max_path()*frame_sampling(1,fs_opts=fs_opts))
+            else:
+                # isinstance(rp_opts,np.ndarray):
+                sst=sst.resample(sst.max_path()*rp_opts)
 
         S.add(sst)
         i+=array_val(skip,k)

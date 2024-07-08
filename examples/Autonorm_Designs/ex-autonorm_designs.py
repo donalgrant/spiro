@@ -276,3 +276,75 @@ S.add(on_frame(U,scale=sc,oangle=pi/2,fb=offset,fh=offset,asym=asym,orient=o,fir
              object=1,arc_angle=0,rp_opts=None))
 
 figure(S,S.o+sin(S.t/max(S.t)*2*pi),'Wistia')
+
+###
+
+###   coordinate dither -- pointillist / impressionist version of autonorm design 004
+
+R = 50
+ppl = 1000
+e = 0.0
+e_circum=circum(R,semi_minor(R,e))
+a = 1/3*e_circum/2/pi
+S1 = cIe(ring=Ellipse(R,e),wheel=Wheel(a,1.3*a),
+         loops=1,ppl=ppl,inside=True,reverse=True).rotate(pi/7)
+
+S1 = S1.resample(S1.max_path()*frame_sampling(S1.n(),spacing='random',
+                                              repeat=10,deramp=True))
+
+f0=S1.n()//24
+
+U=SpiroData()
+
+ns = 1 
+
+n = S1.n()
+
+norm = 0 
+
+lbox = 4*R
+nk = 1
+for k in range(nk):
+    f = k*S1.n()//nk//4
+    for i in range(ns):
+        T = auto_inorm_frame(S1,first=f0+f+int(S1.n()/20*i/ns),norm_off1=0,norm_off2=norm,
+                             intersect_tol=.1,
+                             base=0.0,amp=0.4,rate=10,object=i,n=n).rotate(1*pi*i/ns).valid() 
+        for j in range(T.n()):
+            T.fx[j]=S1.x[j]
+            T.fy[j]=S1.y[j]
+
+        U.add(T)
+
+U = U.valid_in_radius(lbox)
+
+n = U.n()
+
+o = 0 
+pts = 100 
+aa = 0 
+
+nv = 3
+v = linspace(0,nv-1,nv,dtype=int)
+
+rp_opts = { 'n': nv*pts, 
+            'parm': 9,
+            'spacing':  'random', 'repeat': 3, 'deramp': False }
+
+fs = frame_sampling(1,fs_opts=rp_opts)
+
+offset = 0.5
+sc = 75
+
+asym = 0.0 + 0.3 * frame_sampling(n,parm=5,spacing='sinusoid',repeat=3,deramp=True,nocum=True)/6 * 0
+
+f0 = 1384
+follow = 1
+
+nn = n
+    
+S = on_frame(U,scale=sc,oangle=pi/2,fb=offset,fh=offset,asym=asym,orient=o,first=f0,
+             polyfunc=tcoords,pts=pts,orient_follow=follow,n=nn,vertex_order=None,
+             object=1,arc_angle=aa,rp_opts=None)
+
+figure(S,'fcdist3','hot')

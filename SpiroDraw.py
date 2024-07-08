@@ -146,7 +146,7 @@ class SpiroFig:
     def plot_col(self):  return self.plot_num % self.cols
 
     def plot(self,sd,cmap=None,color_scheme=None,
-             dot_size=0.1,linestyle='',alpha=1.0, color_dither=0.0,
+             dot_size=0.1,linestyle='',alpha=1.0, color_dither=0.0, coord_dither=0.0,
              subsample=None,no_frame=True, fig_dim=10, save=False, no_multi_inc=False,
              new_fig=True,smooth=False, caption='', fontsize=18, rgb=None, limits=None,
              filename=None, transparent=True):
@@ -154,6 +154,12 @@ class SpiroFig:
         if new_fig or self.ax is None or (self.multi and not self.ax.any):
             self.new_fig(no_frame=no_frame,fig_dim=fig_dim,limits=limits)
 
+        if coord_dither > 0.0:
+            dr = np.random.standard_normal(sd.n())
+            dt = np.random.uniform(0,2*pi,sd.n())
+            sd.x += coord_dither*dr*cos(dt)
+            sd.y += coord_dither*dr*sin(dt)
+            
         r = sqrt(sd.x**2+sd.y**2)
 
         if color_scheme is None:  color_scheme=self.cs

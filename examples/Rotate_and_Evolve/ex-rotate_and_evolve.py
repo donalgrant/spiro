@@ -15,7 +15,7 @@ from Ring import *
 import imageio.v2 as imageio
 import glob
 
-parser = argparse.ArgumentParser(description="3D Animation Examples")
+parser = argparse.ArgumentParser(description="Rotate and Evolve Examples")
 parser.add_argument("--full_res", help="use high-definition mode", action="store_true")
 args = parser.parse_args()
 

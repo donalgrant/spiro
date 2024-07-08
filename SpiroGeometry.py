@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 from numpy import sin,cos,tan,empty,array,matmul,linspace,geomspace,full
-from numpy import abs,pi,sqrt,arctan2,arccos,arcsin,diff,zeros,flip
+from numpy import abs,pi,sqrt,arctan2,arccos,arcsin,diff,zeros,flip,log
 from scipy.spatial.transform import Rotation as R
 from scipy.interpolate import make_interp_spline
 
@@ -300,7 +300,9 @@ def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat
         case 'linear':     x = linspace(1,1+parm,n//dn)
         case 'geometric':  x = geomspace(1,1+parm,n//dn)
         case 'sinusoid':   x = array([ 1.0 + parm*sin(pi*j/(2*n//dn)) for j in range(0,n//dn) ])
+        case 'log':        x = array([ parm*log(j+2)/log((n+1)//dn) for j in range(0,n//dn) ])
         case 'fibonacci':  x = array([ fibonacci(j+1) for j in range(n//dn) ])  # parm is ignored
+        case 'random':     x = 1.0 + parm*np.random.rand(n//dn)
         case _:
             print("***Error -- not a valid spacing")
             sys.exit()
