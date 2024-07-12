@@ -33,6 +33,7 @@ parser.add_argument("--fd", help="figure dimensions (10 by default, 30 for high-
 parser.add_argument("--dpi", help="dots per inch for png (150 by default)", type=int)
 parser.add_argument("--subsample", help="choose every n'th point", type=int)
 parser.add_argument("--dither", help="random color choice:  0 is default, 0.1 typical, 1 is large")
+parser.add_argument("--soften", help="random coord offsets:  0 is default, 0.2 typical, 1.0 is large")
 parser.add_argument("--dot_size", help="size of each dot; 0.1 by default, 10 typical for subsampled dot version")
 parser.add_argument("--alpha", help="transparency; 0.4 by default, 1 is max, 0.0 is invisible")
 parser.add_argument("--new_cmap", help="comma-separated list of (xkcd:) colors for colormap generation")
@@ -72,6 +73,7 @@ dpi  = 150         if args.dpi       is None else args.dpi
 ds   = 0.1         if args.dot_size  is None else float(args.dot_size)
 alpha = 0.4        if args.alpha     is None else float(args.alpha)
 dither=0.0         if args.dither    is None else float(args.dither)
+soften=0.0         if args.soften    is None else float(args.soften)
 
 if args.full_res:
     ss = 1
@@ -88,5 +90,5 @@ for data_file in args.file:
             filename=f'{data_file}-{cmap_name}-{cs_i}-ss{ss}-fd{fd}-cd{dither}.png'
             print(f'Plotting and saving {filename} with dot_size={ds}, alpha={alpha}')
             F.plot(S.subsample(ss),cmap=cmap_i,color_scheme=cs_i,fig_dim=fd,alpha=alpha,
-                   dot_size=ds,color_dither=dither)
+                   dot_size=ds,color_dither=dither,coord_dither=soften)
             F.save_fig(filename,dpi=dpi)

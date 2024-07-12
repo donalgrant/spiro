@@ -34,6 +34,7 @@ def rotate(x0,y0,xr,yr,angle,object=0,segment=0):
     sd.s = t*0+segment
     sd.fx = t*0+x0
     sd.fy = t*0+y0
+    sd.v  = sd.x*0 + 1
 
     return sd
 
@@ -150,7 +151,15 @@ class SpiroData:
         lavg=self.n()/2
         for i in range(self.n()):
             cc[i]=array([self.x[i],self.y[i],scale*cos(pi*(i-lavg)/lrange)])
-            
+        return cc
+
+    
+    def xyf(self,scale=1.0):
+        cc = empty((self.n(),3))
+        frange=max(self.dists_to_frame())-min(self.dists_to_frame())
+        favg=min(self.dists_to_frame())+frange/2.0
+        for i in range(self.n()):
+            cc[i]=array([self.x[i],self.y[i],scale*(self.dist_to_frame(i)-favg)/frange])
         return cc
     
     def wrap(self,i):  return i % self.n()
@@ -307,7 +316,7 @@ class SpiroData:
         sd.y = inv_r * sin(pp)
         sd.fx = self.fx
         sd.fy = self.fy
-        sd.v = self.v
+        sd.v = self.v   # could use this to trap 1/0
         return sd
     
     def subsample(self,n,first=0):

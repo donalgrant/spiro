@@ -61,6 +61,8 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
     sd.s=linspace(0,int(loops*ppl),int(loops*ppl))//ppl
     sd.fx=xnc
     sd.fy=ync
+    sd.v = np.full((sd.n()),1)
+
 
     sd.rotate(orient).move(x0,y0)
 
@@ -147,6 +149,8 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
     sd.s=linspace(0,int(loops*ppl),int(loops*ppl))//ppl
     sd.fx=R*sin(theta)
     sd.fy=R*cos(theta)
+    sd.v  = np.full((sd.n()),1)
+
     
     return sd.move(x0,y0)
 

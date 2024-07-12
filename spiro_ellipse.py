@@ -85,6 +85,8 @@ def eIe(ring=Ellipse(20,0.5,0,0),
 
     sd.fx = cx
     sd.fy = cy
+    sd.v  = np.full((sd.n()),1)
+
     
     sd.rotate(ring.o).move(ring.O[0],ring.O[1])
     
@@ -166,6 +168,8 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
 
     sd.fx = cx
     sd.fy = cy
+    sd.v  = np.full((sd.n()),1)
+
 
     return sd.move(x0,y0)
 
@@ -212,6 +216,8 @@ def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False,ppl=
     sd.o = full((ppl),segment)
     sd.fx = linspace(x1,x2,sd.x.shape[0]) # should really include guards, but usually subtle effect
     sd.fy = linspace(y1,y2,sd.y.shape[0]) # ditto
+    sd.v  = np.full((sd.n()),1)
+
     
     return sd
 
