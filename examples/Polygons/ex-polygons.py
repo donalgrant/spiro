@@ -1,13 +1,47 @@
 import sys
 sys.path.append('../..')
+import argparse
 
 from SpiroData import *
 from SpiroDraw import *
 from spiro import *
 from polygon import *
 
+parser = argparse.ArgumentParser(description="Polygons")
+parser.add_argument("--full_res", help="use high-definition mode", action="store_true")
+args = parser.parse_args()
+
+
+F=SpiroFig()
+F.text_color='white'
+
+if args.full_res:
+    hd = 1
+else:
+    hd = 0
+
+def_factor = (1+4*hd)
+save=True
+
+F.set_default_dpi(150*(1+hd))
+fd = 10*(1+2*hd) # figure dimensions
+
+F._figname='Polygons-'
+
+def figure(S,cs,cmap,alpha=0.4,dot_size=0.1,filename=None,limits=None,color_dither=0.0,no_frame=True):
+    if hd:
+        if not hasattr(figure,"data_set"):  figure.data_set=0
+        S.save(f'figure-{figure.data_set}.pickle')
+        figure.data_set+=1
+
+    if filename is None:
+        F.plot(S,color_scheme=cs,cmap=cmap,alpha=alpha,fig_dim=fd,dot_size=dot_size,save=save,
+               limits=limits,color_dither=0.0,no_frame=no_frame)
+    else:
+        F.plot(S,color_scheme=cs,cmap=cmap,alpha=alpha,fig_dim=fd,dot_size=dot_size,
+               save=save,filename=filename,limits=limits,color_dither=0.0,no_frame=no_frame)
+        
 S = SpiroData()
-F = SpiroFig()
 
 ###
 
@@ -15,7 +49,7 @@ F.plot(spiro_square(R=64,wheel=Wheel(8,8),loops=10,inside=True),new_fig=True,sav
 
 ###
 
-F.plot(spiro_square(20,Wheel(4,3.5),loops=20,fold=False,inside=True),new_fig=True)
+F.plot(spiro_square(20,Wheel(4,3.5),loops=20,fold=False,inside=True),new_fig=True,save=True,filename='missing.png')
 
 ###
 
@@ -261,3 +295,19 @@ F.plot(S,color_scheme='l-waves',cmap='RdPu',save=True)
 
 ###
 
+S1 = SpiroData()
+R = 50
+ppl = 4000
+a=R/(2*pi)/3
+ns = 75
+pen_scale=0.995
+rot_inc=pi/75
+shrink=0.998
+max_po=pi/4
+dy=-R/75
+for i in range(ns):
+    S1.add(spiro_eq_triangle(R=R,wheel=Wheel(a,a*(pen_scale**i),max_po*i/ns),
+                             object=i,orient=0,loops=1,fold=False,inside=False)
+           ).rotate(rot_inc).move(0,dy).scale(shrink)
+
+figure(S1,'fradii','hot_r')

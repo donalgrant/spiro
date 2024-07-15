@@ -29,7 +29,7 @@ from spiro import *
 #     
 #     return sd
 
-def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
+def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False,segment=0,object=0):
     '''roll in straight line from (x1,y1) to (x2,y2) using circular wheel
     invert keyword controls sense of wheel location:  default
     is above and/or to the right.  invert=True is the opposite.
@@ -65,8 +65,8 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False):
     sd.y = ys + time_factor * t * sin(A) + b * cos(p) 
     sd.p = p
     sd.t = t
-    sd.s = sd.t*0
-    sd.o = sd.t*0
+    sd.s = sd.t*0 + segment
+    sd.o = sd.t*0 + object
     sd.fx = linspace(x1,x2,sd.x.shape[0]) # should really include guards, but usually subtle effect
     sd.fy = linspace(y1,y2,sd.y.shape[0]) # ditto
     sd.v  = np.full((sd.n()),1)
@@ -100,38 +100,38 @@ def spiro_line_orig(R=60,wheel=Wheel(12,7.2),orient=0,loops=60,fold=False, inver
         
     return sd
 
-def spiro_line(R=60,wheel=Wheel(12,7.2,0),orient=0,loops=60,fold=False, invert=False):
+def spiro_line(R=60,wheel=Wheel(12,7.2,0),orient=0,loops=60,fold=False, invert=False, object=0):
     coords=array([ [-R/2,0], [R/2,0] ])
-    return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=False)  # invert doesn't work
+    return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=False,object=object)  # invert doesn't work
 
-def spiro_eq_triangle(R=60,wheel=Wheel(12,7.2,0),orient=0,loops=60,fold=False,inside=False):
+def spiro_eq_triangle(R=60,wheel=Wheel(12,7.2,0),orient=0,loops=60,fold=False,inside=False, object=0):
     ytop = R*sin(pi/3.0)
     coords = array([ [-R/2,-ytop/3], [0,2*ytop/3], [R/2,-ytop/3] ])
-    return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=inside)
+    return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=inside,object=object)
 
-def spiro_square(R=60,wheel=Wheel(12,7.2),orient=0,loops=60,fold=False,inside=False):
+def spiro_square(R=60,wheel=Wheel(12,7.2),orient=0,loops=60,fold=False,inside=False,object=0):
     coords = array([ [-R/2,R/2], [R/2,R/2], [R/2,-R/2], [-R/2,-R/2] ])
-    return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=inside)
+    return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=inside,object=object)
 
 def spiro_cross(width=30,height=30,fwidth=1/3,fheight=1/3,base=1/3,
                 wheel=Wheel(0.01,0),orient=0,loops=1,
-                fold=False,inside=False):
+                fold=False,inside=False,object=0):
     (x0,x1,x2,x3) = (-width/2, -fwidth*width/2, fwidth*width/2, width/2)
     (y0,y1,y2,y3) = (height*(-base-fheight/2), -height*fheight/2, height*fheight/2, height*(1-fheight/2-base))
     coords = array([ [x0,y2], [x1,y2], [x1,y3], [x2,y3], [x2,y2], [x3,y2],
                      [x3,y1], [x2,y1], [x2,y0], [x1,y0], [x1,y1], [x0,y1] ])
-    return spiro_polygon(coords,wheel,orient=orient,loops=loops,fold=fold,inside=inside)
+    return spiro_polygon(coords,wheel,orient=orient,loops=loops,fold=fold,inside=inside,object=object)
     
-def spiro_ngon(n,R=60,wheel=Wheel(12,7.2),orient=0,loops=1,fold=False,inside=False):
+def spiro_ngon(n,R=60,wheel=Wheel(12,7.2),orient=0,loops=1,fold=False,inside=False,object=0):
     coords = np.empty((n,2))
     for i in range(n):
         theta = -2*pi*i/n
         coords[i,0]=R*cos(theta)
         coords[i,1]=R*sin(theta)
-    return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=inside)
+    return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=inside,object=object)
     
 def spiro_nstar(n,r1=30,r2=0.5,wheel=Wheel(0.01,0),
-                orient=0,loops=1,fold=False,inside=False):
+                orient=0,loops=1,fold=False,inside=False,object=0):
     coords = np.empty((2*n,2))
     for i in range(0,n):
         theta1 = -2*pi*i/n
@@ -142,7 +142,7 @@ def spiro_nstar(n,r1=30,r2=0.5,wheel=Wheel(0.01,0),
         coords[2*i+1,1]=r2*r1*sin(theta2)
         
     return spiro_polygon(coords,wheel,orient,
-                         loops=loops,fold=fold,inside=inside)
+                         loops=loops,fold=fold,inside=inside,object=object)
 
 def corner_angles(coords,inside=False):
     '''find the angle between adjacent pairs of coords'''
@@ -164,7 +164,7 @@ def corner_angles(coords,inside=False):
 
     return ba
             
-def spiro_polygon(coords,wheel,orient=0,loops=1,fold=False,inside=False):
+def spiro_polygon(coords,wheel,orient=0,loops=1,fold=False,inside=False,object=0):
 
     cc = rot_coords(orient,coords)
     ba = corner_angles(cc,inside)
@@ -187,8 +187,11 @@ def spiro_polygon(coords,wheel,orient=0,loops=1,fold=False,inside=False):
             cp=(c+cc.shape[0]-1) % cc.shape[0]
             cn=(c+1) % cc.shape[0]
 
-            sd.add(roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],wheel,
-                        start_guard=bump[cp],end_guard=bump[c],invert=inside)) 
+            sdi = roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],wheel,
+                        start_guard=bump[cp],end_guard=bump[c],invert=inside)
+            sdi.set_object(object)
+            sdi.set_segment(2*cc.shape[0]*i+c)
+            sd.add(sdi) 
             wheel.o=sd.pc()
 
             if ba[c]>0:
@@ -196,19 +199,22 @@ def spiro_polygon(coords,wheel,orient=0,loops=1,fold=False,inside=False):
                 else:      rot_angle=  ba[c]
                 if fold:
                     rot_angle=ba[c]+2*pi if inside else ba[c]-2*pi
-                sd.add(rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)) # roll over upper right
+                sdi = rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)
+                sdi.set_object(object)
+                sdi.set_segment(2*cc.shape[0]*i+c+1)
+                sd.add(sdi) # roll over upper right
                 wheel.o+=rot_angle
     
     return sd
 
 def poly_heart(width=40,depth=20,height=5,wheel=Wheel(2.2,1.0),orient=0,loops=1,
-               fold=False,inside=False,guarded=True):
+               fold=False,inside=False,guarded=True,object=object):
     coords = array([ [0,-depth], [-width/2,-height/2], [-width/2+width/12,0], [-width/6,height],
                      [0,0], [width/6,height], [width/2-width/12,0], [width/2,-height/2] ])
-    return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=inside)
+    return spiro_polygon(coords,wheel,orient,loops=loops,fold=fold,inside=inside,object=object)
 
 def heart(x0=0,y0=0,width=40,depth=20,wheel=Wheel(2.2,1.0),loops=1,
-          inside=False,fold=False,guarded=True):
+          inside=False,fold=False,guarded=True,object=object):       # still need to add segment here...
 
     sd = SpiroData()
 

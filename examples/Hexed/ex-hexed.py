@@ -33,18 +33,20 @@ fd = 10*(1+2*hd) # figure dimensions
 
 F._figname='Hexed-'
 
-def figure(S,cs,cmap,alpha=0.4,dot_size=0.1,filename=None,color_dither=0.0):
+def figure(S,cs,cmap,alpha=0.4,dot_size=0.1*(1+hd),filename=None,color_dither=0.0):
+    transparent=True
     if hd:
+        transparent=False
         if not hasattr(figure,"data_set"):  figure.data_set=0
         S.save(f'figure-{figure.data_set}.pickle')
         figure.data_set+=1
 
     if filename is None:
         F.plot(S,color_scheme=cs,cmap=cmap,alpha=alpha,fig_dim=fd,dot_size=dot_size,
-               save=save,color_dither=color_dither)
+               save=save,color_dither=color_dither,transparent=transparent)
     else:
         F.plot(S,color_scheme=cs,cmap=cmap,alpha=alpha,fig_dim=fd,dot_size=dot_size,
-               save=save,filename=filename,color_dither=color_dither)
+               save=save,filename=filename,color_dither=color_dither,transparent=transparent)
 
 ###
 

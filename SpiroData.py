@@ -104,6 +104,14 @@ class SpiroData:
         self.v = self.x*0+1               if v  is None else v
         return self
 
+    def set_object(self,object=0):
+        self.o = object if is_array(object) else np.full((self.n()),object)
+        return self
+
+    def set_segment(self,segment=0):
+        self.s = segment if is_array(segment) else np.full((self.n()),segment)
+        return self
+    
     def load(self,xy_array,phase=0.0,time_offset=0,object=0,segment=0,frame_x=0,frame_y=0):
         s = SpiroData()
         s.x=xy_array[:,0]
@@ -126,6 +134,14 @@ class SpiroData:
 
     def xy(self, index): return array([  self.x[index % self.n()],  self.y[index % self.n()] ])
     def fxy(self,index): return array([ self.fx[index % self.n()], self.fy[index % self.n()] ])
+
+    def xys(self,scale=1.0):
+        cc = empty((self.n(),3))
+        srange=max(self.s)-min(self.s)
+        savg=min(self.s)+srange/2.0
+        for i in range(self.n()):
+            cc[i]=array([self.x[i],self.y[i],scale*(self.s[i]-savg)/srange])
+        return cc
 
     def xyp(self,scale=1.0):
         cc = empty((self.n(),3))

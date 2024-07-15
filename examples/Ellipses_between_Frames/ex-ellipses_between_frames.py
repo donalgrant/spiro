@@ -1,5 +1,6 @@
 import sys
 sys.path.append('../..')
+import argparse
 
 from SpiroData import *
 from SpiroDraw import *
@@ -11,10 +12,18 @@ from spiro_string import *
 from polygon import *
 from Ring import *
 
+parser = argparse.ArgumentParser(description="Ellipses Between Frames Examples")
+parser.add_argument("--full_res", help="use high-definition mode", action="store_true")
+args = parser.parse_args()
+
+
 F=SpiroFig()
 F.text_color='white'
 
-hd = 0  # 1 for high-def
+if args.full_res:
+    hd = 1
+else:
+    hd = 0
 
 def_factor = (1+4*hd)
 save=True
@@ -22,13 +31,22 @@ save=True
 F.set_default_dpi(150*(1+hd))
 fd = 10*(1+2*hd) # figure dimensions
 
-def figure(S,cs,cmap,alpha=0.4,dot_size=0.1):
+F._figname='EBF-'
+
+def figure(S,cs,cmap,alpha=0.4,dot_size=0.1*(1+hd),filename=None,color_dither=0.0):
+    transparent=True
     if hd:
+        transparent=False
         if not hasattr(figure,"data_set"):  figure.data_set=0
         S.save(f'figure-{figure.data_set}.pickle')
         figure.data_set+=1
 
-    F.plot(S,color_scheme=cs,cmap=cmap,alpha=alpha,fig_dim=fd,dot_size=dot_size,save=save)
+    if filename is None:
+        F.plot(S,color_scheme=cs,cmap=cmap,alpha=alpha,fig_dim=fd,dot_size=dot_size,
+               save=save,color_dither=color_dither,transparent=transparent)
+    else:
+        F.plot(S,color_scheme=cs,cmap=cmap,alpha=alpha,fig_dim=fd,dot_size=dot_size,
+               save=save,filename=filename,color_dither=color_dither,transparent=transparent)
 
 ###
 

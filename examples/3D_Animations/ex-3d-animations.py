@@ -201,12 +201,11 @@ images.extend(rot3D_plot(S,S.xyt(scale=xscale),cs,cmap,n2,n1,ll))
 images.extend(rot3D_plot(S,S.xyp(scale=xscale),cs,cmap,n2,n1,ll))
 images.extend(rot3D_plot(S,S.xyl(scale=xscale),cs,cmap,n2,n1,ll))
 images.extend(rot3D_plot(S,S.xyf(scale=xscale),cs,cmap,n2,n1,ll))
+images.extend(rot3D_plot(S,S.xys(scale=xscale),cs,cmap,n2,n1,ll))
 
 images.extend(np.flip(fade_in,axis=0))
 
 imageio.mimsave("3D-rotate-01.gif", images, duration=0.1, loop=0)
-
-# exit()
 
 ###
 

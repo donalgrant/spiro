@@ -16,6 +16,9 @@ def array_val(a,i):
 def array_or_scalar_len(a):
     return len(a) if hasattr(a,"__len__") else 1
 
+def is_array(a):
+    return 1 if hasattr(a,"__len__") else 0
+
 def rot_2D(angle):
     '''Matrix will rotate a coordinate by angle_rads cw'''
     return array([ [ cos(angle), sin(angle) ],
