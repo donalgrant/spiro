@@ -189,8 +189,8 @@ def spiro_polygon(coords,wheel,orient=0,loops=1,fold=False,inside=False,object=0
 
             sdi = roll(cc[c,0],cc[c,1],cc[cn,0],cc[cn,1],wheel,
                         start_guard=bump[cp],end_guard=bump[c],invert=inside)
-            sdi.set_object(object)
-            sdi.set_segment(2*cc.shape[0]*i+c)
+            sdi.set_objects(object)
+            sdi.set_segments(2*cc.shape[0]*i+c)
             sd.add(sdi) 
             wheel.o=sd.pc()
 
@@ -200,8 +200,8 @@ def spiro_polygon(coords,wheel,orient=0,loops=1,fold=False,inside=False,object=0
                 if fold:
                     rot_angle=ba[c]+2*pi if inside else ba[c]-2*pi
                 sdi = rotate(cc[cn,0],cc[cn,1],sd.xc(),sd.yc(),rot_angle)
-                sdi.set_object(object)
-                sdi.set_segment(2*cc.shape[0]*i+c+1)
+                sdi.set_objects(object)
+                sdi.set_segments(2*cc.shape[0]*i+c+1)
                 sd.add(sdi) # roll over upper right
                 wheel.o+=rot_angle
     

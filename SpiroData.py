@@ -25,18 +25,9 @@ def rotate(x0,y0,xr,yr,angle,object=0,segment=0):
     p += phi
     
     sd = SpiroData()
-    
-    sd.x = x0+r*sin(p)
-    sd.y = y0+r*cos(p)
-    sd.p = p
-    sd.t = t
-    sd.o = t*0+object
-    sd.s = t*0+segment
-    sd.fx = t*0+x0
-    sd.fy = t*0+y0
-    sd.v  = sd.x*0 + 1
 
-    return sd
+    return sd.set_array(x0+r*sin(p),y0+r*cos(p),p,t,object,segment,x0,y0,1)
+
 
 class SpiroData:
     
@@ -44,85 +35,75 @@ class SpiroData:
         self.reset()
         
     def reset(self):
-        self.x = array([])  # x-coord
-        self.y = array([])  # y-coord
-        self.p = array([])  # wheel phase
-        self.t = array([])  # overall parameterization
-        self.o = array([])  # object number
-        self.s = array([])  # segment number
-        self.fx = array([])  # frame x-coord
-        self.fy = array([])  # frame y-coord
-        self.v = array([])   # flag:  1 if valid, 0 if invalid
+        return self.set_array(array([]),array([]))
+
+#  x: x-coord
+#  y: y-coord
+#  p: wheel phase
+#  t: overall parameterization
+#  o: object number
+#  s: segment number
+#  fx: frame x-coord
+#  fy: frame y-coord
+#  v: flag:  1 if valid, 0 if invalid
+
+    def update_coords(self, x, y):
+        self.x=x
+        self.y=y
+        if (x.shape[0]!=y.shape[0]):
+            print(f'***>ERROR:  Length mismatch -- x{x.shape[0]}!=y{y.shape[0]}')
         return self
 
-    def add(self, sd):
-        self.x = append(self.x,sd.x)
-        self.y = append(self.y,sd.y)
-        self.p = append(self.p,sd.p)
-        self.t = append(self.t,sd.t)
-        self.o = append(self.o,sd.o)
-        self.s = append(self.s,sd.s)
-        self.fx = append(self.fx,sd.fx)
-        self.fy = append(self.fy,sd.fy)
-        self.v = append(self.v,sd.v)
-        return self
+    def add(self, sd, valid=True):
+        sdv = sd.v if valid else sd.v*0
+        return self.set_array(append(self.x,sd.x),append(self.y,sd.y),append(self.p,sd.p),  append(self.t,sd.t),
+                              append(self.o,sd.o),append(self.s,sd.s),append(self.fx,sd.fx),append(self.fy,sd.fy),
+                              append(self.v,sdv))
 
     # use add_invalid to maintain correspondence of points to a source, even if some points are undefined/invalid
     def add_invalid(self, sd):
-        self.x = append(self.x,sd.x)
-        self.y = append(self.y,sd.y)
-        self.p = append(self.p,sd.p)
-        self.t = append(self.t,sd.t)
-        self.o = append(self.o,sd.o)
-        self.s = append(self.s,sd.s)
-        self.fx = append(self.fx,sd.fx)
-        self.fy = append(self.fy,sd.fy)
-        self.v = append(self.v,sd.v*0)   # mark all points as invalid
-        return self
-
-    def set(self,x=0,y=0,p=0,t=0,o=0,s=0,fx=0,fy=0,v=1):
-        self.x = array([x])
-        self.y = array([y])
-        self.p = array([p])
-        self.t = array([t])
-        self.o = array([o])
-        self.s = array([s])
-        self.fx = array([fx])
-        self.fy = array([fy])
-        self.v = array([v])
-        return self
+        return self.add(sd,False)
 
     def set_array(self,x,y,p=None,t=None,o=None,s=None,fx=None,fy=None,v=None):
-        self.x = x
-        self.y = y
-        self.p = self.x*0                 if p  is None else p
-        self.t = linspace(0,1,x.shape[0]) if t  is None else t
-        self.o = self.x*0                 if o  is None else o
-        self.s = self.x*0                 if s  is None else s
-        self.fx = self.x                  if fx is None else fx
-        self.fy = self.y                  if fy is None else fy
-        self.v = self.x*0+1               if v  is None else v
+        return self.update_coords(x,y).set_phases(p).set_tcoords(t).set_objects(o).set_segments(s).set_fcoords(fx,fy).set_valid(v)
+
+    def set_phases(self,p=None):
+        if p is None: self.p=np.full(self.n(),0.0)
+        else:         self.p=p if is_array(p) else np.full((self.n()),p)
         return self
 
-    def set_object(self,object=0):
-        self.o = object if is_array(object) else np.full((self.n()),object)
+    def set_tcoords(self,t=None):
+        if t is None: self.t=linspace(0.0,1.0,self.n())
+        else:         self.t=t if is_array(t) else np.full((self.n()),t)
         return self
 
-    def set_segment(self,segment=0):
-        self.s = segment if is_array(segment) else np.full((self.n()),segment)
+    def set_fcoords(self,fx=None,fy=None):
+        if fx is None: self.fx=np.full(self.n(),0.0)
+        else:          self.fx=fx if is_array(fx) else np.full((self.n()),fx)
+        if fy is None: self.fy=np.full(self.n(),0.0)
+        else:          self.fy=fy if is_array(fy) else np.full((self.n()),fy)
+        return self
+
+    def set_objects(self,o=None):
+        if o is None: self.o=np.full(self.n(),0)
+        else:         self.o=o if is_array(o) else np.full((self.n()),o)
+        return self
+
+    def set_segments(self,s=None):
+        if s is None: self.s=np.full(self.n(),0)
+        else:         self.s=s if is_array(s) else np.full((self.n()),s)
+        return self
+
+    def set_valid(self,v=None):
+        if v is None: self.v=np.full(self.n(),1)
+        else:         self.v=v if is_array(v) else np.full((self.n()),v)
         return self
     
-    def load(self,xy_array,phase=0.0,time_offset=0,object=0,segment=0,frame_x=0,frame_y=0):
+    def load(self,xy_array,phase=0.0,time_offset=0,object=0,segment=0,frame_x=0,frame_y=0,v=1):
         s = SpiroData()
-        s.x=xy_array[:,0]
-        s.y=xy_array[:,1]
-        s.t=linspace(time_offset,time_offset+s.x.shape[0],s.x.shape[0])
-        s.p=s.t*0+phase
-        s.o=np.full((s.n()),object)
-        s.s=np.full((s.n()),segment)
-        s.fx=np.full((s.n()),frame_x)
-        s.fy=np.full((s.n()),frame_y)
-        s.v= np.full((s.n()),1)
+        n = xy_array.shape[0]
+        s.set_array(xy_array[:,0],xy_array[:,1],phase,linspace(time_offset,time_offset+n,n),
+                    object,segment,frame_x,frame_y,v)
         return self.add(s);
         
     def xc(self):  return self.x[-1] 
@@ -151,7 +132,6 @@ class SpiroData:
             cc[i]=array([self.x[i],self.y[i],scale*(self.p[i]-pavg)/prange])
         return cc
 
-    
     def xyt(self,scale=1.0):
         cc = empty((self.n(),3))
         trange=max(self.t)-min(self.t)
@@ -159,7 +139,6 @@ class SpiroData:
         for i in range(self.n()):
             cc[i]=array([self.x[i],self.y[i],scale*(self.t[i]-tavg)/trange])
         return cc
-
     
     def xyl(self,scale=1.0):
         cc = empty((self.n(),3))
@@ -168,7 +147,6 @@ class SpiroData:
         for i in range(self.n()):
             cc[i]=array([self.x[i],self.y[i],scale*cos(pi*(i-lavg)/lrange)])
         return cc
-
     
     def xyf(self,scale=1.0):
         cc = empty((self.n(),3))
@@ -299,55 +277,28 @@ class SpiroData:
     
     def rotate(self,angle):
         coords = rot_coords(angle,column_stack((self.x,self.y)))
-        self.x = coords[:,0]
-        self.y = coords[:,1]
-        return self
+        return self.update_coords(coords[:,0],coords[:,1])
 
     def scale(self,factor):
-        self.x*=factor
-        self.y*=factor
-        self.fx*=factor
-        self.fy*=factor
-        return self
+        return self.update_coords(self.x*factor,self.y*factor).set_fcoords(self.fx*factor,self.fy*factor)
 
     def move(self,x0,y0):
-        self.x+=x0
-        self.y+=y0
-        self.fx+=x0
-        self.fy+=y0
-        return self
+        return self.update_coords(self.x+x0,self.y+y0).set_fcoords(self.fx+x0,self.fy+y0)
 
     def disp(self,coord): return self.move(coord[0],coord[1])
 
     def inverted_radii(self):
         '''return an inverted version of the current data'''
-        sd = SpiroData()
-        sd.p=self.p
-        sd.t=self.t
-        sd.o=self.o
-        sd.s=self.s
-        inv_r = 1/self.radii()
+        inv_r = 1/self.radii()  # need to trap 1/0 here
         pp = self.polars()
-        sd.x = inv_r * cos(pp)
-        sd.y = inv_r * sin(pp)
-        sd.fx = self.fx
-        sd.fy = self.fy
-        sd.v = self.v   # could use this to trap 1/0
-        return sd
+        x = inv_r * cos(pp)
+        y = inv_r * sin(pp)
+        sd = self.copy()
+        return sd.update_coords(x,y)
     
     def subsample(self,n,first=0):
         '''return a subsampled version of the current data'''
-        sd = SpiroData()
-        sd.x=self.x[first::n]
-        sd.y=self.y[first::n]
-        sd.p=self.p[first::n]
-        sd.t=self.t[first::n]
-        sd.o=self.o[first::n]
-        sd.s=self.s[first::n]
-        sd.fx=self.fx[first::n]
-        sd.fy=self.fy[first::n]
-        sd.v =self.v[first::n]
-        return sd
+        return self.select(slice(first,self.n(),n))
 
     def n(self):  return self.x.shape[0]
 
@@ -407,16 +358,8 @@ class SpiroData:
         bfx=make_interp_spline(dist,self.fx[j])
         bfy=make_interp_spline(dist,self.fy[j])
         sd = SpiroData()
-        sd.x=bx(interp_dists)
-        sd.y=by(interp_dists)
-        sd.p=bp(interp_dists)
-        sd.t=bt(interp_dists)
-        sd.o=bo(interp_dists)
-        sd.s=bs(interp_dists)
-        sd.fx=bfx(interp_dists)
-        sd.fy=bfy(interp_dists)
-        sd.v=sd.x*0+1
-        return sd
+        return sd.set_array(bx(interp_dists),by(interp_dists),bp(interp_dists),bt(interp_dists),
+                            bo(interp_dists),bs(interp_dists),bfx(interp_dists),bfy(interp_dists))
 
     def oversample(self,factor):
         sd = self.resample(self.max_path()*frame_sampling(int(factor*self.n()),1.0,'constant'))
@@ -424,16 +367,8 @@ class SpiroData:
     
     def copy(self):
         sd = SpiroData()
-        sd.x= np.copy(self.x)
-        sd.y= np.copy(self.y)
-        sd.p= np.copy(self.p)
-        sd.t= np.copy(self.t)
-        sd.o= np.copy(self.o)
-        sd.s= np.copy(self.s)
-        sd.fx=np.copy(self.fx)
-        sd.fy=np.copy(self.fy)
-        sd.v =np.copy(self.v)
-        return sd
+        return sd.set_array(np.copy(self.x),np.copy(self.y), np.copy(self.p), np.copy(self.t),np.copy(self.o),
+                            np.copy(self.s),np.copy(self.fx),np.copy(self.fy),np.copy(self.v))
 
     def copy_n(self,n_copies):
         sd = SpiroData()
