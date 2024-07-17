@@ -52,21 +52,13 @@ def wheel_in_ellipse(x0=0,y0=0,wheel=Wheel(4,3.5,0),ellipse=Ellipse(10,0.5,0,0),
 
     x0_wheel = xnc + iv * wheel.r * sin(normal)
     y0_wheel = ync + iv * wheel.r * cos(normal)
-    
-    sd.t=t
-    sd.x=x0_wheel + m*sin(p+normal)
-    sd.y=y0_wheel + m*cos(p+normal)
-    sd.p=p
-    sd.o=np.full((sd.n()),object)
-    sd.s=linspace(0,int(loops*ppl),int(loops*ppl))//ppl
-    sd.fx=xnc
-    sd.fy=ync
-    sd.v = np.full((sd.n()),1)
 
+    sd.set_array(x0_wheel + m*sin(p+normal),
+                 y0_wheel + m*cos(p+normal),
+                 p,t,object,linspace(0,int(loops*ppl),int(loops*ppl))//ppl,
+                 xnc,ync,1)
 
-    sd.rotate(orient).move(x0,y0)
-
-    return sd
+    return sd.rotate(orient).move(x0,y0)
 
 
 def cIc(ring,wheel, loops=1,ppl=1000, inside=False,reverse=False,
@@ -92,7 +84,6 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
     Direction of motion can be reversed by setting reverse=True
     '''
     iv = -1 if invert else 1
-    sd = SpiroData()
 
     a = wheel.r
     b = wheel.m
@@ -140,17 +131,13 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
         qtheta = 2 * pi / quadrants
         int_th = array([ int(th/qtheta) for th in theta ])
         theta = int_th*qtheta + np.random.normal(0,qtheta/qfuzz,theta.size)
-        
-    sd.p=p
-    sd.t=theta
-    sd.x=r*sin(theta) + b*sin(p+normal)
-    sd.y=r*cos(theta) + b*cos(p+normal)
-    sd.o=np.full((sd.n()),object)
-    sd.s=linspace(0,int(loops*ppl),int(loops*ppl))//ppl
-    sd.fx=R*sin(theta)
-    sd.fy=R*cos(theta)
-    sd.v  = np.full((sd.n()),1)
 
+    sd=SpiroData()
+    sd.set_array(r*sin(theta) + b*sin(p+normal),
+                 r*cos(theta) + b*cos(p+normal),
+                 p,theta,object,
+                 linspace(0,int(loops*ppl),int(loops*ppl))//ppl,
+                 R*sin(theta),R*cos(theta),1)
     
     return sd.move(x0,y0)
 

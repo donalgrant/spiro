@@ -20,8 +20,6 @@ def eIe(ring=Ellipse(20,0.5,0,0),
     
     '''
 
-    sd = SpiroData()
-
     RC = ring.c
 
     t=linspace(0,loops,int(loops*ppl))
@@ -75,21 +73,9 @@ def eIe(ring=Ellipse(20,0.5,0,0),
         
     # coordinate of pen
 
-    sd.t = t
-    sd.p = p
-    sd.o = full((int(loops*ppl)),object)
-    sd.s = t//ppl
-
-    sd.x = pp[:,0]
-    sd.y = pp[:,1]
-
-    sd.fx = cx
-    sd.fy = cy
-    sd.v  = np.full((sd.n()),1)
-
-    
+    sd = SpiroData()
+    sd.set_array(pp[:,0],pp[:,1],p,t,object,t//ppl,cx,cy,1)
     sd.rotate(ring.o).move(ring.O[0],ring.O[1])
-    
     return sd
 
 def eIc(ring=Ring(10),wheel=Ellipse(3,0.5,2,0,0),
@@ -105,8 +91,6 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
     orient radians cw from the vertical.  Arc has length loops * 2pi
     Todo:  Direction of motion can be reversed by setting reverse=True
     '''
-
-    sd = SpiroData()
 
     RC = circum(R)
 
@@ -158,19 +142,8 @@ def elliptical_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Ellipse(3,0.5,2,0),
         
     # coordinate of pen
 
-    sd.t = t
-    sd.p = p
-    sd.o = full((int(loops/spacing)),object)
-    sd.s = (t*spacing).astype(int)
-
-    sd.x = pp[:,0]
-    sd.y = pp[:,1]
-
-    sd.fx = cx
-    sd.fy = cy
-    sd.v  = np.full((sd.n()),1)
-
-
+    sd = SpiroData()
+    sd.set_array(pp[:,0],pp[:,1],p,t,object,(t*spacing).astype(int),cx,cy,1)
     return sd.move(x0,y0)
 
 def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False,ppl=1000,object=0,segment=0):
@@ -205,20 +178,15 @@ def roll_ellipse(x1,y1,x2,y2,ellipse,start_guard=0,end_guard=0,invert=False,ppl=
     ys = y1 + iv * a * cos(A) + start_guard * sin(A)
 
     p = phi_factor * t + offset
+
+    fx = linspace(x1,x2,ppl) # should really include guards, but usually subtle effect
+    fy = linspace(y1,y2,ppl) # ditto
     
     sd = SpiroData()
-    
-    sd.x = xs + time_factor * t * cos(A) + b * sin(p)
-    sd.y = ys + time_factor * t * sin(A) + b * cos(p) 
-    sd.p = p
-    sd.t = t
-    sd.o = full((ppl),object)
-    sd.o = full((ppl),segment)
-    sd.fx = linspace(x1,x2,sd.x.shape[0]) # should really include guards, but usually subtle effect
-    sd.fy = linspace(y1,y2,sd.y.shape[0]) # ditto
-    sd.v  = np.full((sd.n()),1)
-
-    
+    sd.set_array(xs + time_factor * t * cos(A) + b * sin(p),
+                 ys + time_factor * t * sin(A) + b * cos(p),
+                 p,t,object,segment,fx,fy,1)
+                 
     return sd
 
 def integral_ellipticals(n,e_ring,e_wheel,ring_angle=pi/4,

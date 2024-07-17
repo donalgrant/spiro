@@ -29,7 +29,7 @@ from spiro import *
 #     
 #     return sd
 
-def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False,segment=0,object=0):
+def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False,segment=0,object=0,ppl=1000):
     '''roll in straight line from (x1,y1) to (x2,y2) using circular wheel
     invert keyword controls sense of wheel location:  default
     is above and/or to the right.  invert=True is the opposite.
@@ -41,7 +41,7 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False,segment=0,obje
     
     D=sqrt((x2-x1)**2+(y2-y1)**2) - (start_guard+end_guard)  # roll distance
     A=arctan2(y2-y1,x2-x1)                                   # roll angle
-    t=np.linspace(0,2*pi*(D/(2*pi*a)),1000)                  # angle through which the wheel rolls
+    t=np.linspace(0,2*pi*(D/(2*pi*a)),ppl)                  # angle through which the wheel rolls
     
     iv = -1 if invert else 1
 
@@ -59,19 +59,14 @@ def roll(x1,y1,x2,y2,wheel,start_guard=0,end_guard=0,invert=False,segment=0,obje
 
     p = phi_factor * t + offset
     
+    fx = linspace(x1,x2,ppl) # should really include guards, but usually subtle effect
+    fy = linspace(y1,y2,ppl) # ditto
+    
     sd = SpiroData()
+    return sd.set_array(xs + time_factor * t * cos(A) + b * sin(p),
+                        ys + time_factor * t * sin(A) + b * cos(p),
+                        p,t,segment,object,fx,fy,1)
     
-    sd.x = xs + time_factor * t * cos(A) + b * sin(p)
-    sd.y = ys + time_factor * t * sin(A) + b * cos(p) 
-    sd.p = p
-    sd.t = t
-    sd.s = sd.t*0 + segment
-    sd.o = sd.t*0 + object
-    sd.fx = linspace(x1,x2,sd.x.shape[0]) # should really include guards, but usually subtle effect
-    sd.fy = linspace(y1,y2,sd.y.shape[0]) # ditto
-    sd.v  = np.full((sd.n()),1)
-    
-    return sd
 
 def corner_guard(wheel_size=0,corner_angle=pi/2,):
     return wheel_size/tan(corner_angle/2)
