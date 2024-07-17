@@ -95,7 +95,7 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
 
     t=np.linspace(0.0,(2*pi*R/a)*loops-(start_guard_angle+end_guard_angle)*R/a,int(loops*ppl))
 
-    p = t
+    p = t  # looks like this gets overridden
     
     guard_offset_angle=start_guard_angle
     
@@ -120,7 +120,7 @@ def spiro_arc(x0=0,y0=0,orient=0,R=10.0,wheel=Wheel(4,3.5,0),
 
     p     = phi_factor   * t + offset
 #    theta = theta_factor * t + orient + guard_offset_angle  # original
-    arc = slide_arc(array([ wheel.arc(phi) for phi in p ]),slide)
+    arc = slide_arc(array([ wheel.arc(phi-offset) for phi in p ]),slide)
     theta = iv * theta_factor * arc / R + orient + guard_offset_angle
 
     r     = R + iv * a
