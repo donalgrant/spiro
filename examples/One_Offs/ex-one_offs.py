@@ -429,3 +429,48 @@ S = on_frame(U,scale=sc,oangle=pi/2,fb=offset,fh=offset,asym=asym,orient=o,first
 F.plot(S,color_scheme='fcdist3',cmap='hot', dot_size=0.1,alpha=0.4,coord_dither=2.0,limits=None)
 
 F.save_fig()
+
+###  "disintegration"
+
+e=0.2
+R=40
+ppl=200
+loops=10
+a=R/2.1
+U = cIc(Ring(R),wheel=Wheel(a,0.6*a),ppl=ppl,loops=loops,inside=True)
+W = U.resample(U.max_path()*frame_sampling(ppl*loops,parm=0.3,reverse=False,
+                                           spacing='erf',deramp=True,repeat=10))
+
+tpts=[100,200,300]
+n=int(0.2*W.n())
+offset=0.5
+
+rp_opts = None 
+
+oa = linspace(pi/4,pi/2,n-2)
+f0 = W.n()//6
+o = linspace(pi/2,pi/2,n-2)
+
+S = on_frame(W,first=f0,n=n-2,scale=70,pts=tpts,
+             oangle=oa,asym=0.2,
+             orient_follow=1,arc_angle=pi/4,fb=offset,fh=offset,
+             polyfunc=tcoords,orient=o,rp_opts=rp_opts)
+
+max_dither=10
+exp_dither=6
+
+cd=S.dists_to_coord(array([min(S.x),max(S.y)]))
+mcd=max(cd)
+x = np.copy(S.x)
+y = np.copy(S.y)
+dr = np.random.standard_normal(S.n())
+dt = np.random.uniform(0,2*pi,S.n())
+coord_dither = max_dither*((cd/mcd)**exp_dither)
+for j in range(S.n()):
+    x[j] += coord_dither[j]*dr[j]*cos(dt[j])
+    y[j] += coord_dither[j]*dr[j]*sin(dt[j])
+T = S.copy()
+T.update_coords(x,y)
+F.plot(T,color_scheme='time',cmap='cyans',alpha=0.4,dot_size=0.1)
+
+F.save_fig()

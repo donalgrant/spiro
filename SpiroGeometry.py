@@ -1,7 +1,8 @@
 import sys
 import numpy as np
 from numpy import sin,cos,tan,empty,array,matmul,linspace,geomspace,full
-from numpy import abs,pi,sqrt,arctan2,arccos,arcsin,diff,zeros,flip,log
+from numpy import abs,pi,sqrt,arctan2,arccos,arcsin,diff,zeros,flip,log,exp
+from math import erf
 from scipy.spatial.transform import Rotation as R
 from scipy.interpolate import make_interp_spline
 
@@ -282,6 +283,12 @@ def fibonacci(n):
         (x1,x2) = (x2,x1+x2)
     return x2
         
+
+def gaussian(n,p):
+    return array([ sqrt(1.0/2/pi)/(2*p*n) * exp(-0.5*((j-n)/(2*p*n))**2) for j in range(0,n) ])
+
+def error_fn(n,p):
+    return array([ (1+erf( p*(j-n/2)/n ))/2 for j in range(0,n) ])
     
 def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat=1,nocum=False,
                    zero=True,fs_opts=None):
@@ -302,6 +309,8 @@ def frame_sampling(n,parm=1.0,spacing='linear',reverse=False,deramp=False,repeat
         case 'constant':   x = np.full(n//dn,parm)
         case 'linear':     x = linspace(1,1+parm,n//dn)
         case 'geometric':  x = geomspace(1,1+parm,n//dn)
+        case 'gaussian':   x = gaussian(n//dn,parm)
+        case 'erf':        x = error_fn(n//dn,parm)
         case 'sinusoid':   x = array([ 1.0 + parm*sin(pi*j/(2*n//dn)) for j in range(0,n//dn) ])
         case 'log':        x = array([ parm*log(j+2)/log((n+1)//dn) for j in range(0,n//dn) ])
         case 'fibonacci':  x = array([ fibonacci(j+1) for j in range(n//dn) ])  # parm is ignored

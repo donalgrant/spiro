@@ -21,6 +21,9 @@ cmap1 = cmap_from_list(["Red","Orange","hotpink"],'cmap1')
 cmap2 = cmap_from_list(["rebeccapurple","darkmagenta","orchid","pink"],'cmap2')
 cmap3 = cmap_from_list(["seagreen","teal","cornflowerblue","mediumblue","indigo"],'cmap3')
 
+
+cyans = cmap_from_list(["xkcd:dark aqua","xkcd:dark cyan","xkcd:cyan","xkcd:light cyan","xkcd:ice"],'cyans')
+
 clist = [ 'xkcd:'+i for i in ['sapphire','vibrant blue','carolina blue','navy blue','azul','sapphire'] ]
 pretty_blues = cmap_from_list(clist,'pretty_blues')
 
@@ -45,7 +48,7 @@ pretty_reds = cmap_from_list(clist,'pretty_reds')
 
 def cmap_list():
     return ['pretty_blues','wreath','gold','emerald_woman','pinks','pale_pink',
-            'cmap1','cmap2','cmap3',
+            'cmap1','cmap2','cmap3','cyans',
             'viridis','magma','inferno','plasma','cividis',
             'spring','summer','winter','autumn','Wistia','cool',
             'hot','gist_heat','copper',

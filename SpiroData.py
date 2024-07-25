@@ -35,7 +35,15 @@ class SpiroData:
         self.reset()
         
     def reset(self):
-        return self.set_array(array([]),array([]))
+        return self.set_array(array([]),array([])).clear_meta()
+
+    def clear_meta(self):
+        self.meta={}
+        return self
+
+    def load_meta(self,key,val):
+        self.meta[key]=val
+        return self
 
 #  x: x-coord
 #  y: y-coord
@@ -183,6 +191,9 @@ class SpiroData:
         iw = self.wrap(i)
         return arctan2(coord[1]-self.y[iw],coord[0]-self.x[iw])
 
+    def directions_to_coord(self,coord):
+        return array([ self.direction_to_coord(i,coord) for i in range(self.n()) ])
+
     def direction_to_frame(self,i):
         return self.direction_to_coord(i,self.fxy(i))
 
@@ -198,6 +209,9 @@ class SpiroData:
     def dist_to_coord(self,i,coord):
         iw = self.wrap(i)
         return dist(array([ self.xy(i), coord ]))
+
+    def dists_to_coord(self,coord):
+        return array([ self.dist_to_coord(i,coord) for i in range(self.n()) ])
 
     def dist_to_frame(self,i):
         return self.dist_to_coord(i,self.fxy(i))
@@ -281,6 +295,12 @@ class SpiroData:
 
     def scale(self,factor):
         return self.update_coords(self.x*factor,self.y*factor).set_fcoords(self.fx*factor,self.fy*factor)
+
+    def scalex(self,factor):
+        return self.update_coords(self.x*factor,self.y).set_fcoords(self.fx*factor,self.fy)
+
+    def scaley(self,factor):
+        return self.update_coords(self.x,self.y*factor).set_fcoords(self.fx,self.fy*factor)
 
     def move(self,x0,y0):
         return self.update_coords(self.x+x0,self.y+y0).set_fcoords(self.fx+x0,self.fy+y0)

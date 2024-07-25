@@ -10,7 +10,7 @@ from spiro_ellipse import *
 from spiro_frame import *
 from polygon import *
 
-parser = argparse.ArgumentParser(description="Autonorm Design Examples")
+parser = argparse.ArgumentParser(description="Glass and Wings Examples")
 parser.add_argument("--full_res", help="use high-definition mode", action="store_true")
 args = parser.parse_args()
 
@@ -29,7 +29,7 @@ save=True
 F.set_default_dpi(150*(1+hd))
 fd = 10*(1+2*hd) # figure dimensions
 
-F._figname='Autonorm_Design-'
+F._figname='Glass_and_Wings-'
 
 def figure(S,cs,cmap,alpha=0.4,dot_size=0.1,filename=None,color_dither=0.0,limits=None):
     if hd:
@@ -161,5 +161,58 @@ for i in range(ns):
     F.plot(SA[i].rotate(i/ns*pi/3),color_scheme=cs,cmap=cmap, dot_size=0.1,alpha=(i+1)/ns * 0.6,limits=None,
            coord_dither=0.0,color_dither=0.0,new_fig=first_plot)
     first_plot=False
+
+F.save_fig()
+
+###  colormap chosen by Cara vote, with 'time', and no rp_opts, though 'spacing' is good with rp_opts
+
+e=0.2
+R=40
+ppl=300
+loops=2
+a=R/(1.07*2)
+U = cIc(Ring(R),wheel=Wheel(a,0.5*a,pi/6),ppl=ppl,loops=loops,inside=True).rotate(pi/3)
+W = U.resample(U.max_path()*frame_sampling(ppl*loops,parm=1.0,
+                                           spacing='sinusoid',deramp=True,repeat=15))
+
+tpts=150
+n=W.n()
+offset=0.5
+
+rp_opts = None # { 'n': 3*tpts, 'spacing': ['sinusoid'], 'deramp': True, 'repeat': 1 }
+
+S = on_frame(W,first=1,n=n-2,scale=50,pts=tpts,
+             oangle=linspace(pi/4,pi/2,n-2),asym=0.2,
+             orient_follow=1,arc_angle=pi/4,fb=offset,fh=offset,
+             polyfunc=pcoords,orient=0,rp_opts=rp_opts)
+
+F.plot(S,color_scheme='time',cmap='twilight',alpha=0.4,dot_size=0.1)
+
+F.save_fig()
+
+###
+
+e=0.2
+R=40
+ppl=1000
+loops=2
+a=R/(1.07*2)
+U = cIc(Ring(R),wheel=Wheel(a,0.5*a,pi/6),ppl=ppl,loops=loops,inside=True).rotate(pi/3)
+W = U.resample(U.max_path()*frame_sampling(ppl*loops,parm=0.3,
+                                           spacing='gaussian',deramp=True,repeat=5))
+
+tpts=[100,0,0]
+n=W.n()
+offset=0.5
+
+rp_opts = { 'n': 3*tpts[0], 'parm': 0.3, 'spacing': ['sinusoid'], 'deramp': False, 'repeat': 30 }
+
+S = on_frame(W,first=1,n=n-2,scale=50,pts=tpts,
+             oangle=linspace(pi/4,pi/2,n-2),asym=0.5,
+             orient_follow=1,arc_angle=pi/4,fb=offset,fh=offset,
+             polyfunc=tcoords,orient=0,rp_opts=rp_opts)
+
+first=True
+F.plot(S,color_scheme='time',cmap='pretty_blues',alpha=0.4,dot_size=0.1,new_fig=first)
 
 F.save_fig()
