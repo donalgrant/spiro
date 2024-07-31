@@ -16,19 +16,25 @@ def objectify(SA):
 def partition_rings(sd,n,scalex=1.0,prot=0,pad=0):
 
     SA = []
-    
+
     for i in range(n):
         S = sd.copy().rotate(array_val(prot,i))
-        S.scalex(array_val(scalex,i))
-        r = S.radii()
-        mr = max(r)
-        S=S.remove(np.where( r < (i+array_val(pad,i))/n * mr))
-        r = S.radii()
-        mr = max(r)
-        T=S.remove(np.where( r > (i+1-array_val(pad,i))/n * mr))
-        T.scalex(1.0/array_val(scalex,i))
-        T.rotate(-array_val(prot,i))
-        SA.append(T)
+        if S.n()>0:
+            S.scalex(array_val(scalex,i))
+            r = S.radii()
+            mr = max(r)
+            S=S.remove(np.where( r < (i+array_val(pad,i))/n * mr))
+            if S.n()>0:
+                r = S.radii()
+                mr = max(r)
+                T=S.remove(np.where( r > (i+1-array_val(pad,i))/n * mr))
+                T.scalex(1.0/array_val(scalex,i))
+                T.rotate(-array_val(prot,i))
+                SA.append(T)
+            else:
+                SA.append(S)  # preserve number of rings, even if empty
+        else:
+            SA.append(S)
 
     return SA
 
@@ -76,4 +82,13 @@ def partition_tiles(sd,nx=1,ny=1,padx=0.0,pady=0.0):
             sd.load_meta('tile-yc',(y1+y2)/2)
             SA.append(sd)
     
+    return SA
+
+def partition_radial_tiles(sd,nr=1,na=1,padr=0,pada=0,scalex=1,prot=0):
+    SR = partition_rings(sd,nr,scalex=scalex,pad=padr,prot=prot)
+    SA = []
+    for i in range(nr):
+        if SR[i].n()>0:
+            for Q in partition_azimuth(SR[i],array_val(na,i),pad=array_val(pada,i)):
+                if Q.n()>0:  SA.append(Q)
     return SA

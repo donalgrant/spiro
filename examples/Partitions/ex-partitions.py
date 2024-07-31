@@ -674,3 +674,70 @@ F.plot(SS,color_scheme='time',cmap='Oranges',alpha=0.4,dot_size=0.1)
 F.plot(ST[0].subsample(2),color_scheme='time',cmap='gist_heat_r',alpha=0.4,dot_size=0.1,new_fig=False)
 
 F.save_fig()
+
+###  exploding tiles
+
+e=0.2
+R=40
+ppl=200
+loops=10
+a=R/2.1
+U = cIc(Ring(R),wheel=Wheel(a,0.6*a),ppl=ppl,loops=loops,inside=True)
+W = U.resample(U.max_path()*frame_sampling(ppl*loops,parm=0.3,reverse=False,
+                                           spacing='erf',deramp=True,repeat=10))
+
+tpts=[100,200,300]
+n=int(0.2*W.n())
+offset=0.5
+
+rp_opts = None
+
+oa = pi/4
+f0 = W.n()//6
+o = linspace(pi/2,pi/2,n-2)
+
+S = on_frame(W,first=f0,n=n-2,scale=70,pts=tpts,
+             oangle=oa,asym=0.2,
+             orient_follow=1,arc_angle=pi/4,fb=offset,fh=offset,
+             polyfunc=tcoords,orient=o,rp_opts=rp_opts)
+
+SS = S.copy()
+
+nn = 4
+ST = partition_rings(SS,nn,pad=0.0)
+QQ = [ ST[0] ]
+QQ1 = ST[1]
+r0 = min(QQ1.radii())/2
+k=0
+for Q in ST[1:]:
+    scale = Q.rmid()/r0
+    naz = int(nn*scale)
+    for X in partition_azimuth(Q,naz,pad=0.0):
+        if X.n()>0:
+            X.set_objects(k)
+            k+=1
+            theta = X.azmid()
+            dr = Q.rmid()/nn * (1+np.random.standard_normal()/3)
+            X.update_coords(X.x + dr*cos(theta),X.y + dr*sin(theta))
+            QQ=np.append(QQ,X.rotate(2*pi*np.random.standard_normal()/(3*naz)))
+
+SS = objectify(QQ)
+
+max_dither=20
+exp_dither=6
+
+cd = SS.dists_to_coord(array([ 0,0 ]))
+mcd=max(cd)
+x = np.copy(SS.x)
+y = np.copy(SS.y)
+dr = np.random.standard_normal(SS.n())
+dt = np.random.uniform(0,2*pi,SS.n())
+coord_dither = max_dither*((cd/mcd)**exp_dither)
+for j in range(SS.n()):
+    x[j] += coord_dither[j]*dr[j]*cos(dt[j])
+    y[j] += coord_dither[j]*dr[j]*sin(dt[j])
+
+SS.update_coords(x,y)
+F.plot(SS,color_scheme='fwidth',cmap='gist_heat',alpha=0.4,dot_size=0.1)
+
+F.save_fig()

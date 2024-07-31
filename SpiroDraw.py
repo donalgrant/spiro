@@ -9,6 +9,86 @@ from pathlib import Path
 import matplotlib as mpl
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
+import colorsys
+
+def modify_colormap(cmap_name='turbo', saturation_factor=1.0, brightness_factor=1.0, contrast_factor=1.0):
+  """
+  Modifies the saturation, brightness, and contrast of a colormap.
+
+  Args:
+    cmap_name: The name of the colormap to modify.
+    saturation_factor: A factor to multiply the saturation by.
+    brightness_factor: A factor to multiply the value channel by (brightness).
+    contrast_factor: A factor to adjust the contrast (1.0 is no change).
+
+  Returns:
+    A matplotlib colormap object with the modified colors.
+  """
+
+  cmap = plt.get_cmap(cmap_name)
+  rgb_colors = cmap(np.linspace(0, 1, 256))[:, :3]
+
+  hsv_colors = np.array([colorsys.rgb_to_hsv(*color) for color in rgb_colors])
+
+  # Adjust saturation, brightness, and contrast
+  hsv_colors[:, 1] *= saturation_factor
+  hsv_colors[:, 2] *= brightness_factor
+  hsv_colors[:, 2] = np.clip(hsv_colors[:, 2], 0, 1)  # Ensure value stays within [0, 1]
+  hsv_colors[:, 2] = (hsv_colors[:, 2] - hsv_colors[:, 2].mean()) * contrast_factor + hsv_colors[:, 2].mean()
+  hsv_colors[:, 2] = np.clip(hsv_colors[:, 2], 0, 1)  # Ensure value stays within [0, 1]
+
+  rgb_colors = np.array([colorsys.hsv_to_rgb(*color) for color in hsv_colors])
+
+  new_cmap = plt.matplotlib.colors.ListedColormap(rgb_colors)
+  return new_cmap
+
+
+def modify_colormap_saturation(cmap_name, saturation_factor=1.0):
+  """
+  Modifies the saturation of a colormap.
+
+  Args:
+    cmap_name: The name of the colormap to modify.
+    saturation_factor: A factor to multiply the saturation by.
+
+  Returns:
+    A matplotlib colormap object with the modified colors.
+  """
+
+  cmap = plt.get_cmap(cmap_name)
+  rgb_colors = cmap(np.linspace(0, 1, 256))[:, :3]
+
+  hsv_colors = np.array([colorsys.rgb_to_hsv(*color) for color in rgb_colors])
+  hsv_colors[:, 1] *= saturation_factor  # Adjust saturation
+  rgb_colors = np.array([colorsys.hsv_to_rgb(*color) for color in hsv_colors])
+
+  new_cmap = plt.matplotlib.colors.ListedColormap(rgb_colors)
+  return new_cmap
+
+def morph_colormaps(cmap_name1, cmap_name2, fraction):
+  """
+  Morphs two matplotlib colormaps.
+
+  Args:
+    cmap1: The first colormap.
+    cmap2: The second colormap.
+    fraction: The fraction of the way to morph from cmap1 to cmap2.
+
+  Returns:
+    A new matplotlib colormap.
+  """
+  
+  cmap1 = plt.get_cmap(cmap_name1)
+  cmap2 = plt.get_cmap(cmap_name2)
+
+  cmap1_colors = cmap1(np.linspace(0, 1, 256))[:, :3]
+  cmap2_colors = cmap2(np.linspace(0, 1, 256))[:, :3]
+
+  morph_colors = cmap1_colors * (1 - fraction) + cmap2_colors * fraction
+
+  new_cmap = plt.matplotlib.colors.ListedColormap(morph_colors)
+  return new_cmap
+
 def cmap_from_list(clist,cname=None):
     if cname is None:
         cname=''

@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import array, append, column_stack, abs, sqrt, arctan2, linspace
+from matplotlib.path import Path
 
 from SpiroGeometry import *
 import pickle
@@ -121,8 +122,18 @@ class SpiroData:
     def oc(self):  return self.o[-1]
     def sc(self):  return self.s[-1]
 
+    def coords(self):
+        cc = empty((self.n(),2))
+        for i in range(self.n()): cc[i]=array([ self.x[i],self.y[i] ])
+        return cc
+    
     def xy(self, index): return array([  self.x[index % self.n()],  self.y[index % self.n()] ])
     def fxy(self,index): return array([ self.fx[index % self.n()], self.fy[index % self.n()] ])
+
+    def xmid(self):  return 0.5*(max(self.x)+min(self.x))
+    def ymid(self):  return 0.5*(max(self.y)+min(self.y))
+    def rmid(self):  return 0.5*(max(self.radii())+min(self.radii()))
+    def azmid(self): return arctan2(self.ymid(),self.xmid())
 
     def xys(self,scale=1.0):
         cc = empty((self.n(),3))
@@ -336,6 +347,16 @@ class SpiroData:
                             self.t[~j],self.o[~j],self.s[~j],
                             self.fx[~j],self.fy[~j],self.v[~j])
 
+    def is_contained_in(self,coords,radius=0):
+        return Path(coords).contains_points(self.coords(),radius=radius)
+
+    def is_within(self,max_dist,coords):
+        xy_array = self.coords()
+        j = np.where(dists(coords[0],xy_array)<=max_dist,True,False)
+        for i in range(1,coords.shape[0]):
+            j |= np.where(dists(coords[i],xy_array)<=max_dist,True,False)
+        return j
+    
     def valid(self):
         sd = self.copy()
         sd = sd.select(sd.v==1)

@@ -474,3 +474,46 @@ T.update_coords(x,y)
 F.plot(T,color_scheme='time',cmap='cyans',alpha=0.4,dot_size=0.1)
 
 F.save_fig()
+
+###
+
+e=0.2
+R=40
+ppl=500
+loops=10
+a=R/2.1
+U = cIc(Ring(R),wheel=Wheel(a,0.5*a),ppl=ppl,loops=loops,inside=True)
+W = U 
+
+tpts=[20,20,0,30]
+n=int(0.1*W.n())
+offset=-0.1
+
+rp_opts = { 'n': 500, 'parm': 2, 'spacing': ['erf'], 'deramp': True, 'repeat': 5 }
+
+oa = pi/4 
+f0 = W.n()//3
+o = linspace(0,pi/2,n-2)
+asym=linspace(-0.1,0.3,n-1)
+
+S = on_frame(W,first=f0,n=n-2,scale=30,pts=tpts,
+             oangle=oa,asym=asym,
+             orient_follow=W.n()//3,arc_angle=pi/2,fb=offset,fh=offset,
+             polyfunc=pcoords,orient=o,rp_opts=rp_opts,object=arange(n-2,dtype=int))
+
+fade = np.full( (ppl), 0.0 )
+fade[ppl-ppl//3:ppl] = linspace(0.0,5.0,ppl//3)
+sat = np.full( (ppl), 0.0 )
+sat[0:ppl//4] = 1.0
+sat[ppl//4:ppl-ppl//4] = linspace(1.0,0.0,ppl//2)
+sat[ppl-ppl//4:ppl] = 0.0
+
+for cmap in ['prism']:
+    first=True
+    for i in range(ppl):
+        F.plot(S.select(np.where(np.rint(S.o)==i)),color_scheme='time',
+               cmap=modify_colormap_saturation(cmap,sat[i]),
+               alpha=0.4,dot_size=0.1,new_fig=first,coord_dither=fade[i])
+        first=False
+
+F.save_fig()

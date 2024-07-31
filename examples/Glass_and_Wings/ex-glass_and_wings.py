@@ -216,3 +216,40 @@ first=True
 F.plot(S,color_scheme='time',cmap='pretty_blues',alpha=0.4,dot_size=0.1,new_fig=first)
 
 F.save_fig()
+
+###
+
+e=0.2
+R=40
+ppl=500
+loops=10
+a=R/2.1
+U = cIc(Ring(R),wheel=Wheel(a,0.5*a),ppl=ppl,loops=loops,inside=True)
+W = U 
+
+tpts=[20,20,0,30]
+n=int(0.1*W.n())
+offset=-0.1
+
+rp_opts = { 'n': 500, 'parm': 2, 'spacing': ['erf'], 'deramp': True, 'repeat': 5 }
+
+oa = pi/4 
+f0 = W.n()//3
+o = linspace(0,pi/2,n-2)
+asym=linspace(-0.1,0.3,n-1)
+
+S = on_frame(W,first=f0,n=n-2,scale=30,pts=tpts,
+             oangle=oa,asym=asym,
+             orient_follow=W.n()//3,arc_angle=pi/2,fb=offset,fh=offset,
+             polyfunc=pcoords,orient=o,rp_opts=rp_opts,object=arange(n-2,dtype=int))
+
+first=True
+for i in range(ppl):
+    F.plot(S.select(np.where(np.rint(S.o)==i)),color_scheme='time',
+           cmap=modify_colormap_saturation('turbo',(1.0-i/ppl)),
+           alpha=0.4,dot_size=0.1,new_fig=first)
+    first=False
+
+F.save_fig()
+
+###

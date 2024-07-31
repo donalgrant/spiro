@@ -271,6 +271,11 @@ def ellipse_between_pts(end_pt,eccen,npts=50):
 def cos_angle(a,b,c):
     return arccos( (a**2+b**2-c**2) / (2*a*b) )
 
+def dists(targ_coord,cc):
+    return sqrt((cc[:,0]-targ_coord[0])**2 + (cc[:,1]-targ_coord[1])**2)
+
+def min_dist(targ_coord,cc):  return min(dists(targ_coord,cc))
+
 '''
 parameters: factor=1 (uniform), reverse=False, flip=True, option='linear','geometric','fibonacci','sinusoid', repeat=1, scale=max-path (1 if not given)
 '''
