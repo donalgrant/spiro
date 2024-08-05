@@ -318,6 +318,24 @@ class SpiroData:
 
     def disp(self,coord): return self.move(coord[0],coord[1])
 
+    def dither_coords(self,coord_dither=0.0):
+        if is_array(coord_dither):
+            x = self.x.copy()
+            y = self.y.copy()
+            for j in range(self.n()):
+                dr = np.random.standard_normal()
+                dt = np.random.uniform(0,2*pi)
+                x[j] = coord_dither[j]*dr*cos(dt)
+                y[j] = coord_dither[j]*dr*sin(dt)
+        else:
+            if coord_dither==0.0:  return self
+            dr = np.random.standard_normal(self.n())
+            dt = np.random.uniform(0,2*pi,self.n())
+            x = coord_dither*dr*cos(dt)
+            y = coord_dither*dr*sin(dt)
+            
+        return self.update_coords(self.x+x,self.y+y)
+    
     def inverted_radii(self):
         '''return an inverted version of the current data'''
         inv_r = 1/self.radii()  # need to trap 1/0 here
@@ -402,6 +420,18 @@ class SpiroData:
         return sd.set_array(bx(interp_dists),by(interp_dists),bp(interp_dists),bt(interp_dists),
                             bo(interp_dists),bs(interp_dists),bfx(interp_dists),bfy(interp_dists))
 
+    def resample_using(self,opts,iteration=0):
+        sd = SpiroData()
+        if (opts is not None):
+            if isinstance(opts,dict):
+                fs_opts={}
+                for key in opts:  fs_opts[key]=array_val(opts[key],iteration)
+                sd=self.resample(self.max_path()*frame_sampling(1,fs_opts=fs_opts))
+            else:
+                sd=self.resample(self.max_path()*opts)
+        else:  sd=self.copy()
+        return sd
+                
     def oversample(self,factor):
         sd = self.resample(self.max_path()*frame_sampling(int(factor*self.n()),1.0,'constant'))
         return sd # .add(self.select(slice(0,1)))

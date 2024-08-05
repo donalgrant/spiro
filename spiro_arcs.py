@@ -175,7 +175,10 @@ def closed_arcs(sd,offsets,radii,invert=True,skip=1,first=0,n=0,
 
     return st
 
-def closed_subarcs(sd,offsets,sub_angle,invert=True,skip=1,first=0,n=0,line_pts=500,interp_phase=False,object=0):
+### deprecated, retained for backwards compatibility -- use spiro_frame::anchored_arcs 
+
+def closed_subarcs(sd,offsets,sub_angle,invert=True,skip=1,first=0,n=0,
+                   line_pts=500,interp_phase=False,object=0,connect_times=False,rp_opts=None):
     st = SpiroData()
     if n==0:  n = sd.n()//3  # number of closed paths to do
     i1=first % sd.n()        # offset to first closed path starting point
@@ -183,26 +186,46 @@ def closed_subarcs(sd,offsets,sub_angle,invert=True,skip=1,first=0,n=0,line_pts=
     nk = array_or_scalar_len(offsets)
     while True:
         i0=i1
+        tt=0
         for k in range(nk):
             o = array_val(offsets,k)
             end_points=array([ sd.xy(i1), sd.xy(i1+o) ])
             radius = dist(end_points)/ 2 / sin(array_val(sub_angle,k)/2)
             phase = linspace(sd.p[i1%sd.n()],sd.p[(i1+o)%sd.n()],line_pts) if interp_phase else sd.p[i1%sd.n()]
-            st.load(arc(end_points,radius,invert=array_val(invert,k),npts=line_pts),phase,
-                    object=array_val(object,j),segment=j*(nk+1)+k,
-                    frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
 
+            sst = SpiroData().load(arc(end_points,radius,invert=array_val(invert,k),npts=line_pts),
+                                   phase,object=array_val(object,j),segment=j*(nk+1)+k,time_offset=tt,
+                                   frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
+
+            '''
+            if (rp_opts is not None):
+                if isinstance(rp_opts,dict):
+                    fs_opts={}
+                    for key in rp_opts:  fs_opts[key]=array_val(rp_opts[key],k)
+                    sst=sst.resample(sst.max_path()*frame_sampling(1,fs_opts=fs_opts))
+                else:
+                    # isinstance(rp_opts,np.ndarray):
+                    sst=sst.resample(sst.max_path()*rp_opts)
+            '''
+
+            st.add(sst.resample_using(rp_opts,k))
+            
             i1 += o
+            if connect_times:  tt += line_pts
 
         # now close the loop
         end_points=array([ sd.xy(i1), sd.xy(i0) ])
         radius = dist(end_points)/ 2 / sin(array_val(sub_angle,k+1)/2)
         phase = linspace(sd.p[i1%sd.n()],sd.p[i0%sd.n()],line_pts) if interp_phase else sd.p[i1%sd.n()]
-        st.load(arc(end_points,radius,invert=array_val(invert,k+1),npts=line_pts),phase,
-                object=array_val(object,j),segment=j*(nk+1)+k+1,
-                frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
 
+        sst = SpiroData().load(arc(end_points,radius,invert=array_val(invert,k+1),npts=line_pts),
+                               phase,object=array_val(object,j),segment=j*(nk+1)+k+1,time_offset=tt,
+                               frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
+
+        st.add(sst.resample_using(rp_opts,k))
+        
         j+=1
+        if connect_times:  tt += line_pts
         
         if (n<=0) and (i0+skip)>=sd.n(): break
         i1 = (i0 + skip) % sd.n()

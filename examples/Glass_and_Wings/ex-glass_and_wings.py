@@ -7,6 +7,7 @@ import numpy as np
 from SpiroDraw import *
 from spiro import *
 from spiro_ellipse import *
+from spiro_arcs import *
 from spiro_frame import *
 from polygon import *
 
@@ -253,3 +254,165 @@ for i in range(ppl):
 F.save_fig()
 
 ###
+
+e=0.2
+R=40
+ppl=150
+loops=10
+a=R/2.1
+
+nrings=3
+U = integral_ellipticals(nrings,0.4,0.3,ring_angle=0,min_pen=0.8,max_pen=1.0,
+                         min_po=0.0,max_po=pi/4,rounds=3,circuits=4,inside=True,ppl=100)
+
+W = U.resample(U.max_path()*frame_sampling(ppl*loops,parm=0.2,reverse=False,
+                                          spacing='sinusoid',deramp=True,repeat=5))
+
+F.plot(W,color_scheme='white',cmap='turbo',alpha=0.4,dot_size=1)
+
+tpts=array([150,150,0,0])
+n=int(W.n())
+offset=0
+
+rp_opts = { 'n': 150, 'parm': 5, 'spacing': ['sinusoid'], 'deramp': True, 'repeat': 5 }
+
+f00 = 0 
+oa = pi/2 
+asym=0 
+S = SpiroData()
+objects = np.unique(W.o)
+for i in objects:
+    T = W.select(np.where(np.rint(W.o)==i))
+    n = T.n()
+    f0 = f00 + int(i/(nrings*objects.shape[0]) * T.n())
+    o = pi/4+linspace(0,pi/8,n)
+    S.add(on_frame(T,first=f0,n=n,scale=10,pts=tpts,
+                   oangle=oa,asym=asym,
+                   orient_follow=1,arc_angle=pi/2,fb=offset,fh=offset,
+                   polyfunc=pcoords,orient=o,rp_opts=rp_opts))
+
+cs = 'dist_to_frm'
+cmap='Reds'
+first=True
+
+F.plot(S,color_scheme=cs,cmap=cmap,alpha=0.4,dot_size=0.1,new_fig=first,coord_dither=0)
+
+F.save_fig()
+
+###
+
+e=0.2
+R=40
+ppl=50
+
+nrings=6
+U = integral_ellipticals(nrings,0.4,0.3,ring_angle=0,min_pen=0.3,max_pen=1.0,
+                         min_po=0.0,max_po=pi,rounds=6,circuits=4,inside=True,ppl=ppl)
+W=U
+
+tpts=array([15,15,0,0])
+n=int(W.n())
+offset=0.4 
+
+rp_opts = { 'n': linspace(450,30,n//6,dtype=int), 'parm': 2, 'spacing': ['erf'], 'deramp': True, 'repeat': 3 }
+
+seed = np.random.randint(100) # 6 
+np.random.seed(seed)
+f00 = 0 
+oa = pi/4 
+
+asym=0 
+S = SpiroData()
+first=True
+objects = np.unique(np.rint(W.o))
+
+cs = 'object'
+cmap='Oranges'
+
+first=True
+for i in [1,2,3,4]:
+    T = W.select(np.where(np.rint(W.o)==i))
+    n = T.n()
+    f0 = f00 
+    o = 0 
+    S.add(on_frame(T,first=f0,n=n,scale=16,pts=tpts,
+                   oangle=oa,asym=asym,
+                   orient_follow=T.n()//3,arc_angle=pi/2,fb=offset,fh=offset,
+                   polyfunc=pcoords,orient=o,rp_opts=rp_opts,object=i))
+
+first=True
+F.plot(S,color_scheme=cs,cmap=cmap,alpha=0.4,dot_size=0.1,new_fig=first,coord_dither=0)
+
+F.save_fig()
+
+###
+
+e=0.2
+R=40
+ppl=500
+
+re = 0.4
+a = circum(R,semi_minor(R,re))
+U = cIe(ring=Ellipse(R,re),wheel=Wheel(a/(2*pi)/4,a/4),inside=True,ppl=1000,loops=1)
+
+W = U.resample(U.max_path()*frame_sampling(ppl*1,parm=5,reverse=False,
+                                           spacing='erf',deramp=False,repeat=5))
+
+n=W.n()
+tn = ppl
+l = 500
+rp_opts = { 'n': linspace(l,l//20,tn,dtype=int), 'parm': 5, 'spacing': ['linear'], 'deramp': True, 'repeat': 5 }
+
+S = SpiroData()
+
+cs = 'time'
+cmap='cyans'
+
+f0=269
+subarcs_spacing=[n//9,n//6]
+S=closed_subarcs(W,subarcs_spacing,sub_angle=pi/3,invert=True,skip=1,first=f0,n=n//2,
+                 connect_times=True,line_pts=l,interp_phase=False,object=arange(n//10),rp_opts=rp_opts)
+S.t /= 500
+F.plot(S,color_scheme=cs,cmap=cmap,alpha=0.4,dot_size=0.1)
+
+F.save_fig()
+
+###
+
+e=0.2
+R=40
+ppl=500
+
+re = 0.4
+a = circum(R,semi_minor(R,re))
+U = cIe(ring=Ellipse(R,re),wheel=Wheel(a/(2*pi)/4,a/4),inside=True,ppl=1000,loops=1)
+
+W = U.resample(U.max_path()*frame_sampling(ppl*1,parm=1,reverse=False,
+                                           spacing='sinusoid',deramp=False,repeat=5))
+W.dither_coords(0)
+
+n=W.n()
+tn = ppl
+l = 600
+rp_opts = { 'n': linspace(l,30,tn//4,dtype=int), 'parm': 5, 'spacing': ['linear'], 'deramp': True, 'repeat': 5 }
+
+S = SpiroData()
+
+cs = 'time'
+cmap='pinks'
+
+f0=32 
+subarcs_spacing=[n//8,n//12,n//4]
+T=anchored_arcs(W,subarcs_spacing,arc_angle=linspace(-pi/11,-pi/3,n//10),first=f0,n=n//10,
+                connect_times=True,line_pts=l,interp_phase=False,
+                object=arange(n//10),rp_opts=rp_opts)
+T.t /= 500
+    
+nrots = 3
+for i in range(nrots):
+    S.add(T.scale(0.95).rotate(pi/4)).move(5,0).subsample((i+1)*3)
+
+F.plot(S,color_scheme=cs,cmap=cmap,alpha=0.4,dot_size=0.1)
+
+F.save_fig()
+

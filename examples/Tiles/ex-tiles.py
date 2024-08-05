@@ -131,3 +131,63 @@ F.plot(S.select(j5).rotate(pi/36), color_scheme='fwidth',cmap='gist_heat',
        alpha=0.6,dot_size=0.1,color_dither=0.3,new_fig=False)
 
 F.save_fig()
+
+###
+
+R1=20
+a = R1/(2*2*pi)
+ppl=500
+loops=1
+
+U = spiro_nstar(3,R1,0.25,Wheel(a,a),loops=loops,inside=False,fold=True)
+#U = spiro_nstar(3,R1,0.0,Wheel(a,a),loops=loops,inside=False,fold=True)
+
+W = U.resample_using( { 'n': ppl*loops, 'parm': 1, 'spacing': ['constant'], 'deramp': False, 'repeat': 5 } )
+
+l=300
+n=W.n()
+nn=n
+subarcs_spacing=[int(0.4*n),int(0.3*n)]
+f0=0
+tn=ppl*loops
+rp_opts = { 'n': l, 'parm': 1, 'spacing': ['erf'], 'deramp': True, 'repeat': 2 }
+
+T=anchored_arcs(W,subarcs_spacing,arc_angle=0, 
+                first=f0, n=nn,
+                connect_times=True,line_pts=l,interp_phase=False,
+                object=arange(nn),rp_opts=rp_opts,close_loop=False)
+T.t /= 500
+
+#X = spiro_ngon(3,R1,W0,loops=1).rotate(pi/3).scale(0.7)
+X = cIc(Ring(0.6*R1),W0,ppl=ppl).move(1,0)
+
+j = T.is_contained_in(X.coords())
+
+Q1 = T.select(j)
+Q2 = T.select(~j)
+
+F.plot(Q1,color_scheme='time',cmap='turbo',alpha=0.4,dot_size=.1,new_fig=True)
+
+Q2.scale(1.03)
+r = Q2.radii()
+rmax = max(r)
+
+P = partition_tiles(Q2,30,30,0.0,0.0)
+for PP in P:
+    if PP.n()>0:
+        dx = PP.xmid()
+        dy = PP.ymid()
+        theta = 2*pi*np.random.standard_normal()*(PP.rmid()/rmax)/8
+        PP.move(-dx,-dy).rotate(theta).move(dx,dy)
+    
+Q2 = objectify(P)
+r = Q2.radii()
+rmax = max(Q2.radii())
+r1 = 0.6*rmax
+
+dc = array([ 0 if r[j] < r1 else 3*((r[j]-r1)/(rmax-r1))**5 for j in range(Q2.n()) ])
+Q2.dither_coords(dc)
+
+F.plot(Q2,color_scheme='time',cmap='Wistia',alpha=0.4,dot_size=.1,new_fig=False)
+
+F.save_fig()

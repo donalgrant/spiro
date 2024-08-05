@@ -418,3 +418,49 @@ def auto_inorm_frame(s1,first=0,n=None,norm_off1=0,norm_off2=0,
     return frame_pair(s1,s1,first1=first,n2=n,pin_to_frame1=ptf,
                       normal_intersect=True,norm_off1=norm_off1,norm_off2=norm_off2,
                       frame_only=True,intersect_tol=intersect_tol,show_intersect=show_intersect,object=object)
+
+###
+
+def anchored_arcs(sd,offsets,arc_angle,first=0,n=0,line_pts=500,close_loop=True,
+                  interp_phase=False,object=0,connect_times=True,rp_opts=None):
+    st = SpiroData()
+    if n==0:  n = sd.n()     # number of closed paths to do
+    i1=first % sd.n()        # offset to first closed path starting point
+    j=0                      # counter for number of closed paths
+    nk = array_or_scalar_len(offsets)
+    while True:
+        i0=i1
+        tt=0
+        for k in range(nk):
+            o = array_val(offsets,k)
+            end_points=array([ sd.xy(i1), sd.xy(i1+o) ])
+            phase = linspace(sd.p[i1%sd.n()],sd.p[(i1+o)%sd.n()],line_pts) if interp_phase else sd.p[i1%sd.n()]
+
+            sst = SpiroData().load(arc_between_pts(end_points,array_val(arc_angle,k),npts=line_pts),
+                                   phase,object=array_val(object,j),segment=j*(nk+1)+k,time_offset=tt,
+                                   frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
+
+            st.add(sst.resample_using(rp_opts,k))
+            
+            i1 += o
+            if connect_times:  tt += line_pts
+
+        if close_loop:
+            end_points=array([ sd.xy(i1), sd.xy(i0) ])
+            phase = linspace(sd.p[i1%sd.n()],sd.p[i0%sd.n()],line_pts) if interp_phase else sd.p[i1%sd.n()]
+
+            sst = SpiroData().load(arc_between_pts(end_points,array_val(arc_angle,k+1),npts=line_pts),
+                                   phase,object=array_val(object,j),segment=j*(nk+1)+k+1,time_offset=tt,
+                                   frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
+
+            st.add(sst.resample_using(rp_opts,k))
+        
+            if connect_times:  tt += line_pts
+
+        j += 1
+        
+        if (n<=0) and (i0+1)>=sd.n(): break
+        i1 = (i0+1) % sd.n()
+        if (n>0)  and (j>=n): break
+    
+    return st
