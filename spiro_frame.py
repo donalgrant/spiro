@@ -5,7 +5,8 @@ import numpy as np
 from numpy import array,linspace,fmod,arange,sin,cos
 
 def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyfunc=None,  # Xcoords; X=[tped]
-             pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0,vertex_order=None,
+             pts=100,first=0,n=None,orient_follow=None,arc_angle=0,object=0,prot=0,
+             arc_scale=1.0,arc_offset=0.0,vertex_order=None,
              pin_coord=None,pin_to_frame=0.0,autoscale=True,pinned_vertex=0,
              frame_intersect=False,show_line=False,rp_opts=None):
     '''
@@ -73,7 +74,9 @@ def on_frame(sd,skip=1,scale=1.0,oangle=pi/3,fb=0.5,fh=0.5,asym=0,orient=0,polyf
         for j in range(nv):
             npts=array_val(pts,k*T.n()+j)
             st.load(arc_between_pts(array([ T.xy(j),T.xy(j+1) ]),
-                                    arc_subtended=array_val(arc_angle,k*T.n()+j),npts=npts),
+                                    arc_subtended=array_val(arc_angle,k*T.n()+j),npts=npts,
+                                    scale=array_val(arc_scale,k*T.n()+j),
+                                    arc_offset=array_val(arc_offset,k*T.n()+j)),
                     T.p[j], time_offset=tt,object=array_val(object,k),segment=j,
                     frame_x=fcoord[0],frame_y=fcoord[1])
             tt += npts
@@ -421,7 +424,7 @@ def auto_inorm_frame(s1,first=0,n=None,norm_off1=0,norm_off2=0,
 
 ###
 
-def anchored_arcs(sd,offsets,arc_angle,first=0,n=0,line_pts=500,close_loop=True,
+def anchored_arcs(sd,offsets,arc_angle,scale=1.0,arc_offset=0.0,first=0,n=0,line_pts=500,close_loop=True,
                   interp_phase=False,object=0,connect_times=True,rp_opts=None):
     st = SpiroData()
     if n==0:  n = sd.n()     # number of closed paths to do
@@ -436,7 +439,8 @@ def anchored_arcs(sd,offsets,arc_angle,first=0,n=0,line_pts=500,close_loop=True,
             end_points=array([ sd.xy(i1), sd.xy(i1+o) ])
             phase = linspace(sd.p[i1%sd.n()],sd.p[(i1+o)%sd.n()],line_pts) if interp_phase else sd.p[i1%sd.n()]
 
-            sst = SpiroData().load(arc_between_pts(end_points,array_val(arc_angle,k),npts=line_pts),
+            sst = SpiroData().load(arc_between_pts(end_points,array_val(arc_angle,k),npts=line_pts,
+                                                   scale=array_val(scale,k),arc_offset=array_val(arc_offset,k)),
                                    phase,object=array_val(object,j),segment=j*(nk+1)+k,time_offset=tt,
                                    frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
 
@@ -449,7 +453,8 @@ def anchored_arcs(sd,offsets,arc_angle,first=0,n=0,line_pts=500,close_loop=True,
             end_points=array([ sd.xy(i1), sd.xy(i0) ])
             phase = linspace(sd.p[i1%sd.n()],sd.p[i0%sd.n()],line_pts) if interp_phase else sd.p[i1%sd.n()]
 
-            sst = SpiroData().load(arc_between_pts(end_points,array_val(arc_angle,k+1),npts=line_pts),
+            sst = SpiroData().load(arc_between_pts(end_points,array_val(arc_angle,k+1),npts=line_pts,
+                                                   scale=array_val(scale,k+1),arc_offset=array_val(arc_offset,k+1)),
                                    phase,object=array_val(object,j),segment=j*(nk+1)+k+1,time_offset=tt,
                                    frame_x=sd.xy(i1)[0],frame_y=sd.xy(i1)[1])
 

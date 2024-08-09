@@ -53,15 +53,19 @@ def rotZ(xyz,theta): return rot3D(xyz,rotmat3D(array([0,0,1]),theta))
 def path_diffs(x,y): return sqrt(diff(x)**2+diff(y)**2)
 def path_length(x,y): return sqrt(diff(x)**2+diff(y)**2).cumsum()
     
-def line(end_pt,npts=20):
+def line(end_pt,npts=20,scale=1.0,offset=0.0):
 
     cc = empty((npts,2))
     
     if abs(end_pt[1,0]-end_pt[0,0]) < 1.0e-8:
         cc[:,0] = full((npts),end_pt[0,0]) # linspace(0,npts) * 0 + end_pt[0,0]
-        cc[:,1] = linspace(end_pt[0,1],end_pt[1,1],npts)
+        yrange=(end_pt[1,1]-end_pt[0,1])
+        ymid=(end_pt[0,1]+end_pt[1,1])/2.0 + offset*yrange
+        cc[:,1] = linspace(ymid-yrange*scale/2.0,ymid+yrange*scale/2.0,npts)
     else:
-        cc[:,0] = linspace(end_pt[0,0],end_pt[1,0],npts)
+        xrange=(end_pt[1,0]-end_pt[0,0])
+        xmid=(end_pt[0,0]+end_pt[1,0])/2.0 + offset*xrange
+        cc[:,0] = linspace(xmid-xrange*scale/2.0,xmid+xrange*scale/2.0,npts)
         cc[:,1] = end_pt[0,1] + (end_pt[1,1]-end_pt[0,1]) / (end_pt[1,0]-end_pt[0,0]) * (cc[:,0] - end_pt[0,0])
 
     return cc
@@ -137,14 +141,14 @@ def arc_on_center(center,radius,arc_subtended,angle_offset=0,npts=20,to_origin=0
         cc[i,1] = radius*sin(angle)
     return rot_coords(angle_offset,cc)+center
 
-def arc_between_pts(end_pt,arc_subtended,npts=20):
+def arc_between_pts(end_pt,arc_subtended,npts=20,scale=1.0,arc_offset=0.0):
     cc = empty((npts,2))
-    if arc_subtended == 0:  return line(end_pt,npts)
+    if arc_subtended == 0:  return line(end_pt,npts,scale=scale,offset=arc_offset)
     invert=True if arc_subtended<0 else False
     D=dist(end_pt)
-    return arc(end_pt,abs((D/2)/sin(arc_subtended/2)),invert=invert,npts=npts)
+    return arc(end_pt,abs((D/2)/sin(arc_subtended/2)),invert=invert,npts=npts,scale=scale,arc_offset=arc_offset)
         
-def arc(end_pt,radius,invert=False,npts=20):
+def arc(end_pt,radius,invert=False,npts=20,scale=1.0,arc_offset=0.0):
 
     cc = empty((npts,2))
 
@@ -167,7 +171,7 @@ def arc(end_pt,radius,invert=False,npts=20):
     phi = arcsin(D/(2*radius))
     
     for i in range(npts):
-        p = 2*phi*(i/(npts-1) - 0.5)
+        p = 2*phi*scale*(i/(npts-1) - 0.5 - arc_offset)
         cc[i,0] = sign*(xc - radius*cos(p))
         cc[i,1] = yc + radius*sin(p)
 

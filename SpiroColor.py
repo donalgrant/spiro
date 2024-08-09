@@ -97,7 +97,7 @@ cmap1 = cmap_from_list(["Red","Orange","hotpink"],'cmap1')
 cmap2 = cmap_from_list(["rebeccapurple","darkmagenta","orchid","pink"],'cmap2')
 cmap3 = cmap_from_list(["seagreen","teal","cornflowerblue","mediumblue","indigo"],'cmap3')
 
-clist = [ 'xkcd:'+i for i in ['dark peach','peach','light peach','pale peach'] ]
+clist = [ 'xkcd:'+i for i in ['vermillion','dark peach','peachy pink','peach','light peach','pale peach'] ]
 peaches = cmap_from_list(clist,'peaches')
 
 cyans = cmap_from_list(["xkcd:dark aqua","xkcd:dark cyan","xkcd:cyan","xkcd:light cyan","xkcd:ice"],'cyans')
